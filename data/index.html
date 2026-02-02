@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>UK Courts – Judge Assignment Explorer</title>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+  <style>
+    body { font-family: "Helvetica Neue", Arial, sans-serif; margin: 20px; color: #222; }
+    h1 { margin-bottom: 0.2em; }
+    .meta { color: #666; margin-bottom: 1em; }
+    .section { margin-top: 28px; }
+    table.dataTable tbody tr:hover { background: #f5f8ff; }
+    .pill { display:inline-block; padding:2px 6px; margin:1px; border-radius:12px; background:#eef2ff; border:1px solid #dce3ff; font-size:12px; }
+    .flex { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .card { padding:12px; border:1px solid #e3e3e3; border-radius:10px; background:#fafafa; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; }
+    code { background:#f2f2f2; padding:2px 4px; border-radius:4px; }
+  </style>
+</head>
+<body>
+  <h1>Judge Assignment Explorer</h1>
+  <div class="meta">Loads JSONs from GitHub (<code>data/cases_raw.json</code>, <code>data/test_assignments.json</code>, <code>data/judge_profiles_summary.json</code>, <code>data/test_report.json</code>) so you can view without local file access.</div>
+
+  <div class="grid">
+    <div class="card" id="metric-summary">
+      <div><strong>Overall metrics</strong></div>
+      <div id="metrics-body">Loading…</div>
+    </div>
+    <div class="card">
+      <div><strong>Data files</strong></div>
+      <ul>
+        <li>cases_raw.json</li>
+        <li>test_assignments.json</li>
+        <li>judge_profiles_summary.json</li>
+        <li>test_report.json</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Cases (test set) with recommendations</h2>
+    <table id="cases-table" class="display" style="width:100%">
+      <thead>
+        <tr>
+          <th>Case ID</th>
+          <th>Title</th>
+          <th>Judgment date</th>
+          <th>Area of law</th>
+          <th>True panel</th>
+          <th>Top1 predicted</th>
+          <th>Top1 score</th>
+          <th>Top3</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Judge profiles (training-derived)</h2>
+    <table id="judges-table" class="display" style="width:100%">
+      <thead>
+        <tr>
+          <th>Judge</th>
+          <th>Train cases</th>
+          <th>Avg turnaround (days)</th>
+          <th>Median turnaround</th>
+          <th>Avg complexity</th>
+          <th>Top areas (count)</th>
+          <th>Top keywords (count)</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script>
+    const fmtList = (arr, max=6) => {
+      if (!arr || arr.length === 0) return '';
+      const sliced = arr.slice(0, max);
+      const items = sliced.map(x => Array.isArray(x) ? `${x[0]} (${x[1]})` : x);
+      return items.join(', ') + (arr.length > max ? ' …' : '');
+    };
+
+    const BASE = 'https://raw.githubusercontent.com/adithyap/legal_uber/main/data/';
+
+    async function loadAll() {
+      const [cases, assigns, judges, report] = await Promise.all([
+        fetch(BASE + 'cases_raw.json').then(r => r.json()),
+        fetch(BASE + 'test_assignments.json').then(r => r.json()),
+        fetch(BASE + 'judge_profiles_summary.json').then(r => r.json()),
+        fetch(BASE + 'test_report.json').then(r => r.json())
+      ]);
+
+      // map case_idx -> case
+      const caseByIdx = new Map();
+      cases.forEach((c, idx) => caseByIdx.set(idx, c));
+
+      const caseRows = assigns.map(a => {
+        const c = caseByIdx.get(a.case_idx) || {};
+        const preds = a.predictions || [];
+        const top1 = preds[0] || {};
+        const top3 = preds.slice(0,3).map(p => `${p.judge} (${p.score.toFixed(3)})`).join('; ');
+        return {
+          case_id: a.case_id || '',
+          title: a.title || c.title || '',
+          judgment_date: c.judgment_date || '',
+          area: c.area_of_law || '',
+          true_panel: (a.true_panel || []).join(', '),
+          top1: top1.judge || '',
+          top1_score: top1.score != null ? top1.score.toFixed(3) : '',
+          top3
+        };
+      });
+
+      $('#cases-table').DataTable({
+        data: caseRows,
+        columns: [
+          { data: 'case_id' },
+          { data: 'title', render: $.fn.dataTable.render.text() },
+          { data: 'judgment_date' },
+          { data: 'area' },
+          { data: 'true_panel' },
+          { data: 'top1' },
+          { data: 'top1_score' },
+          { data: 'top3' }
+        ],
+        pageLength: 25,
+        order: [[2, 'desc']],
+        dom: 'lrtip'
+      });
+
+      const judgeEntries = Object.entries(judges).map(([name, info]) => ({
+        name,
+        n: info.n_train_cases,
+        avg_t: info.avg_turnaround_days != null ? info.avg_turnaround_days.toFixed(1) : '',
+        med_t: info.median_turnaround_days != null ? info.median_turnaround_days.toFixed(1) : '',
+        avg_c: info.avg_complexity != null ? info.avg_complexity.toFixed(3) : '',
+        areas: fmtList(info.top_areas_of_law || [], 5),
+        kws: fmtList(info.top_keywords || [], 6)
+      }));
+
+      $('#judges-table').DataTable({
+        data: judgeEntries,
+        columns: [
+          { data: 'name' },
+          { data: 'n' },
+          { data: 'avg_t' },
+          { data: 'med_t' },
+          { data: 'avg_c' },
+          { data: 'areas' },
+          { data: 'kws' }
+        ],
+        pageLength: 25,
+        order: [[1, 'desc']],
+        dom: 'lrtip'
+      });
+
+      const m = report.metrics || {};
+      const metricsHtml = `
+        <div><strong>Test cases with panel:</strong> ${m.n_with_panel ?? '–'} / ${m.n_total ?? '–'}</div>
+        <div><strong>Top-1 accuracy:</strong> ${(m.top1_accuracy*100).toFixed(1)}%</div>
+        <div><strong>Top-3 accuracy:</strong> ${(m.top3_accuracy*100).toFixed(1)}%</div>
+        <div><strong>MRR:</strong> ${(m.mrr ?? 0).toFixed(3)}</div>
+        <div><strong>Avg panel size:</strong> ${(m.avg_panel_size ?? 0).toFixed(2)}</div>
+        <div><strong>Avg overlap count:</strong> ${(m.avg_overlap_count ?? 0).toFixed(2)}</div>
+      `;
+      document.getElementById('metrics-body').innerHTML = metricsHtml;
+    }
+
+    loadAll().catch(err => {
+      console.error(err);
+      document.getElementById('metrics-body').textContent = 'Failed to load JSON files. Ensure this HTML sits beside the JSON outputs.';
+    });
+  </script>
+</body>
+</html>
