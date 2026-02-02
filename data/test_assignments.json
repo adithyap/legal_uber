@@ -1,0 +1,4402 @@
+[
+  {
+    "case_idx": 10,
+    "case_id": "[2022] EWHC 2353 (KB)",
+    "title": "Debbie Deb-Nath v Ajit K Das [2022] EWHC 2353 (KB) (23 May 2022)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE LAVENDER"
+    ],
+    "predictions": [
+      {
+        "judge": "DEXTER DIAS KC",
+        "score": 0.6801923882961273
+      },
+      {
+        "judge": "MRS JUSTICE HILL",
+        "score": 0.6789400633552979
+      },
+      {
+        "judge": "THE HON. MR JUSTICE CHAMBERLAIN",
+        "score": 0.6768191702663898
+      }
+    ]
+  },
+  {
+    "case_idx": 23,
+    "case_id": "[2022] EWHC 2508 (KB)",
+    "title": "Hayes v Pack & Ors [2022] EWHC 2508 (KB) (10 October 2022)",
+    "true_panel": [
+      "MR JUSTICE JOHNSON"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE PEPPERALL",
+        "score": 0.6740347780964591
+      },
+      {
+        "judge": "MRS JUSTICE HILL",
+        "score": 0.6687158178666542
+      },
+      {
+        "judge": "Deputy Master Skinner KC",
+        "score": 0.6582231894135474
+      }
+    ]
+  },
+  {
+    "case_idx": 25,
+    "case_id": "[2022] EWHC 2537 (KB)",
+    "title": "North Warwickshire Borough Council v Shatford & Ors [2022] EWHC 2537 (KB) (21 September 2022)",
+    "true_panel": [
+      "HER HONOUR JUDGE EMMA KELLY"
+    ],
+    "predictions": [
+      {
+        "judge": "HER HONOUR JUDGE EMMA KELLY",
+        "score": 0.7469143234193324
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE COTTER",
+        "score": 0.7457641586661339
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MORRIS",
+        "score": 0.71384829133749
+      }
+    ]
+  },
+  {
+    "case_idx": 30,
+    "case_id": "[2022] EWHC 2557 (KB)",
+    "title": "Harrison v TUI UK Ltd [2022] EWHC 2557 (KB) (11 October 2022)",
+    "true_panel": [
+      "MR JUSTICE FORDHAM"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MARTIN SPENCER",
+        "score": 0.6784396972258885
+      },
+      {
+        "judge": "MR DEXTER DIAS KC",
+        "score": 0.6752265021204948
+      },
+      {
+        "judge": "MRS JUSTICE HILL",
+        "score": 0.6740157198289345
+      }
+    ]
+  },
+  {
+    "case_idx": 39,
+    "case_id": "[2022] EWHC 2626 (KB)",
+    "title": "HS2 (High Speed Two Ltd & Anor v Elliott Cuciurean (D33) & Ors [2022] EWHC 2626 (KB) (15 September 2022)",
+    "true_panel": [
+      "MR JUSTICE RITCHIE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE NICKLIN",
+        "score": 0.7033173374831676
+      },
+      {
+        "judge": "MR JUSTICE JULIAN KNOWLES",
+        "score": 0.7012835773198228
+      },
+      {
+        "judge": "MR JUSTICE LINDEN",
+        "score": 0.6950253153076539
+      }
+    ]
+  },
+  {
+    "case_idx": 44,
+    "case_id": "[2022] EWHC 2686 (KB)",
+    "title": "Bae Systems Marine Ltd v Alfa Laval Ltd [2022] EWHC 2686 (KB) (25 October 2022)",
+    "true_panel": [
+      "HHJ Lickley KC Sitting as a Judge of the High Court"
+    ],
+    "predictions": [
+      {
+        "judge": "ANDREW KINNIER K.C.",
+        "score": 0.6612343043088912
+      },
+      {
+        "judge": "JEREMY HYAM KC",
+        "score": 0.6558330208063126
+      },
+      {
+        "judge": "HIS HONOUR JUDGE SIMON",
+        "score": 0.606934556365013
+      }
+    ]
+  },
+  {
+    "case_idx": 54,
+    "case_id": "[2022] EWHC 2821 (KB)",
+    "title": "Bailey v Bijlani & Anor [2022] EWHC 2821 (KB) (11 November 2022)",
+    "true_panel": [
+      "MASTER STEVENS"
+    ],
+    "predictions": [
+      {
+        "judge": "MASTER SULLIVAN",
+        "score": 0.7279588152964909
+      },
+      {
+        "judge": "MASTER STEVENS",
+        "score": 0.7268483685329555
+      },
+      {
+        "judge": "MASTER THORNETT",
+        "score": 0.7223805364635255
+      }
+    ]
+  },
+  {
+    "case_idx": 55,
+    "case_id": "[2022] EWHC 2824 (KB)",
+    "title": "Correia v Williams [2022] EWHC 2824 (KB) (11 September 2022)",
+    "true_panel": [
+      "MR JUSTICE GARNHAM"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.7189057566549467
+      },
+      {
+        "judge": "MRS JUSTICE HILL DBE",
+        "score": 0.7147421847690234
+      },
+      {
+        "judge": "MR DEXTER DIAS KC",
+        "score": 0.7137153193354606
+      }
+    ]
+  },
+  {
+    "case_idx": 59,
+    "case_id": "[2022] EWHC 2902 (KB)",
+    "title": "QRT v JBE [2022] EWHC 2902 (KB) (20 October 2022)",
+    "true_panel": [
+      "MR JUSTICE NICKLIN"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE LINDEN",
+        "score": 0.707228180192984
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MURRAY",
+        "score": 0.7071118064902044
+      },
+      {
+        "judge": "MR JUSTICE CAVANAGH",
+        "score": 0.6910325273871422
+      }
+    ]
+  },
+  {
+    "case_idx": 60,
+    "case_id": "[2022] EWHC 2925 (KB)",
+    "title": "His Majesty's Attorney General for England and Wales v British Broadcasting Corporation (Costs) [2022] EWHC 2925 (KB) (18 November 2022)",
+    "true_panel": [
+      "MR JUSTICE CHAMBERLAIN"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE CHAMBERLAIN",
+        "score": 0.6886034179064963
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE PEPPERALL",
+        "score": 0.6725807748057626
+      },
+      {
+        "judge": "MASTER DAVISON",
+        "score": 0.6693402749300003
+      }
+    ]
+  },
+  {
+    "case_idx": 63,
+    "case_id": "[2022] EWHC 2952 (KB)",
+    "title": "Kerseviciene v Quadri & Anor [2022] EWHC 2952 (KB) (21 November 2022)",
+    "true_panel": [
+      "MR JUSTICE FREEDMAN"
+    ],
+    "predictions": [
+      {
+        "judge": "DEPUTY MASTER GRIMSHAW",
+        "score": 0.7014537751674652
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE DOVE",
+        "score": 0.6963828675448894
+      },
+      {
+        "judge": "MR JUSTICE SAINI",
+        "score": 0.6959569782018661
+      }
+    ]
+  },
+  {
+    "case_idx": 66,
+    "case_id": "[2022] EWHC 2999 (KB)",
+    "title": "Singh v Grief To Grace & Ors [2022] EWHC 2999 (KB) (01 December 2022)",
+    "true_panel": [
+      "MASTER DAVID COOK"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE NICKLIN",
+        "score": 0.7214983291923999
+      },
+      {
+        "judge": "MRS JUSTICE HILL DBE",
+        "score": 0.7192689012397419
+      },
+      {
+        "judge": "Deputy Master Skinner KC",
+        "score": 0.7174052789807319
+      }
+    ]
+  },
+  {
+    "case_idx": 67,
+    "case_id": "[2022] EWHC 3003 (KB)",
+    "title": "Carr v G4S Care and Justice Services (UK) Ltd [2022] EWHC 3003 (KB) (25 November 2022)",
+    "true_panel": [
+      "MRS JUSTICE HILL DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE RITCHIE",
+        "score": 0.6709909292886841
+      },
+      {
+        "judge": "MRS JUSTICE ELLENBOGEN",
+        "score": 0.6631573547919591
+      },
+      {
+        "judge": "MR JUSTICE JULIAN KNOWLES",
+        "score": 0.6589944871632676
+      }
+    ]
+  },
+  {
+    "case_idx": 70,
+    "case_id": "[2022] EWHC 3011 (KB)",
+    "title": "Smith v Backhouse [2022] EWHC 3011 (KB) (08 November 2022)",
+    "true_panel": [
+      "THE HONOURABLE MR. JUSTICE NICKLIN"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE KERR",
+        "score": 0.6719784059203587
+      },
+      {
+        "judge": "MR JUSTICE SOOLE",
+        "score": 0.6690726576372981
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE HILL DBE",
+        "score": 0.6682385578751564
+      }
+    ]
+  },
+  {
+    "case_idx": 72,
+    "case_id": "[2022] EWHC 3036 (KB)",
+    "title": "Cuthbert v Taylor Woodrow Construction Holdings [2022] EWHC 3036 (KB) (30 November 2022)",
+    "true_panel": [
+      "HIS HONOUR JUDGE FREEDMAN"
+    ],
+    "predictions": [
+      {
+        "judge": "ANDREW KINNIER K.C.",
+        "score": 0.7606933236122131
+      },
+      {
+        "judge": "HIS HONOUR JUDGE SIMON",
+        "score": 0.7202902972698212
+      },
+      {
+        "judge": "JEREMY HYAM KC",
+        "score": 0.6672115743160247
+      }
+    ]
+  },
+  {
+    "case_idx": 76,
+    "case_id": "[2022] EWHC 3096 (KB)",
+    "title": "Horlick & Ors v Cavaco & Ors (Costs) [2022] EWHC 3096 (KB) (02 December 2022)",
+    "true_panel": [
+      "MR JUSTICE FREEDMAN"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MARTIN SPENCER",
+        "score": 0.7109362747271855
+      },
+      {
+        "judge": "HHJ GRAHAM WOOD KC",
+        "score": 0.7100696086883544
+      },
+      {
+        "judge": "MASTER STEVENS",
+        "score": 0.7097176415845752
+      }
+    ]
+  },
+  {
+    "case_idx": 78,
+    "case_id": "[2022] EWHC 3125 (KB)",
+    "title": "Moradi v The Home Office (Costs) [2022] EWHC 3125 (KB) (05 December 2022)",
+    "true_panel": [
+      "HIS HONOUR JUDGE TINDAL"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE BOURNE",
+        "score": 0.7244282215833664
+      },
+      {
+        "judge": "MASTER STEVENS",
+        "score": 0.7050456030294299
+      },
+      {
+        "judge": "DEPUTY MASTER GRIMSHAW",
+        "score": 0.7046178102493286
+      }
+    ]
+  },
+  {
+    "case_idx": 86,
+    "case_id": "[2022] EWHC 3199 (KB)",
+    "title": "Menzies v Oakwood Solicitors Ltd [2022] EWHC 3199 (KB) (14 December 2022)",
+    "true_panel": [
+      "THE HON. MR JUSTICE BOURNE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE BOURNE",
+        "score": 0.7017659813165664
+      },
+      {
+        "judge": "MASTER STEVENS",
+        "score": 0.6958150906488298
+      },
+      {
+        "judge": "HHJ GRAHAM WOOD KC",
+        "score": 0.687354165315628
+      }
+    ]
+  },
+  {
+    "case_idx": 88,
+    "case_id": "[2022] EWHC 3244 (KB)",
+    "title": "Pathan v Commissioner of Police of the Metropolis [2022] EWHC 3244 (KB) (16 December 2022)",
+    "true_panel": [
+      "THE HON. MR JUSTICE BOURNE"
+    ],
+    "predictions": [
+      {
+        "judge": "MRS JUSTICE HILL",
+        "score": 0.7027046989777992
+      },
+      {
+        "judge": "MASTER STEVENS",
+        "score": 0.6942039174959063
+      },
+      {
+        "judge": "MASTER THORNETT",
+        "score": 0.6873560700151655
+      }
+    ]
+  },
+  {
+    "case_idx": 96,
+    "case_id": "[2022] EWHC 3341 (KB)",
+    "title": "Ayeh-Kumi v Lord Chancellor & Anor [2022] EWHC 3341 (KB) (21 December 2022)",
+    "true_panel": [
+      "MR JUSTICE LINDEN"
+    ],
+    "predictions": [
+      {
+        "judge": "MASTER DAGNALL",
+        "score": 0.6907919939756393
+      },
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.689321932974069
+      },
+      {
+        "judge": "MRS JUSTICE ELLENBOGEN",
+        "score": 0.6888691415389379
+      }
+    ]
+  },
+  {
+    "case_idx": 101,
+    "case_id": "[2022] EWHC 3458 (KB)",
+    "title": "HM Solicitor General v Paczkowska (Rev2) [2022] EWHC 3458 (KB) (04 November 2022)",
+    "true_panel": [
+      "MR JUSTICE CHAMBERLAIN"
+    ],
+    "predictions": [
+      {
+        "judge": "MRS JUSTICE COLLINS RICE",
+        "score": 0.6769556919733682
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE PEPPERALL",
+        "score": 0.6700209162452004
+      },
+      {
+        "judge": "HIS HONOUR JUDGE STEPHEN DAVIES",
+        "score": 0.661538490653038
+      }
+    ]
+  },
+  {
+    "case_idx": 107,
+    "case_id": "[2022] EWHC 3697 (KB)",
+    "title": "Property Services LDN Ltd v Laverstock Management Corporation Ltd [2022] EWHC 3697 (KB) (23 June 2022)",
+    "true_panel": [
+      "MR JUSTICE MARTIN SPENCER"
+    ],
+    "predictions": [
+      {
+        "judge": "FORDHAM J",
+        "score": 0.7246133839711547
+      },
+      {
+        "judge": "MASTER YOXALL",
+        "score": 0.6928849957883357
+      },
+      {
+        "judge": "MR JUSTICE KERR",
+        "score": 0.6891416915334188
+      }
+    ]
+  },
+  {
+    "case_idx": 110,
+    "case_id": "[2023] EWHC 1030 (KB)",
+    "title": "Wright v McCormack [2023] EWHC 1030 (KB) (05 April 2023)",
+    "true_panel": [
+      "LORD JUSTICE WARBY"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE PEPPERALL",
+        "score": 0.6766612134196541
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE LINDEN",
+        "score": 0.6643576815724372
+      },
+      {
+        "judge": "MRS JUSTICE COLLINS RICE",
+        "score": 0.6605553646882374
+      }
+    ]
+  },
+  {
+    "case_idx": 120,
+    "case_id": "[2023] EWHC 1080 (KB)",
+    "title": "J & J Franks Ltd v Shotter & Anor [2023] EWHC 1080 (KB) (11 May 2023)",
+    "true_panel": [
+      "CLARE PADLEY"
+    ],
+    "predictions": [
+      {
+        "judge": "HER HONOUR JUDGE MELISSA CLARKE",
+        "score": 0.6194338992238044
+      },
+      {
+        "judge": "HHJ Howells",
+        "score": 0.6187988579273224
+      },
+      {
+        "judge": "HIS HONOUR JUDGE TINDAL",
+        "score": 0.6005782619118691
+      }
+    ]
+  },
+  {
+    "case_idx": 136,
+    "case_id": "[2023] EWHC 1199 (KB)",
+    "title": "Callaghan v South Tees Hospitals NHS Foundation Trust [2023] EWHC 1199 (KB) (19 May 2023)",
+    "true_panel": [
+      "MRS JUSTICE ELLENBOGEN"
+    ],
+    "predictions": [
+      {
+        "judge": "HER HONOUR JUDGE MELISSA CLARKE",
+        "score": 0.6031656965613366
+      },
+      {
+        "judge": "HHJ Sephton KC, sitting as a Judge of the High Court",
+        "score": 0.5982696771621704
+      },
+      {
+        "judge": "HHJ Howells",
+        "score": 0.5947378039360046
+      }
+    ]
+  },
+  {
+    "case_idx": 137,
+    "case_id": "[2023] EWHC 120 (KB)",
+    "title": "Shah v Imran & Ors [2023] EWHC 120 (KB) (26 January 2023)",
+    "true_panel": [
+      "THE HON. MRS JUSTICE STEYN DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE COLLINS RICE",
+        "score": 0.6521615909205543
+      },
+      {
+        "judge": "THE HON. MRS JUSTICE STEYN DBE",
+        "score": 0.6420700734311884
+      },
+      {
+        "judge": "RICHARD SPEARMAN Q.C.",
+        "score": 0.6368440508842468
+      }
+    ]
+  },
+  {
+    "case_idx": 139,
+    "case_id": "[2023] EWHC 1219 (KB)",
+    "title": "Ness v Carillion Capital Projects Ltd & Ors [2023] EWHC 1219 (KB) (23 May 2023)",
+    "true_panel": [
+      "HHJ LICKLEY KC SITTING AS A"
+    ],
+    "predictions": [
+      {
+        "judge": "ANDREW KINNIER K.C.",
+        "score": 0.7486831545829773
+      },
+      {
+        "judge": "HIS HONOUR JUDGE SIMON",
+        "score": 0.7214762330055237
+      },
+      {
+        "judge": "JEREMY HYAM KC",
+        "score": 0.680040270090103
+      }
+    ]
+  },
+  {
+    "case_idx": 158,
+    "case_id": "[2023] EWHC 1358 (KB)",
+    "title": "Brem v Clark & Anor [2023] EWHC 1358 (KB) (16 June 2023)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE MARTIN SPENCER"
+    ],
+    "predictions": [
+      {
+        "judge": "MASTER THORNETT",
+        "score": 0.7472478803661134
+      },
+      {
+        "judge": "MR JUSTICE COTTER",
+        "score": 0.7463584861159325
+      },
+      {
+        "judge": "MR JUSTICE SOOLE",
+        "score": 0.7450669648125767
+      }
+    ]
+  },
+  {
+    "case_idx": 168,
+    "case_id": "[2023] EWHC 1442 (KB)",
+    "title": "Akram v Academy Doors And Windows Ltd & Anor [2023] EWHC 1442 (KB) (24 May 2023)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE BOURNE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE SWEETING",
+        "score": 0.7219807392358779
+      },
+      {
+        "judge": "MRS JUSTICE FOSTER",
+        "score": 0.7196401000022887
+      },
+      {
+        "judge": "MR JUSTICE COTTER",
+        "score": 0.7177616289258003
+      }
+    ]
+  },
+  {
+    "case_idx": 174,
+    "case_id": "[2023] EWHC 1479 (KB)",
+    "title": "Dean & Ors v Mitchell & Anor [2023] EWHC 1479 (KB) (15 June 2023)",
+    "true_panel": [
+      "HUGH MERCER KC"
+    ],
+    "predictions": [
+      {
+        "judge": "Mr James Healy-Pratt",
+        "score": 0.6648874282836914
+      },
+      {
+        "judge": "CHARLES BAGOT KC, sitting as a Deputy High Court Judge",
+        "score": 0.6640709340572357
+      },
+      {
+        "judge": "KAREN RIDGE SITTING AS A DEPUTY HIGH COURT JUDGE",
+        "score": 0.6524284921586513
+      }
+    ]
+  },
+  {
+    "case_idx": 184,
+    "case_id": "[2023] EWHC 1582 (KB)",
+    "title": "Alger v Commissioner of Police of the Metropolis [2023] EWHC 1582 (KB) (28 June 2023)",
+    "true_panel": [
+      "MR JUSTICE COTTER"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE LAMBERT DBE",
+        "score": 0.6938802540302276
+      },
+      {
+        "judge": "MR JUSTICE SHELDON",
+        "score": 0.6877255449692408
+      },
+      {
+        "judge": "MRS JUSTICE HILL",
+        "score": 0.6611741889139701
+      }
+    ]
+  },
+  {
+    "case_idx": 198,
+    "case_id": "[2023] EWHC 1672 (KB)",
+    "title": "Colbert v Royal United Hospitals Bath NHS Foundation Trust [2023] EWHC 1672 (KB) (04 July 2023)",
+    "true_panel": [
+      "Dan Squires KC"
+    ],
+    "predictions": [
+      {
+        "judge": "MRS JUSTICE HILL",
+        "score": 0.6942498255392601
+      },
+      {
+        "judge": "MR JUSTICE RITCHIE",
+        "score": 0.693033566789807
+      },
+      {
+        "judge": "MR JUSTICE COTTER",
+        "score": 0.6924565085768699
+      }
+    ]
+  },
+  {
+    "case_idx": 199,
+    "case_id": "[2023] EWHC 17 (KB)",
+    "title": "Bitar v Banque Libano-Francaise SAL [2023] EWHC 17 (KB) (16 January 2023)",
+    "true_panel": [
+      "MR JUSTICE KERR"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE MOULD",
+        "score": 0.5866856664419173
+      },
+      {
+        "judge": "His Honour Judge Pearce",
+        "score": 0.5713621139526367
+      },
+      {
+        "judge": "MRS JUSTICE MAY DBE",
+        "score": 0.5656735315918923
+      }
+    ]
+  },
+  {
+    "case_idx": 208,
+    "case_id": "[2023] EWHC 1759 (KB)",
+    "title": "DAH v Kenny [2023] EWHC 1759 (KB) (10 July 2023)",
+    "true_panel": [
+      "HIS HONOUR JUDGE SHETTY"
+    ],
+    "predictions": [
+      {
+        "judge": "HHJ RAJEEV SHETTY",
+        "score": 0.7234657235443592
+      },
+      {
+        "judge": "DEXTER DIAS KC",
+        "score": 0.7010141071677207
+      },
+      {
+        "judge": "DEPUTY HIGH COURT JUDGE DEXTER DIAS KC",
+        "score": 0.6993587218225001
+      }
+    ]
+  },
+  {
+    "case_idx": 209,
+    "case_id": "[2023] EWHC 1760 (KB)",
+    "title": "QXB v University Hospitals Plymouth NHS Trust [2023] EWHC 1760 (KB) (11 July 2023)",
+    "true_panel": [
+      "HHJ RAJEEV SHETTY"
+    ],
+    "predictions": [
+      {
+        "judge": "HHJ RAJEEV SHETTY",
+        "score": 0.764433254301548
+      },
+      {
+        "judge": "DEXTER DIAS KC",
+        "score": 0.714346446543932
+      },
+      {
+        "judge": "Elizabeth O'Neill",
+        "score": 0.7117848247289658
+      }
+    ]
+  },
+  {
+    "case_idx": 210,
+    "case_id": "[2023] EWHC 1761 (KB)",
+    "title": "Armstrong Watson LLP v Persons Unknown [2023] EWHC 1761 (KB) (11 July 2023)",
+    "true_panel": [
+      "THE HONOURABLE MRS JUSTICE COLLINS RICE"
+    ],
+    "predictions": [
+      {
+        "judge": "Deputy Master Skinner KC",
+        "score": 0.7315126225352286
+      },
+      {
+        "judge": "MR JUSTICE LINDEN",
+        "score": 0.726993522621118
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MURRAY",
+        "score": 0.7221678189255973
+      }
+    ]
+  },
+  {
+    "case_idx": 213,
+    "case_id": "[2023] EWHC 1808 (KB)",
+    "title": "Chishti v Spottiswoode & Ors [2023] EWHC 1808 (KB) (17 July 2023)",
+    "true_panel": [
+      "THE HONOURABLE MRS JUSTICE COLLINS RICE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HON. MRS JUSTICE STEYN DBE",
+        "score": 0.6512489015405828
+      },
+      {
+        "judge": "RICHARD SPEARMAN K.C",
+        "score": 0.649898487329483
+      },
+      {
+        "judge": "His Honour Judge Lewis",
+        "score": 0.6442406343089209
+      }
+    ]
+  },
+  {
+    "case_idx": 215,
+    "case_id": "[2023] EWHC 1813 (KB)",
+    "title": "McGee v Lewis [2023] EWHC 1813 (KB) (17 July 2023)",
+    "true_panel": [
+      "THE HONOURABLE MRS JUSTICE COLLINS RICE"
+    ],
+    "predictions": [
+      {
+        "judge": "Deputy Master Skinner KC",
+        "score": 0.7222186043858527
+      },
+      {
+        "judge": "MRS JUSTICE HILL DBE",
+        "score": 0.7174706767905842
+      },
+      {
+        "judge": "MR JUSTICE LINDEN",
+        "score": 0.7157949471702942
+      }
+    ]
+  },
+  {
+    "case_idx": 218,
+    "case_id": "[2023] EWHC 1825 (KB)",
+    "title": "Davidoff & Ors v Hargrave [2023] EWHC 1825 (KB) (21 July 2023)",
+    "true_panel": [
+      "THE HONOURABLE MRS JUSTICE HEATHER WILLIAMS DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "HIS HONOUR JUDGE LEWIS",
+        "score": 0.734872156381607
+      },
+      {
+        "judge": "His Honour Judge Lewis",
+        "score": 0.7305295897854699
+      },
+      {
+        "judge": "THE HON. MRS JUSTICE STEYN DBE",
+        "score": 0.7183701282197779
+      }
+    ]
+  },
+  {
+    "case_idx": 221,
+    "case_id": "[2023] EWHC 1860 (KB)",
+    "title": "Verdi Law Group PC v BNP Paribas SA & Ors [2023] EWHC 1860 (KB) (18 July 2023)",
+    "true_panel": [
+      "Mr Justice Picken"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE GRIFFITHS",
+        "score": 0.6601654248578207
+      },
+      {
+        "judge": "The Honourable Mr Justice Dexter Dias",
+        "score": 0.659761655330658
+      },
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.6575668491747068
+      }
+    ]
+  },
+  {
+    "case_idx": 235,
+    "case_id": "[2023] EWHC 1920 (KB)",
+    "title": "Makin v Ministry of Justice (Rev1) [2023] EWHC 1920 (KB) (26 July 2023)",
+    "true_panel": [
+      "MRS JUSTICE MAY DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE CAVANAGH",
+        "score": 0.7297123953700065
+      },
+      {
+        "judge": "MR JUSTICE CHAMBERLAIN",
+        "score": 0.7286238473322657
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MURRAY",
+        "score": 0.7188158951022408
+      }
+    ]
+  },
+  {
+    "case_idx": 237,
+    "case_id": "[2023] EWHC 1940 (KB)",
+    "title": "Adams v Associated Newspapers Ltd [2023] EWHC 1940 (KB) (27 July 2023)",
+    "true_panel": [
+      "THE HONOURABLE MRS JUSTICE TIPPLES DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "Deputy High Court Judge Susie Alegre",
+        "score": 0.6487682431936264
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE COLLINS RICE",
+        "score": 0.5995088623629675
+      },
+      {
+        "judge": "THE HON. MRS JUSTICE STEYN DBE",
+        "score": 0.5973691051656549
+      }
+    ]
+  },
+  {
+    "case_idx": 244,
+    "case_id": "[2023] EWHC 1984 (KB)",
+    "title": "Pantheon International Advisors Ltd v Co-Diagnostics, Inc [2023] EWHC 1984 (KB) (28 July 2023)",
+    "true_panel": [
+      "MASTER STEVENS"
+    ],
+    "predictions": [
+      {
+        "judge": "MASTER DAGNALL",
+        "score": 0.7163033906221389
+      },
+      {
+        "judge": "HHJ RICHARD ROBERTS,",
+        "score": 0.692331039905548
+      },
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.6876855470564054
+      }
+    ]
+  },
+  {
+    "case_idx": 247,
+    "case_id": "[2023] EWHC 2004 (KB)",
+    "title": "QBE UK Ltd v Hilton [2023] EWHC 2004 (KB) (31 July 2023)",
+    "true_panel": [
+      "MR JUSTICE CONSTABLE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE PEPPERALL",
+        "score": 0.7259838350794532
+      },
+      {
+        "judge": "MRS JUSTICE HILL",
+        "score": 0.7230822365859458
+      },
+      {
+        "judge": "MR JUSTICE SHELDON",
+        "score": 0.7208462317784626
+      }
+    ]
+  },
+  {
+    "case_idx": 254,
+    "case_id": "[2023] EWHC 2036 (KB)",
+    "title": "Aspinall's Club Ltd v Hui [2023] EWHC 2036 (KB) (04 August 2023)",
+    "true_panel": [
+      "MR JUSTICE COTTER"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE JAY",
+        "score": 0.6013116069138049
+      },
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.5907377459432768
+      },
+      {
+        "judge": "MR JUSTICE COTTER",
+        "score": 0.5894473859667777
+      }
+    ]
+  },
+  {
+    "case_idx": 256,
+    "case_id": "[2023] EWHC 2047 (KB)",
+    "title": "Fernie v Burton Waters Management Ltd & Anor [2023] EWHC 2047 (KB) (13 June 2023)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE MARTIN SPENCER"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE SWEETING",
+        "score": 0.6991016203165054
+      },
+      {
+        "judge": "MASTER THORNETT",
+        "score": 0.68735887143347
+      },
+      {
+        "judge": "MR JUSTICE SAINI",
+        "score": 0.6864843577146529
+      }
+    ]
+  },
+  {
+    "case_idx": 259,
+    "case_id": "[2023] EWHC 2077 (KB)",
+    "title": "Denzil v Mohammed & Anor [2023] EWHC 2077 (KB) (10 August 2023)",
+    "true_panel": [
+      "MR JUSTICE FREEDMAN"
+    ],
+    "predictions": [
+      {
+        "judge": "SARAH CROWTHER KC",
+        "score": 0.7043882012367249
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MARTIN SPENCER",
+        "score": 0.6892677519718805
+      },
+      {
+        "judge": "MR JUSTICE ANDREW BAKER",
+        "score": 0.6856794291734696
+      }
+    ]
+  },
+  {
+    "case_idx": 260,
+    "case_id": "[2023] EWHC 21 (KB)",
+    "title": "Robinson v Liverpool University Hospitals NHS Trust [2023] EWHC 21 (KB) (11 January 2023)",
+    "true_panel": [
+      "MR JUSTICE SWEETING"
+    ],
+    "predictions": [
+      {
+        "judge": "NEIL MOODY KC",
+        "score": 0.6779612749814987
+      },
+      {
+        "judge": "MR DEXTER DIAS KC",
+        "score": 0.6657801046967506
+      },
+      {
+        "judge": "MR JONATHAN GLASSON KC SITTING AS A DEPUTY HIGH COURT JUDGE",
+        "score": 0.6637904241681098
+      }
+    ]
+  },
+  {
+    "case_idx": 261,
+    "case_id": "[2023] EWHC 2106 (KB)",
+    "title": "Del Curto v Del Curto & Anor [2023] EWHC 2106 (KB) (18 August 2023)",
+    "true_panel": [
+      "MASTER COOK"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.6485948600198911
+      },
+      {
+        "judge": "MASTER DAGNALL",
+        "score": 0.6394671019315719
+      },
+      {
+        "judge": "Master Dagnall",
+        "score": 0.6239994809031486
+      }
+    ]
+  },
+  {
+    "case_idx": 265,
+    "case_id": "[2023] EWHC 2159 (KB)",
+    "title": "Ali v HSF Logistics Polska SP ZOO [2023] EWHC 2159 (KB) (29 August 2023)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE MARTIN SPENCER"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE ANDREW BAKER",
+        "score": 0.6687359237670898
+      },
+      {
+        "judge": "Simon Tinkler",
+        "score": 0.659771879017353
+      },
+      {
+        "judge": "Master Thornett",
+        "score": 0.6577891379594802
+      }
+    ]
+  },
+  {
+    "case_idx": 275,
+    "case_id": "[2023] EWHC 2332 (KB)",
+    "title": "Director of Public Prosecutions v Plepys & Anor [2023] EWHC 2332 (KB) (20 June 2023)",
+    "true_panel": [
+      "MASTER DAGNALL"
+    ],
+    "predictions": [
+      {
+        "judge": "MASTER YOXALL",
+        "score": 0.6425885193049907
+      },
+      {
+        "judge": "His Honour Judge Bird",
+        "score": 0.641521880030632
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE STEYN DBE",
+        "score": 0.6380759105086325
+      }
+    ]
+  },
+  {
+    "case_idx": 277,
+    "case_id": "[2023] EWHC 2355 (KB)",
+    "title": "BBG v Persons Unknown [2023] EWHC 2355 (KB) (22 September 2023)",
+    "true_panel": [
+      "MRS JUSTICE HILL DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "Mrs Justice Stacey",
+        "score": 0.7259395748376846
+      },
+      {
+        "judge": "Mr Justice Ritchie:",
+        "score": 0.7185167282819748
+      },
+      {
+        "judge": "MR JUSTICE CHAMBERLAIN",
+        "score": 0.713414456281397
+      }
+    ]
+  },
+  {
+    "case_idx": 280,
+    "case_id": "[2023] EWHC 2371 (KB)",
+    "title": "London Borough of Barking And Dagenham v Gbadegesin & Anor [2023] EWHC 2371 (KB) (26 September 2023)",
+    "true_panel": [
+      "MRS JUSTICE HILL DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "HIS HONOUR JUDGE AUERBACH",
+        "score": 0.7239535169468985
+      },
+      {
+        "judge": "MR JUSTICE SHELDON",
+        "score": 0.7238374392191569
+      },
+      {
+        "judge": "MR JUSTICE SOOLE",
+        "score": 0.7152889790013431
+      }
+    ]
+  },
+  {
+    "case_idx": 281,
+    "case_id": "[2023] EWHC 2375 (KB)",
+    "title": "Morgan-Rowe v Woodgate [2023] EWHC 2375 (KB) (27 September 2023)",
+    "true_panel": [
+      "MR JUSTICE JULIAN KNOWLES"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE COTTER",
+        "score": 0.7254759380221366
+      },
+      {
+        "judge": "MR JUSTICE ANDREW BAKER",
+        "score": 0.7206108516454696
+      },
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.718993256273477
+      }
+    ]
+  },
+  {
+    "case_idx": 289,
+    "case_id": "[2023] EWHC 2467 (KB)",
+    "title": "Giaquinto & Ors v ITI Capital Ltd [2023] EWHC 2467 (KB) (13 October 2023)",
+    "true_panel": [
+      "MASTER STEVENS"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE CONSTABLE",
+        "score": 0.7256219641305506
+      },
+      {
+        "judge": "MASTER DAGNALL",
+        "score": 0.7191090222597122
+      },
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.7174638904955075
+      }
+    ]
+  },
+  {
+    "case_idx": 292,
+    "case_id": "[2023] EWHC 2480 (KB)",
+    "title": "The Society of Lloyd's v Noel [2023] EWHC 2480 (KB) (03 October 2023)",
+    "true_panel": [
+      "MR JUSTICE GARNHAM"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE SOOLE",
+        "score": 0.6494076011702419
+      },
+      {
+        "judge": "MR JUSTICE LINDEN",
+        "score": 0.6475107496747603
+      },
+      {
+        "judge": "MRS JUSTICE COLLINS RICE",
+        "score": 0.6449700425068537
+      }
+    ]
+  },
+  {
+    "case_idx": 294,
+    "case_id": "[2023] EWHC 2501 (KB)",
+    "title": "Zgonec-Rozej & Ors v Pereira & Ors [2023] EWHC 2501 (KB) (10 October 2023)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE BOURNE"
+    ],
+    "predictions": [
+      {
+        "judge": "HER HONOUR JUDGE MELISSA CLARKE",
+        "score": 0.6542973056435585
+      },
+      {
+        "judge": "HIS HONOUR JUDGE TINDAL",
+        "score": 0.6206161454319954
+      },
+      {
+        "judge": "DEXTER DIAS KC",
+        "score": 0.6171084079146385
+      }
+    ]
+  },
+  {
+    "case_idx": 296,
+    "case_id": "[2023] EWHC 2539 (KB)",
+    "title": "Glaser & Anor v Atay [2023] EWHC 2539 (KB) (12 October 2023)",
+    "true_panel": [
+      "THE HON. MR JUSTICE TURNER"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE CONSTABLE",
+        "score": 0.7152482644654811
+      },
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.7128535769555879
+      },
+      {
+        "judge": "MR JUSTICE CHOUDHURY",
+        "score": 0.701297503709793
+      }
+    ]
+  },
+  {
+    "case_idx": 298,
+    "case_id": "[2023] EWHC 2542 (KB)",
+    "title": "Bennett v Secretary of State for the Environment Food and Rural Affairs [2023] EWHC 2542 (KB) (12 October 2023)",
+    "true_panel": [
+      "MR JUSTICE JAY"
+    ],
+    "predictions": [
+      {
+        "judge": "HUGH MERCER KC",
+        "score": 0.6798410475254059
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE DIAS",
+        "score": 0.6794543385505676
+      },
+      {
+        "judge": "Mr James Healy-Pratt",
+        "score": 0.6603424251079559
+      }
+    ]
+  },
+  {
+    "case_idx": 299,
+    "case_id": "[2023] EWHC 2544 (KB)",
+    "title": "Moore v Somerset Council [2023] EWHC 2544 (KB) (12 October 2023)",
+    "true_panel": [
+      "MR JUSTICE JAY"
+    ],
+    "predictions": [
+      {
+        "judge": "KAREN RIDGE SITTING AS A DEPUTY HIGH COURT JUDGE",
+        "score": 0.6200701929628849
+      },
+      {
+        "judge": "ANDREW KINNIER KC",
+        "score": 0.6191841542720795
+      },
+      {
+        "judge": "Mr James Healy-Pratt sitting as a Deputy High Court Judge",
+        "score": 0.6048990428447724
+      }
+    ]
+  },
+  {
+    "case_idx": 307,
+    "case_id": "[2023] EWHC 2582 (KB)",
+    "title": "Wambura & Ors v Barrick TZ Ltd & Anor [2023] EWHC 2582 (KB) (23 October 2023)",
+    "true_panel": [
+      "MASTER STEVENS"
+    ],
+    "predictions": [
+      {
+        "judge": "MR DEXTER DIAS KC",
+        "score": 0.6367692425847052
+      },
+      {
+        "judge": "SENIOR MASTER COOK",
+        "score": 0.6315241966928754
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MURRAY",
+        "score": 0.6230649449608543
+      }
+    ]
+  },
+  {
+    "case_idx": 309,
+    "case_id": "[2023] EWHC 2594 (KB)",
+    "title": "Birmingham County Council v Blunderfield [2023] EWHC 2594 (KB) (28 September 2023)",
+    "true_panel": [
+      "HER HONOUR JUDGE EMMA KELLY"
+    ],
+    "predictions": [
+      {
+        "judge": "HER HONOUR JUDGE EMMA KELLY",
+        "score": 0.7449217580258847
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE COTTER",
+        "score": 0.6970838174223899
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MORRIS",
+        "score": 0.6873910471796989
+      }
+    ]
+  },
+  {
+    "case_idx": 310,
+    "case_id": "[2023] EWHC 2614 (KB)",
+    "title": "Karpasitis v Hertfordshire County Council [2023] EWHC 2614 (KB) (20 October 2023)",
+    "true_panel": [
+      "VIKRAM SACHDEVA KC"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE DIAS",
+        "score": 0.6630260944366455
+      },
+      {
+        "judge": "His Honour Judge Freedman",
+        "score": 0.6436819871266684
+      },
+      {
+        "judge": "HIS HONOUR JUDGE ROBINSON",
+        "score": 0.6433217585086822
+      }
+    ]
+  },
+  {
+    "case_idx": 312,
+    "case_id": "[2023] EWHC 262 (KB)",
+    "title": "Soriano v Forensic News LLC & Ors [2023] EWHC 262 (KB) (10 February 2023)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE MURRAY"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MURRAY",
+        "score": 0.6730814240195534
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE PEPPERALL",
+        "score": 0.6697042457082055
+      },
+      {
+        "judge": "MR JUSTICE LINDEN",
+        "score": 0.6655330544480911
+      }
+    ]
+  },
+  {
+    "case_idx": 314,
+    "case_id": "[2023] EWHC 2629 (KB)",
+    "title": "Ward v Torridge District Council [2023] EWHC 2629 (KB) (20 October 2023)",
+    "true_panel": [
+      "MR JUSTICE JAY"
+    ],
+    "predictions": [
+      {
+        "judge": "Mr James Healy-Pratt",
+        "score": 0.6433586984872818
+      },
+      {
+        "judge": "KAREN RIDGE SITTING AS A DEPUTY HIGH COURT JUDGE",
+        "score": 0.6387216441333294
+      },
+      {
+        "judge": "HHJ WORSTER",
+        "score": 0.6325355798006057
+      }
+    ]
+  },
+  {
+    "case_idx": 318,
+    "case_id": "[2023] EWHC 2653 (KB)",
+    "title": "Karpichkov v National Crime Agency [2023] EWHC 2653 (KB) (27 October 2023)",
+    "true_panel": [
+      "MASTER VICTORIA MCCLOUD"
+    ],
+    "predictions": [
+      {
+        "judge": "SUSIE ALEGRE SITTING AS A DEPUTY HIGH COURT JUDGE",
+        "score": 0.6121898233890533
+      },
+      {
+        "judge": "MRS JUSTICE COCKERILL DBE",
+        "score": 0.6057068228721618
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE HEATHER WILLIAMS DBE",
+        "score": 0.6026924848556519
+      }
+    ]
+  },
+  {
+    "case_idx": 319,
+    "case_id": "[2023] EWHC 2674 (KB)",
+    "title": "Roach v Vallarta Adventure, SA De CV [2023] EWHC 2674 (KB) (10 September 2023)",
+    "true_panel": [
+      "Dexter Dias KC"
+    ],
+    "predictions": [
+      {
+        "judge": "Master Dagnall",
+        "score": 0.6833422020077705
+      },
+      {
+        "judge": "Alison Morgan KC",
+        "score": 0.6484665840864181
+      },
+      {
+        "judge": "The Hon. Mr Justice Bryan",
+        "score": 0.639615499973297
+      }
+    ]
+  },
+  {
+    "case_idx": 321,
+    "case_id": "[2023] EWHC 2687 (KB)",
+    "title": "Chief Constable of Kent Police & Anor v Taylor [2023] EWHC 2687 (KB) (27 October 2023)",
+    "true_panel": [
+      "MRS JUSTICE STEYN DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "HIS HONOUR JUDGE STEPHEN DAVIES",
+        "score": 0.6915715306997299
+      },
+      {
+        "judge": "MRS JUSTICE COLLINS RICE",
+        "score": 0.6890960892041524
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MORRIS",
+        "score": 0.6842111751437187
+      }
+    ]
+  },
+  {
+    "case_idx": 327,
+    "case_id": "[2023] EWHC 2765 (KB)",
+    "title": "Dee v Welsh Ambulance Services NHS Trust & Ors [2023] EWHC 2765 (KB) (14 November 2023)",
+    "true_panel": [
+      "MASTER STEVENS"
+    ],
+    "predictions": [
+      {
+        "judge": "HER HONOUR JUDGE MELISSA CLARKE",
+        "score": 0.682081364095211
+      },
+      {
+        "judge": "Mr. David Allan KC, sitting as a Deputy High Court Judge",
+        "score": 0.6768680512905121
+      },
+      {
+        "judge": "MR JONATHAN GLASSON KC SITTING AS A DEPUTY HIGH COURT JUDGE",
+        "score": 0.6640532270073891
+      }
+    ]
+  },
+  {
+    "case_idx": 328,
+    "case_id": "[2023] EWHC 2789 (KB)",
+    "title": "Baroness Lawrence of Clarendon & Ors v Associated Newspapers Ltd [2023] EWHC 2789 (KB) (10 November 2023)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE NICKLIN"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE NICKLIN",
+        "score": 0.7101618520915508
+      },
+      {
+        "judge": "MR JUSTICE CHAMBERLAIN",
+        "score": 0.6979045045044686
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE HEATHER WILLIAMS DBE",
+        "score": 0.6889879345893859
+      }
+    ]
+  },
+  {
+    "case_idx": 332,
+    "case_id": "[2023] EWHC 282 (KB)",
+    "title": "Aruchanga v Secretary of State for the Home Department [2023] EWHC 282 (KB) (10 February 2023)",
+    "true_panel": [
+      "Mrs Justice Lambert DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "MR CASPAR GLYN KC",
+        "score": 0.6737264424562454
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE GOOSE",
+        "score": 0.6627883374691009
+      },
+      {
+        "judge": "SIR NIGEL SWEENEY",
+        "score": 0.6514870077371597
+      }
+    ]
+  },
+  {
+    "case_idx": 346,
+    "case_id": "[2023] EWHC 2959 (KB)",
+    "title": "National Health Service Litigation Authority, Re (Part 8 Claim - ASHE 6116 and the Second Reclassification) [2023] EWHC 2959 (KB) (04 July 2023)",
+    "true_panel": [
+      "Mrs Justice Lambert DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "MASTER STEVENS",
+        "score": 0.6402512980625032
+      },
+      {
+        "judge": "HHJ GRAHAM WOOD KC",
+        "score": 0.6291937679052353
+      },
+      {
+        "judge": "SENIOR MASTER FONTAINE",
+        "score": 0.6287500032356808
+      }
+    ]
+  },
+  {
+    "case_idx": 351,
+    "case_id": "[2023] EWHC 2970 (KB)",
+    "title": "WNA v NDP [2023] EWHC 2970 (KB) (22 November 2023)",
+    "true_panel": [
+      "HIS HONOUR JUDGE ROBINSON sitting as a Judge of the High Court"
+    ],
+    "predictions": [
+      {
+        "judge": "Annabel Darlow KC",
+        "score": 0.6962942600250244
+      },
+      {
+        "judge": "MASTER STEVENS",
+        "score": 0.6863053334876894
+      },
+      {
+        "judge": ": Master Brown",
+        "score": 0.6841655045747757
+      }
+    ]
+  },
+  {
+    "case_idx": 355,
+    "case_id": "[2023] EWHC 2977 (KB)",
+    "title": "ZSY v AAA [2023] EWHC 2977 (KB) (24 November 2023)",
+    "true_panel": [
+      "DEXTER DIAS KC"
+    ],
+    "predictions": [
+      {
+        "judge": "DEXTER DIAS KC",
+        "score": 0.7338957872986793
+      },
+      {
+        "judge": "HHJ RAJEEV SHETTY",
+        "score": 0.718674597889185
+      },
+      {
+        "judge": "Elizabeth O'Neill",
+        "score": 0.7185661457479
+      }
+    ]
+  },
+  {
+    "case_idx": 361,
+    "case_id": "[2023] EWHC 3001 (KB)",
+    "title": "Hemming v Poulton [2023] EWHC 3001 (KB) (24 November 2023)",
+    "true_panel": [
+      "MRS JUSTICE HILL DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HON. MRS JUSTICE STEYN DBE",
+        "score": 0.7512303466146641
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE NICKLIN",
+        "score": 0.7324461571872234
+      },
+      {
+        "judge": "DEPUTY HIGH COURT JUDGE AIDAN EARDLEY KC",
+        "score": 0.7265168726444244
+      }
+    ]
+  },
+  {
+    "case_idx": 363,
+    "case_id": "[2023] EWHC 3024 (KB)",
+    "title": "Iqbal v GEO TV Ltd [2023] EWHC 3024 (KB) (27 November 2023)",
+    "true_panel": [
+      "His Honour Judge Lewis"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HON. MRS JUSTICE STEYN DBE",
+        "score": 0.6861429339105433
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE COLLINS RICE",
+        "score": 0.6839051352606879
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE NICKLIN",
+        "score": 0.6679294474422931
+      }
+    ]
+  },
+  {
+    "case_idx": 365,
+    "case_id": "[2023] EWHC 3027 (KB)",
+    "title": "Price v Newsquest Media Group Ltd [2023] EWHC 3027 (KB) (29 November 2023)",
+    "true_panel": [
+      "SUSIE ALEGRE, SITTING AS A DEPUTY JUDGE OF THE HIGH COURT"
+    ],
+    "predictions": [
+      {
+        "judge": "His Honour Judge Lewis",
+        "score": 0.6650153024329079
+      },
+      {
+        "judge": "DEPUTY HIGH COURT JUDGE SUSIE ALEGRE",
+        "score": 0.6642694860696792
+      },
+      {
+        "judge": "HIS HONOUR JUDGE LEWIS",
+        "score": 0.6613296836614608
+      }
+    ]
+  },
+  {
+    "case_idx": 370,
+    "case_id": "[2023] EWHC 3093 (KB)",
+    "title": "Warrington Borough Council v Unite The Union [2023] EWHC 3093 (KB) (01 December 2023)",
+    "true_panel": [
+      "THE HONOURABLE MRS JUSTICE EADY DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE EYRE",
+        "score": 0.6442419791763478
+      },
+      {
+        "judge": "MR JUSTICE CONSTABLE",
+        "score": 0.6346113757230342
+      },
+      {
+        "judge": "Dexter Dias KC",
+        "score": 0.6330963890999556
+      }
+    ]
+  },
+  {
+    "case_idx": 371,
+    "case_id": "[2023] EWHC 3099 (KB)",
+    "title": "Cavallari & Ors v Mercedes-Benz Group AG & Ors [2023] EWHC 3099 (KB) (01 December 2023)",
+    "true_panel": [
+      "MR JUSTICE CONSTABLE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE FRASER",
+        "score": 0.7392328143119812
+      },
+      {
+        "judge": "SENIOR MASTER COOK",
+        "score": 0.70842253608363
+      },
+      {
+        "judge": ": MRS JUSTICE COCKERILL DBE",
+        "score": 0.7019256591796874
+      }
+    ]
+  },
+  {
+    "case_idx": 377,
+    "case_id": "[2023] EWHC 3173 (KB)",
+    "title": "Various Claimants v Mercedes-Benz & Ors [2023] EWHC 3173 (KB) (08 December 2023)",
+    "true_panel": [
+      "THE PRESIDENT OF THE KING'S BENCH DIVISION"
+    ],
+    "predictions": [
+      {
+        "judge": "Mr Justice Constable",
+        "score": 0.6734438337385654
+      },
+      {
+        "judge": "Mrs Justice Cockerill",
+        "score": 0.6664272777736187
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE FRASER",
+        "score": 0.6378097265958785
+      }
+    ]
+  },
+  {
+    "case_idx": 382,
+    "case_id": "[2023] EWHC 3233 (KB)",
+    "title": "AXA Insurance UK PLC v Kryeziu & Ors [2023] EWHC 3233 (KB) (15 December 2023)",
+    "true_panel": [
+      "MR JUSTICE JOHNSON"
+    ],
+    "predictions": [
+      {
+        "judge": "MRS JUSTICE HILL DBE",
+        "score": 0.7141632210124622
+      },
+      {
+        "judge": "MR JUSTICE COTTER",
+        "score": 0.7135388144850731
+      },
+      {
+        "judge": "MR JUSTICE RITCHIE",
+        "score": 0.7125158104131806
+      }
+    ]
+  },
+  {
+    "case_idx": 408,
+    "case_id": "[2023] EWHC 376 (KB)",
+    "title": "Afzal v Khan & Ors [2023] EWHC 376 (KB) (24 February 2023)",
+    "true_panel": [
+      "HIS HONOUR JUDGE FOSTER SITTING AS ELECTION COMMISSIONER"
+    ],
+    "predictions": [
+      {
+        "judge": "HHJ Kramer sitting as a Commissioner",
+        "score": 0.6399721682071686
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE PEPPERALL",
+        "score": 0.6294750175692818
+      },
+      {
+        "judge": "MR JUSTICE SHELDON",
+        "score": 0.6245191325743993
+      }
+    ]
+  },
+  {
+    "case_idx": 411,
+    "case_id": "[2023] EWHC 39 (KB)",
+    "title": "Osbourne v Persons Unknown Category A & Ors [2023] EWHC 39 (KB) (13 January 2023)",
+    "true_panel": [
+      "MR JUSTICE LAVENDER"
+    ],
+    "predictions": [
+      {
+        "judge": "MR. NEIL MOODY, KC",
+        "score": 0.7451589047908782
+      },
+      {
+        "judge": "MR HEALY-PRATT",
+        "score": 0.6790165672699611
+      },
+      {
+        "judge": "MR JUSTICE MOULD",
+        "score": 0.6482040226459502
+      }
+    ]
+  },
+  {
+    "case_idx": 425,
+    "case_id": "[2023] EWHC 508 (KB)",
+    "title": "O'Sullivan v Holmes and Hills LLP [2023] EWHC 508 (KB) (10 March 2023)",
+    "true_panel": [
+      "HIS HONOUR JUDGE GOSNELL"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE BOURNE",
+        "score": 0.7024346262216568
+      },
+      {
+        "judge": "MASTER THORNETT",
+        "score": 0.6980047550466325
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE SWEETING",
+        "score": 0.6885532385110854
+      }
+    ]
+  },
+  {
+    "case_idx": 429,
+    "case_id": "[2023] EWHC 526 (KB)",
+    "title": "MacDonald v Ms Amlin Corporate Member Ltd [2023] EWHC 526 (KB) (01 March 2023)",
+    "true_panel": [
+      "HIS HONOUR JUDGE SALMON"
+    ],
+    "predictions": [
+      {
+        "judge": "HIS HONOUR JUDGE ROBINSON",
+        "score": 0.7238445818424224
+      },
+      {
+        "judge": "His Honour Judge Martin Picton",
+        "score": 0.709086126089096
+      },
+      {
+        "judge": "His Honour Judge Rajeev Shetty",
+        "score": 0.6921672075986861
+      }
+    ]
+  },
+  {
+    "case_idx": 432,
+    "case_id": "[2023] EWHC 566 (KB)",
+    "title": "Mortgage Express v Ramsay [2023] EWHC 566 (KB) (15 March 2023)",
+    "true_panel": [
+      "MR JUSTICE FREEDMAN"
+    ],
+    "predictions": [
+      {
+        "judge": "The Hon. Mr Justice Sweeting",
+        "score": 0.7122732698917388
+      },
+      {
+        "judge": "MR JUSTICE LINDEN",
+        "score": 0.7060606026878723
+      },
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.7028110585782839
+      }
+    ]
+  },
+  {
+    "case_idx": 436,
+    "case_id": "[2023] EWHC 61 (KB)",
+    "title": "Wilkins v Serco Ltd [2023] EWHC 61 (KB) (25 January 2023)",
+    "true_panel": [
+      "THE HONOURABLE MRS JUSTICE HEATHER WILLIAMS DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "MRS JUSTICE HILL",
+        "score": 0.7217194538691948
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MARTIN SPENCER",
+        "score": 0.7123775120576222
+      },
+      {
+        "judge": "MRS JUSTICE HILL DBE",
+        "score": 0.7110492248426784
+      }
+    ]
+  },
+  {
+    "case_idx": 439,
+    "case_id": "[2023] EWHC 63 (KB)",
+    "title": "Gerko v Seal & Ors [2023] EWHC 63 (KB) (18 January 2023)",
+    "true_panel": [
+      "HHJ PARFITT"
+    ],
+    "predictions": [
+      {
+        "judge": "MASTER DAGNALL",
+        "score": 0.682459509730339
+      },
+      {
+        "judge": "MR JUSTICE GRIFFITHS",
+        "score": 0.6693263428551809
+      },
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.6682845868494199
+      }
+    ]
+  },
+  {
+    "case_idx": 445,
+    "case_id": "[2023] EWHC 707 (KB)",
+    "title": "Ashton v The City of Liverpool Young Men's Christian Association [2023] EWHC 707 (KB) (22 February 2023)",
+    "true_panel": [
+      "HIS HONOUR JUDGE GRAHAM WOOD KC"
+    ],
+    "predictions": [
+      {
+        "judge": "His Honour Judge Bird sitting as a Judge of this Court",
+        "score": 0.6584783829748629
+      },
+      {
+        "judge": "His Honour Judge Harrison",
+        "score": 0.6507172048091888
+      },
+      {
+        "judge": "MATTHEW BUTT KC",
+        "score": 0.6398841083049774
+      }
+    ]
+  },
+  {
+    "case_idx": 451,
+    "case_id": "[2023] EWHC 767 (KB)",
+    "title": "BAA & Ors v Commissioner of the British Indian Ocean Territory Administration (Paul Candler) & Ors [2023] EWHC 767 (KB) (31 March 2023)",
+    "true_panel": [
+      "LADY JUSTICE WHIPPLE"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE SWEENEY",
+        "score": 0.6518631041049957
+      },
+      {
+        "judge": "MR CASPAR GLYN KC",
+        "score": 0.6389276027679442
+      },
+      {
+        "judge": "HHJ RICHARD ROBERTS",
+        "score": 0.6317456483840942
+      }
+    ]
+  },
+  {
+    "case_idx": 462,
+    "case_id": "[2023] EWHC 882 (KB)",
+    "title": "Hay v Cresswell [2023] EWHC 882 (KB) (26 April 2023)",
+    "true_panel": [
+      "THE HONOURABLE MRS JUSTICE HEATHER WILLIAMS DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HON. MRS JUSTICE STEYN DBE",
+        "score": 0.7076709741895849
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE COLLINS RICE",
+        "score": 0.6960286961661445
+      },
+      {
+        "judge": "HH RICHARD PARKES KC",
+        "score": 0.6754621088504791
+      }
+    ]
+  },
+  {
+    "case_idx": 479,
+    "case_id": "[2024] EWHC 1006 (KB)",
+    "title": "Chelmsford City Council & Anor v Mixture [2024] EWHC 1006 (KB) (30 April 2024)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE SAINI"
+    ],
+    "predictions": [
+      {
+        "judge": "KAREN RIDGE SITTING AS A DEPUTY HIGH COURT JUDGE",
+        "score": 0.7391413561999798
+      },
+      {
+        "judge": "HUGH MERCER KC",
+        "score": 0.7381511896848678
+      },
+      {
+        "judge": "ANDREW KINNIER KC",
+        "score": 0.7357321947813034
+      }
+    ]
+  },
+  {
+    "case_idx": 486,
+    "case_id": "[2024] EWHC 110 (KB)",
+    "title": "Wragg & Ors v Opel Automobile GmbH & Ors [2024] EWHC 110 (KB) (25 January 2024)",
+    "true_panel": [
+      "MASTER FONTAINE"
+    ],
+    "predictions": [
+      {
+        "judge": "SENIOR MASTER FONTAINE",
+        "score": 0.6901594081095286
+      },
+      {
+        "judge": "Senior Master Fontaine",
+        "score": 0.6893109858036041
+      },
+      {
+        "judge": "MR JUSTICE CONSTABLE",
+        "score": 0.6787133916281164
+      }
+    ]
+  },
+  {
+    "case_idx": 493,
+    "case_id": "[2024] EWHC 1164 (KB)",
+    "title": "De Azavedo Camacho v OCS Group UK Ltd [2024] EWHC 1164 (KB) (16 May 2024)",
+    "true_panel": [
+      "MR JUSTICE LINDEN"
+    ],
+    "predictions": [
+      {
+        "judge": "MS JUSTICE EADY",
+        "score": 0.6728822290897369
+      },
+      {
+        "judge": "His Honour Judge Lewis",
+        "score": 0.6666327430142296
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE LINDEN",
+        "score": 0.6654346391558648
+      }
+    ]
+  },
+  {
+    "case_idx": 494,
+    "case_id": "[2024] EWHC 1165 (KB)",
+    "title": "Nistor & Anor v Union of Shop, Distributive and Allied Workers (USDAW) [2024] EWHC 1165 (KB) (16 May 2024)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE BOURNE"
+    ],
+    "predictions": [
+      {
+        "judge": "SENIOR MASTER COOK",
+        "score": 0.6669637356485638
+      },
+      {
+        "judge": "MR JUSTICE KERR",
+        "score": 0.6619620523773706
+      },
+      {
+        "judge": "MR JUSTICE CONSTABLE",
+        "score": 0.6552608444355428
+      }
+    ]
+  },
+  {
+    "case_idx": 499,
+    "case_id": "[2024] EWHC 1220 (KB)",
+    "title": "Ministry of Defence v Global Media and Entertainment Ltd & Ors [2024] EWHC 1220 (KB) (21 May 2024)",
+    "true_panel": [
+      "MR JUSTICE CHAMBERLAIN"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE CHAMBERLAIN",
+        "score": 0.6921928178932932
+      },
+      {
+        "judge": "MR JUSTICE JOHNSON",
+        "score": 0.6440990631779034
+      },
+      {
+        "judge": "MR JUSTICE JULIAN KNOWLES",
+        "score": 0.6418686715395826
+      }
+    ]
+  },
+  {
+    "case_idx": 513,
+    "case_id": "[2024] EWHC 134 (KB)",
+    "title": "Valero Energy Ltd & Ors v Persons Unknown & Ors [2024] EWHC 134 (KB) (26 January 2024)",
+    "true_panel": [
+      "MR JUSTICE RITCHIE"
+    ],
+    "predictions": [
+      {
+        "judge": "Mr Justice Dexter Dias",
+        "score": 0.7307913243770598
+      },
+      {
+        "judge": "HHJ Lickley KC sitting as a Judge of the High Court",
+        "score": 0.7298261761665343
+      },
+      {
+        "judge": "MR JUSTICE JULIAN KNOWLES",
+        "score": 0.7004755827157121
+      }
+    ]
+  },
+  {
+    "case_idx": 521,
+    "case_id": "[2024] EWHC 1375 (KB)",
+    "title": "IPE Marble Arch Ltd v Moran [2024] EWHC 1375 (KB) (07 June 2024)",
+    "true_panel": [
+      "MRS JUSTICE YIP"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE LINDEN",
+        "score": 0.689976005256176
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MURRAY",
+        "score": 0.6816866107962348
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE SAINI",
+        "score": 0.6795242257416249
+      }
+    ]
+  },
+  {
+    "case_idx": 522,
+    "case_id": "[2024] EWHC 1377 (KB)",
+    "title": "Harrison v Cameron & Anor [2024] EWHC 1377 (KB) (07 June 2024)",
+    "true_panel": [
+      "THE HON. MRS JUSTICE STEYN DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE HEATHER WILLIAMS DBE",
+        "score": 0.6484339833259583
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE NICKLIN",
+        "score": 0.6441231302917003
+      },
+      {
+        "judge": "SUSIE ALEGRE SITTING AS A DEPUTY HIGH COURT JUDGE",
+        "score": 0.6279602587223052
+      }
+    ]
+  },
+  {
+    "case_idx": 526,
+    "case_id": "[2024] EWHC 140 (KB)",
+    "title": "Buckinghamshire Council v Barrett & Ors [2024] EWHC 140 (KB) (29 January 2024)",
+    "true_panel": [
+      "Dexter Dias KC"
+    ],
+    "predictions": [
+      {
+        "judge": "KAREN RIDGE SITTING AS A DEPUTY HIGH COURT JUDGE",
+        "score": 0.7485053203999996
+      },
+      {
+        "judge": "ANDREW KINNIER KC",
+        "score": 0.7248547077178954
+      },
+      {
+        "judge": "David O'Mahony",
+        "score": 0.718926876783371
+      }
+    ]
+  },
+  {
+    "case_idx": 527,
+    "case_id": "[2024] EWHC 1400 (KB)",
+    "title": "A v B [2024] EWHC 1400 (KB) (14 June 2024)",
+    "true_panel": [
+      "MASTER YOXALL"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE STEYN DBE",
+        "score": 0.6969422116875648
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE LINDEN",
+        "score": 0.6948640510439873
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MURRAY",
+        "score": 0.692825605652549
+      }
+    ]
+  },
+  {
+    "case_idx": 528,
+    "case_id": "[2024] EWHC 1403 (KB)",
+    "title": "BRS v Gadd [2024] EWHC 1403 (KB) (11 June 2024)",
+    "true_panel": [
+      "MRS JUSTICE TIPPLES DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HON. MRS JUSTICE THORNTON DBE",
+        "score": 0.6986830055713653
+      },
+      {
+        "judge": "Deputy Master Marzec",
+        "score": 0.6936599329113959
+      },
+      {
+        "judge": "DEXTER DIAS KC",
+        "score": 0.6596594128012656
+      }
+    ]
+  },
+  {
+    "case_idx": 529,
+    "case_id": "[2024] EWHC 1406 (KB)",
+    "title": "FXS (Through His Father And Litigation Friend JLM) v The Mulberry Bush Organisation Ltd [2024] EWHC 1406 (KB) (10 June 2024)",
+    "true_panel": [
+      "MARAGRET OBI"
+    ],
+    "predictions": [
+      {
+        "judge": "MATTHEW BUTT KC",
+        "score": 0.6440153777599333
+      },
+      {
+        "judge": "MS MARGARET OBI",
+        "score": 0.6399422675371169
+      },
+      {
+        "judge": "MRS JUSTICE ELLENBOGEN",
+        "score": 0.5771212587753931
+      }
+    ]
+  },
+  {
+    "case_idx": 534,
+    "case_id": "[2024] EWHC 1432 (KB)",
+    "title": "Woods v Doncaster And Bassetlaw Teaching Hospitals NHS Foundation Trust [2024] EWHC 1432 (KB) (11 June 2024)",
+    "true_panel": [
+      "MRS JUSTICE LAMBERT DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JONATHAN GLASSON KC SITTING AS A DEPUTY HIGH COURT JUDGE",
+        "score": 0.5711047872900963
+      },
+      {
+        "judge": "HER HONOUR JUDGE MELISSA CLARKE",
+        "score": 0.5658159121870995
+      },
+      {
+        "judge": "HHJ Sephton KC, sitting as a Judge of the High Court",
+        "score": 0.5549515604972839
+      }
+    ]
+  },
+  {
+    "case_idx": 542,
+    "case_id": "[2024] EWHC 1475 (KB)",
+    "title": "Taylor v Pathe Productions Ltd & Ors [2024] EWHC 1475 (KB) (14 June 2024)",
+    "true_panel": [
+      "His Honour Judge Lewis"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HON. MRS JUSTICE STEYN DBE",
+        "score": 0.5956024950200861
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE COLLINS RICE",
+        "score": 0.5932828413115607
+      },
+      {
+        "judge": "HIS HONOUR JUDGE LEWIS",
+        "score": 0.5821122467517852
+      }
+    ]
+  },
+  {
+    "case_idx": 543,
+    "case_id": "[2024] EWHC 1481 (KB)",
+    "title": "Invenia Technical Computing Corporation & Anor v Hudson [2024] EWHC 1481 (KB) (14 June 2024)",
+    "true_panel": [
+      "MR JUSTICE JULIAN KNOWLES"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE COTTER",
+        "score": 0.7025113812088966
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE BOURNE",
+        "score": 0.7011502832174301
+      },
+      {
+        "judge": "MRS JUSTICE STACEY",
+        "score": 0.6991669535636902
+      }
+    ]
+  },
+  {
+    "case_idx": 548,
+    "case_id": "[2024] EWHC 1506 (KB)",
+    "title": "National Highways Ltd v Gunning & Ors [2024] EWHC 1506 (KB) (06 June 2024)",
+    "true_panel": [
+      "MR JUSTICE SOOLE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE COTTER",
+        "score": 0.7478107139468193
+      },
+      {
+        "judge": "HER HONOUR JUDGE EMMA KELLY",
+        "score": 0.7334867678582668
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MORRIS",
+        "score": 0.7167022749781607
+      }
+    ]
+  },
+  {
+    "case_idx": 549,
+    "case_id": "[2024] EWHC 1509 (KB)",
+    "title": "Clarke v Poole & Ors [2024] EWHC 1509 (KB) (17 June 2024)",
+    "true_panel": [
+      "HH JUDGE MARK GARGAN"
+    ],
+    "predictions": [
+      {
+        "judge": "MR DEXTER DIAS KC",
+        "score": 0.6881698653101921
+      },
+      {
+        "judge": "MR JONATHAN GLASSON KC SITTING AS A DEPUTY HIGH COURT JUDGE",
+        "score": 0.6833672776818276
+      },
+      {
+        "judge": "HER HONOUR JUDGE MELISSA CLARKE",
+        "score": 0.6801823481917381
+      }
+    ]
+  },
+  {
+    "case_idx": 554,
+    "case_id": "[2024] EWHC 1525 (KB)",
+    "title": "Birmingham City Council v Gordon & Anor [2024] EWHC 1525 (KB) (15 April 2024)",
+    "true_panel": [
+      "HER HONOUR JUDGE EMMA KELLY"
+    ],
+    "predictions": [
+      {
+        "judge": "HER HONOUR JUDGE EMMA KELLY",
+        "score": 0.7670170240104198
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE COTTER",
+        "score": 0.7137059941887856
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MORRIS",
+        "score": 0.7100670173764229
+      }
+    ]
+  },
+  {
+    "case_idx": 559,
+    "case_id": "[2024] EWHC 1558 (KB)",
+    "title": "Artcrafts International SpA v Mou Ltd [2024] EWHC 1558 (KB) (21 June 2024)",
+    "true_panel": [
+      "THE HON. MR JUSTICE BRYAN"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HON MR JUSTICE BUTCHER",
+        "score": 0.630104374885559
+      },
+      {
+        "judge": "MASTER DAGNALL",
+        "score": 0.6182919625043869
+      },
+      {
+        "judge": "MRS JUSTICE STACEY",
+        "score": 0.6174188911914825
+      }
+    ]
+  },
+  {
+    "case_idx": 570,
+    "case_id": "[2024] EWHC 166 (KB)",
+    "title": "Viarentis Property Management Ltd & Anor v Viagefi 1 Ltd & Ors (Re Consequentials) [2024] EWHC 166 (KB) (30 January 2024)",
+    "true_panel": [
+      "MR JUSTICE FREEDMAN"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE BOURNE",
+        "score": 0.6785041064023971
+      },
+      {
+        "judge": "MASTER THORNETT",
+        "score": 0.673282555076811
+      },
+      {
+        "judge": "Elizabeth O'Neill",
+        "score": 0.6730174206197261
+      }
+    ]
+  },
+  {
+    "case_idx": 578,
+    "case_id": "[2024] EWHC 169 (KB)",
+    "title": "Lunn v Antarctic Logistics Centre International (Pty) Ltd (No. 2) [2024] EWHC 169 (KB) (31 January 2024)",
+    "true_panel": [
+      "MASTER THORNETT"
+    ],
+    "predictions": [
+      {
+        "judge": "HIS HONOUR JUDGE BIRD",
+        "score": 0.7181130254907268
+      },
+      {
+        "judge": "MASTER THORNETT",
+        "score": 0.714858305785391
+      },
+      {
+        "judge": "SIR NIGEL SWEENEY",
+        "score": 0.6968384057283401
+      }
+    ]
+  },
+  {
+    "case_idx": 583,
+    "case_id": "[2024] EWHC 1719 (KB)",
+    "title": "Pan NOx Emissions Litigations, Re (Ruling 2) [2024] EWHC 1719 (KB) (17 June 2024)",
+    "true_panel": [
+      "Mrs Justice Cockerill"
+    ],
+    "predictions": [
+      {
+        "judge": "Mrs Justice Cockerill",
+        "score": 0.6872160941362381
+      },
+      {
+        "judge": "FORDHAM J",
+        "score": 0.6191386790946126
+      },
+      {
+        "judge": "MASTER DAVISON",
+        "score": 0.6179103066027164
+      }
+    ]
+  },
+  {
+    "case_idx": 584,
+    "case_id": "[2024] EWHC 1728 (KB)",
+    "title": "Pan NOx Emissions Litigations [2024] EWHC 1728 (KB) (05 July 2024)",
+    "true_panel": [
+      "MR JUSTICE CONSTABLE"
+    ],
+    "predictions": [
+      {
+        "judge": "SENIOR MASTER FONTAINE",
+        "score": 0.7155463537999562
+      },
+      {
+        "judge": "SENIOR MASTER COOK",
+        "score": 0.6986209814037595
+      },
+      {
+        "judge": "MR JUSTICE TURNER DISTRICT JUDGE BALDWIN",
+        "score": 0.6959323912858962
+      }
+    ]
+  },
+  {
+    "case_idx": 589,
+    "case_id": "[2024] EWHC 1754 (KB)",
+    "title": "Fertre v Vale of White Horse District Council [2024] EWHC 1754 (KB) (08 July 2024)",
+    "true_panel": [
+      "MR JUSTICE JAY"
+    ],
+    "predictions": [
+      {
+        "judge": "MR CASPAR GLYN KC",
+        "score": 0.6075436651706696
+      },
+      {
+        "judge": "MR JUSTICE LANE",
+        "score": 0.5949074819684029
+      },
+      {
+        "judge": "MRS JUSTICE FARBEY",
+        "score": 0.5907731354236603
+      }
+    ]
+  },
+  {
+    "case_idx": 590,
+    "case_id": "[2024] EWHC 176 (KB)",
+    "title": "Pang & Anor v Zinda [2024] EWHC 176 (KB) (01 February 2024)",
+    "true_panel": [
+      "MR JUSTICE SOOLE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE DOVE",
+        "score": 0.7110236324369907
+      },
+      {
+        "judge": "MR JUSTICE TURNER DISTRICT JUDGE BALDWIN",
+        "score": 0.6951794520020484
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MARTIN SPENCER",
+        "score": 0.6897478084762891
+      }
+    ]
+  },
+  {
+    "case_idx": 595,
+    "case_id": "[2024] EWHC 1782 (KB)",
+    "title": "Leicestershire County Council & Anor v Miles (Rev1) [2024] EWHC 1782 (KB) (11 July 2024)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE TURNER"
+    ],
+    "predictions": [
+      {
+        "judge": "Dexter Dias KC",
+        "score": 0.6727170217782259
+      },
+      {
+        "judge": "HIS HONOUR JUDGE AUERBACH",
+        "score": 0.6707579927312003
+      },
+      {
+        "judge": "MR JUSTICE EYRE",
+        "score": 0.6703702146356756
+      }
+    ]
+  },
+  {
+    "case_idx": 599,
+    "case_id": "[2024] EWHC 182 (KB)",
+    "title": "GJC v Walker [2024] EWHC 182 (KB) (02 February 2024)",
+    "true_panel": [
+      "DEXTER DIAS KC"
+    ],
+    "predictions": [
+      {
+        "judge": "DEXTER DIAS KC",
+        "score": 0.7420545127987861
+      },
+      {
+        "judge": "HHJ RAJEEV SHETTY",
+        "score": 0.7241413511335849
+      },
+      {
+        "judge": "Elizabeth O'Neill",
+        "score": 0.7188422180712223
+      }
+    ]
+  },
+  {
+    "case_idx": 601,
+    "case_id": "[2024] EWHC 1860 (KB)",
+    "title": "Hemming v Poulton [2024] EWHC 1860 (KB) (19 July 2024)",
+    "true_panel": [
+      "DEPUTY HIGH COURT JUDGE SUSIE ALEGRE"
+    ],
+    "predictions": [
+      {
+        "judge": "DEPUTY HIGH COURT JUDGE SUSIE ALEGRE",
+        "score": 0.7160553872585297
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE COLLINS RICE",
+        "score": 0.7113547874821556
+      },
+      {
+        "judge": "HIS HONOUR JUDGE LEWIS",
+        "score": 0.7107766568660736
+      }
+    ]
+  },
+  {
+    "case_idx": 604,
+    "case_id": "[2024] EWHC 1873 (KB)",
+    "title": "Khokan v Nirjhor (Re Costs) [2024] EWHC 1873 (KB) (19 July 2024)",
+    "true_panel": [
+      "MRS JUSTICE HILL DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE BOURNE",
+        "score": 0.7449960321187973
+      },
+      {
+        "judge": "MASTER THORNETT",
+        "score": 0.7396340820524427
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MARTIN SPENCER",
+        "score": 0.7351752843459447
+      }
+    ]
+  },
+  {
+    "case_idx": 613,
+    "case_id": "[2024] EWHC 1956 (KB)",
+    "title": "Colizzi v Coulson & Anor [2024] EWHC 1956 (KB) (26 July 2024)",
+    "true_panel": [
+      "MR JUSTICE JULIAN KNOWLES"
+    ],
+    "predictions": [
+      {
+        "judge": "Ms Clare Ambrose sitting as a Deputy High Court Judge",
+        "score": 0.751977628469467
+      },
+      {
+        "judge": "HIS HONOUR JUDGE Rawlings",
+        "score": 0.7237763941287993
+      },
+      {
+        "judge": "HIS HONOUR JUDGE ROBINSON",
+        "score": 0.7150453388690948
+      }
+    ]
+  },
+  {
+    "case_idx": 617,
+    "case_id": "[2024] EWHC 1976 (KB)",
+    "title": "Paisley v Linehan (Rev1) [2024] EWHC 1976 (KB) (01 August 2024)",
+    "true_panel": [
+      "DEPUTY HIGH COURT JUDGE AIDAN EARDLEY KC"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HON. MRS JUSTICE STEYN DBE",
+        "score": 0.7050648028200323
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE COLLINS RICE",
+        "score": 0.6859393762217627
+      },
+      {
+        "judge": "HIS HONOUR JUDGE LEWIS",
+        "score": 0.6775573134422301
+      }
+    ]
+  },
+  {
+    "case_idx": 621,
+    "case_id": "[2024] EWHC 2006 (KB)",
+    "title": "Ansari v Commissioner of Police of the Metropolis & Ors [2024] EWHC 2006 (KB) (31 July 2024)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE LINDEN"
+    ],
+    "predictions": [
+      {
+        "judge": "MRS JUSTICE ELLENBOGEN",
+        "score": 0.7323485980431239
+      },
+      {
+        "judge": "MR JUSTICE RITCHIE",
+        "score": 0.731138202829181
+      },
+      {
+        "judge": "MRS JUSTICE HILL",
+        "score": 0.730188374581008
+      }
+    ]
+  },
+  {
+    "case_idx": 626,
+    "case_id": "[2024] EWHC 2023 (KB)",
+    "title": "PXE v University Hospitals Birmingham NHS Foundation Trust [2024] EWHC 2023 (KB) (31 July 2024)",
+    "true_panel": [
+      "HHJ Sarah Richardson"
+    ],
+    "predictions": [
+      {
+        "judge": "HER HONOUR JUDGE MELISSA CLARKE",
+        "score": 0.6282983765006065
+      },
+      {
+        "judge": "HIS HONOUR JUDGE TINDAL",
+        "score": 0.6095803484320641
+      },
+      {
+        "judge": "HHJ Howells",
+        "score": 0.5952559530735015
+      }
+    ]
+  },
+  {
+    "case_idx": 635,
+    "case_id": "[2024] EWHC 2145 (KB)",
+    "title": "The Mayor And Burgesses of the London Borough of Richmond v Trotman [2024] EWHC 2145 (KB) (19 August 2024)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE KERR"
+    ],
+    "predictions": [
+      {
+        "judge": "The Honourable Mrs Justice Lambert",
+        "score": 0.7273494869470596
+      },
+      {
+        "judge": "DUNCAN ATKINSON KC",
+        "score": 0.6594441711902619
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE CHOUDHURY",
+        "score": 0.6530796825885773
+      }
+    ]
+  },
+  {
+    "case_idx": 636,
+    "case_id": "[2024] EWHC 2169 (KB)",
+    "title": "Achille v Calcutt & Anor (No. 3) (Civil Restraint Order & Costs) [2024] EWHC 2169 (KB) (23 August 2024)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE PEPPERALL"
+    ],
+    "predictions": [
+      {
+        "judge": "MRS JUSTICE HILL",
+        "score": 0.7091719668487022
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE PEPPERALL",
+        "score": 0.7051378019831397
+      },
+      {
+        "judge": "MR JUSTICE SOOLE",
+        "score": 0.6985860468819737
+      }
+    ]
+  },
+  {
+    "case_idx": 643,
+    "case_id": "[2024] EWHC 2228 (KB)",
+    "title": "Wolverhampton City Council & Ors v Hussain [2024] EWHC 2228 (KB) (23 May 2024)",
+    "true_panel": [
+      "HER HONOUR JUDGE EMMA KELLY"
+    ],
+    "predictions": [
+      {
+        "judge": "HER HONOUR JUDGE EMMA KELLY",
+        "score": 0.7452605806291103
+      },
+      {
+        "judge": "MRS JUSTICE COLLINS RICE",
+        "score": 0.6966259787480036
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE COTTER",
+        "score": 0.6886638864874839
+      }
+    ]
+  },
+  {
+    "case_idx": 644,
+    "case_id": "[2024] EWHC 2232 (KB)",
+    "title": "Lindsay v O'Loughnane & Ors [2024] EWHC 2232 (KB) (28 August 2024)",
+    "true_panel": [
+      "MASTER DAGNALL"
+    ],
+    "predictions": [
+      {
+        "judge": "MASTER DAGNALL",
+        "score": 0.6976843897104263
+      },
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.6808045901682065
+      },
+      {
+        "judge": "HIS HONOUR JUDGE SIMPKISS",
+        "score": 0.6796436563134193
+      }
+    ]
+  },
+  {
+    "case_idx": 649,
+    "case_id": "[2024] EWHC 2254 (KB)",
+    "title": "North Warwickshire Borough Council v Defendants Listed at Schedule A [2024] EWHC 2254 (KB) (06 September 2024)",
+    "true_panel": [
+      "HHJ Emma Kelly sitting as a Judge of the High Court"
+    ],
+    "predictions": [
+      {
+        "judge": "Mr Justice Dexter Dias",
+        "score": 0.7251970767974854
+      },
+      {
+        "judge": "HHJ Lickley KC sitting as a Judge of the High Court",
+        "score": 0.7130597651004791
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MORRIS",
+        "score": 0.6910431072115898
+      }
+    ]
+  },
+  {
+    "case_idx": 650,
+    "case_id": "[2024] EWHC 2259 (KB)",
+    "title": "Birmingham City Council v Adshead [2024] EWHC 2259 (KB) (08 July 2024)",
+    "true_panel": [
+      "HER HONOUR JUDGE EMMA KELLY"
+    ],
+    "predictions": [
+      {
+        "judge": "HER HONOUR JUDGE EMMA KELLY",
+        "score": 0.760625609010458
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE COTTER",
+        "score": 0.7137385413050652
+      },
+      {
+        "judge": "MRS JUSTICE COLLINS RICE",
+        "score": 0.6997197618087133
+      }
+    ]
+  },
+  {
+    "case_idx": 652,
+    "case_id": "[2024] EWHC 227 (KB)",
+    "title": "Hibbert & Anor v Hall [2024] EWHC 227 (KB) (08 February 2024)",
+    "true_panel": [
+      "MASTER DAVISON"
+    ],
+    "predictions": [
+      {
+        "judge": "MRS JUSTICE HILL DBE",
+        "score": 0.7068680126558651
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE PEPPERALL",
+        "score": 0.7009446033022619
+      },
+      {
+        "judge": "MRS JUSTICE HILL",
+        "score": 0.697234873113961
+      }
+    ]
+  },
+  {
+    "case_idx": 656,
+    "case_id": "[2024] EWHC 2297 (KB)",
+    "title": "Gupta v DB Group Services Ltd [2024] EWHC 2297 (KB) (12 July 2024)",
+    "true_panel": [
+      "HHJ Howells"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE LAVENDER",
+        "score": 0.6367864737908044
+      },
+      {
+        "judge": "Master Brown",
+        "score": 0.6349003881216049
+      },
+      {
+        "judge": "JASON BEER KC",
+        "score": 0.6347280085086822
+      }
+    ]
+  },
+  {
+    "case_idx": 660,
+    "case_id": "[2024] EWHC 2301 (KB)",
+    "title": "Parish v Wikimedia Foundation, Inc. [2024] EWHC 2301 (KB) (06 September 2024)",
+    "true_panel": [
+      "THE HON. MRS JUSTICE STEYN DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE NICKLIN",
+        "score": 0.698150510340929
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE COLLINS RICE",
+        "score": 0.6958298550711737
+      },
+      {
+        "judge": "DEPUTY HIGH COURT JUDGE AIDAN EARDLEY KC",
+        "score": 0.6927793741226196
+      }
+    ]
+  },
+  {
+    "case_idx": 662,
+    "case_id": "[2024] EWHC 2343 (KB)",
+    "title": "Ministry of Justice of the Kingdom of the Netherlands v Baybasin & Ors [2024] EWHC 2343 (KB) (13 September 2024)",
+    "true_panel": [
+      "Mr. Justice Eyre"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.6924675635669542
+      },
+      {
+        "judge": "MR JUSTICE SOOLE",
+        "score": 0.6819489242509007
+      },
+      {
+        "judge": "MR JUSTICE KERR",
+        "score": 0.6802650831066644
+      }
+    ]
+  },
+  {
+    "case_idx": 668,
+    "case_id": "[2024] EWHC 2415 (KB)",
+    "title": "Williams-Henry v Associated British Ports & Anor (Re Wasted Costs Order) [2024] EWHC 2415 (KB) (24 September 2024)",
+    "true_panel": [
+      "MR JUSTICE RITCHIE"
+    ],
+    "predictions": [
+      {
+        "judge": "DEPUTY MASTER GRIMSHAW",
+        "score": 0.7221283197402955
+      },
+      {
+        "judge": "MR JUSTICE RITCHIE",
+        "score": 0.7189594718645204
+      },
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.7185362078573392
+      }
+    ]
+  },
+  {
+    "case_idx": 670,
+    "case_id": "[2024] EWHC 2433 (KB)",
+    "title": "Ahmed & Ors v Akbar [2024] EWHC 2433 (KB) (25 September 2024)",
+    "true_panel": [
+      "MR JUSTICE JAY"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MURRAY",
+        "score": 0.7297225602648475
+      },
+      {
+        "judge": "MR JUSTICE CHAMBERLAIN",
+        "score": 0.7241032910015848
+      },
+      {
+        "judge": "MR JUSTICE LINDEN",
+        "score": 0.7239128971329102
+      }
+    ]
+  },
+  {
+    "case_idx": 677,
+    "case_id": "[2024] EWHC 25 (KB)",
+    "title": "MHE v Wye Valley NHS Trust [2024] EWHC 25 (KB) (11 January 2024)",
+    "true_panel": [
+      "DEXTER DIAS KC"
+    ],
+    "predictions": [
+      {
+        "judge": "DEXTER DIAS KC",
+        "score": 0.7443477270007133
+      },
+      {
+        "judge": "HHJ RAJEEV SHETTY",
+        "score": 0.7376175649464131
+      },
+      {
+        "judge": "Elizabeth O'Neill",
+        "score": 0.7097743324935435
+      }
+    ]
+  },
+  {
+    "case_idx": 678,
+    "case_id": "[2024] EWHC 2502 (KB)",
+    "title": "Jones v Hagger [2024] EWHC 2502 (KB) (21 May 2024)",
+    "true_panel": [
+      "MRS JUSTICE MAY"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE SWEETING",
+        "score": 0.6877643579244612
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MARTIN SPENCER",
+        "score": 0.6820727731784185
+      },
+      {
+        "judge": "MRS JUSTICE FOSTER",
+        "score": 0.6808866620063782
+      }
+    ]
+  },
+  {
+    "case_idx": 679,
+    "case_id": "[2024] EWHC 2515 (KB)",
+    "title": "Northampton General Hospital NHS Trust v Mercer [2024] EWHC 2515 (KB) (Hearing 4 October 2024)",
+    "true_panel": [
+      "HIS HONOUR JUDGE TINDAL"
+    ],
+    "predictions": [
+      {
+        "judge": "Her Honour Judge Karen Walden-Smith, sitting as a Judge of the High Court",
+        "score": 0.6125629127025604
+      },
+      {
+        "judge": "MR JUSTICE MARTIN SPENCER",
+        "score": 0.5894944503903389
+      },
+      {
+        "judge": "DEXTER DIAS KC",
+        "score": 0.5881153079867363
+      }
+    ]
+  },
+  {
+    "case_idx": 687,
+    "case_id": "[2024] EWHC 2586 (KB)",
+    "title": "Titan Wealth Holdings Ltd & Ors v Okunola (Rev1) [2024] EWHC 2586 (KB) (10 October 2024)",
+    "true_panel": [
+      "MRS. JUSTICE HILL"
+    ],
+    "predictions": [
+      {
+        "judge": "MASTER DAVISON",
+        "score": 0.7380980890989304
+      },
+      {
+        "judge": "MR JUSTICE LINDEN",
+        "score": 0.7255019521484009
+      },
+      {
+        "judge": "HIS HONOUR JUDGE BIRD",
+        "score": 0.7245131546897547
+      }
+    ]
+  },
+  {
+    "case_idx": 689,
+    "case_id": "[2024] EWHC 2595 (KB)",
+    "title": "Elphicke v Times Media Ltd [2024] EWHC 2595 (KB) (14 October 2024)",
+    "true_panel": [
+      "VICTORIA MCCLOUD"
+    ],
+    "predictions": [
+      {
+        "judge": "MASTER DAGNALL",
+        "score": 0.7376810785531998
+      },
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.7353922523882077
+      },
+      {
+        "judge": "MR JUSTICE RITCHIE",
+        "score": 0.7336025568674196
+      }
+    ]
+  },
+  {
+    "case_idx": 692,
+    "case_id": "[2024] EWHC 2621 (KB)",
+    "title": "Foot Anstey LLP & Anor v Stimson [2024] EWHC 2621 (KB) (12 September 2024)",
+    "true_panel": [
+      "MRS JUSTICE HILL"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE LINDEN",
+        "score": 0.7173724299440016
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MURRAY",
+        "score": 0.7101503513076088
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE PEPPERALL",
+        "score": 0.7078403242609717
+      }
+    ]
+  },
+  {
+    "case_idx": 697,
+    "case_id": "[2024] EWHC 2654 (KB)",
+    "title": "Domestic & General Group Ltd v Premier Protect Holdings Ltd & Ors [2024] EWHC 2654 (KB) (21 October 2024)",
+    "true_panel": [
+      "MR JUSTICE LAVENDER"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE LAVENDER",
+        "score": 0.6684579441944758
+      },
+      {
+        "judge": "Her Honour Judge EMMA KELLY",
+        "score": 0.6668377101421357
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE HEATHER WILLIAMS DBE",
+        "score": 0.6655341863632201
+      }
+    ]
+  },
+  {
+    "case_idx": 713,
+    "case_id": "[2024] EWHC 273 (KB)",
+    "title": "Mills v The Commissioner of Police of the Metropolis [2024] EWHC 273 (KB) (08 February 2024)",
+    "true_panel": [
+      "THE HON. MR JUSTICE TURNER"
+    ],
+    "predictions": [
+      {
+        "judge": "His Honour Judge Bird sitting as a Judge of this Court",
+        "score": 0.6682028450071811
+      },
+      {
+        "judge": "His Honour Judge Martin Picton",
+        "score": 0.6627779662609099
+      },
+      {
+        "judge": "Dexter Dias KC",
+        "score": 0.661009194329381
+      }
+    ]
+  },
+  {
+    "case_idx": 714,
+    "case_id": "[2024] EWHC 2732 (KB)",
+    "title": "HM Solicitor General v Yaxley-Lennon (aka Tommy Robinson) [2024] EWHC 2732 (KB) (28 October 2024)",
+    "true_panel": [
+      "MR JUSTICE JOHNSON"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MORRIS",
+        "score": 0.7183742925524712
+      },
+      {
+        "judge": "HER HONOUR JUDGE EMMA KELLY",
+        "score": 0.6992818780243397
+      },
+      {
+        "judge": "MR JUSTICE JOHNSON",
+        "score": 0.6826383466521899
+      }
+    ]
+  },
+  {
+    "case_idx": 716,
+    "case_id": "[2024] EWHC 2750 (KB)",
+    "title": "Thurrock Council & Anor v Adams & Ors [2024] EWHC 2750 (KB) (30 October 2024)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE BOURNE"
+    ],
+    "predictions": [
+      {
+        "judge": "HHJ Lickley KC sitting as a Judge of the High Court",
+        "score": 0.7323499917984009
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MORRIS",
+        "score": 0.7236326858401297
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE COTTER",
+        "score": 0.7104647859930993
+      }
+    ]
+  },
+  {
+    "case_idx": 721,
+    "case_id": "[2024] EWHC 281 (KB)",
+    "title": "Walker & Anor v JMount (t/a Take To Removals) [2024] EWHC 281 (KB) (12 February 2024)",
+    "true_panel": [
+      "FORDHAM J"
+    ],
+    "predictions": [
+      {
+        "judge": "FORDHAM J",
+        "score": 0.7295142540708184
+      },
+      {
+        "judge": "MASTER EASTMAN",
+        "score": 0.6898808762431144
+      },
+      {
+        "judge": "HIS HONOUR JUDGE AUERBACH",
+        "score": 0.6874385567175016
+      }
+    ]
+  },
+  {
+    "case_idx": 737,
+    "case_id": "[2024] EWHC 2958 (KB)",
+    "title": "Tait v Torbay and South Devon NHS Foundation Trust [2024] EWHC 2958 (KB) (20 November 2024)",
+    "true_panel": [
+      "MASTER SULLIVAN"
+    ],
+    "predictions": [
+      {
+        "judge": "MASTER STEVENS",
+        "score": 0.6776907516643405
+      },
+      {
+        "judge": "MASTER SULLIVAN",
+        "score": 0.6721591422955195
+      },
+      {
+        "judge": "DEXTER DIAS KC",
+        "score": 0.6622365471720695
+      }
+    ]
+  },
+  {
+    "case_idx": 740,
+    "case_id": "[2024] EWHC 2972 (KB)",
+    "title": "Attaei v Alsharif & Ors [2024] EWHC 2972 (KB) (21 November 2024)",
+    "true_panel": [
+      "MRS JUSTICE HILL"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE RITCHIE",
+        "score": 0.7283221808244597
+      },
+      {
+        "judge": "MRS JUSTICE HILL",
+        "score": 0.726334958138137
+      },
+      {
+        "judge": "MR JUSTICE LINDEN",
+        "score": 0.7225129091968903
+      }
+    ]
+  },
+  {
+    "case_idx": 741,
+    "case_id": "[2024] EWHC 2977 (KB)",
+    "title": "Fraser v Ministry of Defence [2024] EWHC 2977 (KB) (21 November 2024)",
+    "true_panel": [
+      "MRS JUSTICE YIP"
+    ],
+    "predictions": [
+      {
+        "judge": "HHJ Howells",
+        "score": 0.6179018378257751
+      },
+      {
+        "judge": "MR JONATHAN GLASSON KC SITTING AS A DEPUTY HIGH COURT JUDGE",
+        "score": 0.5953921511769295
+      },
+      {
+        "judge": "HER HONOUR JUDGE MELISSA CLARKE",
+        "score": 0.587607030570507
+      }
+    ]
+  },
+  {
+    "case_idx": 749,
+    "case_id": "[2024] EWHC 3052 (KB)",
+    "title": "Carus v Stonyhurst [2024] EWHC 3052 (KB) (07 October 2024)",
+    "true_panel": [
+      "Her Honour Judge Beech"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE COTTER",
+        "score": 0.6222324022650718
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MARTIN SPENCER",
+        "score": 0.6214951012531915
+      },
+      {
+        "judge": "MR JUSTICE ANDREW BAKER",
+        "score": 0.6209862238168716
+      }
+    ]
+  },
+  {
+    "case_idx": 753,
+    "case_id": "[2024] EWHC 31 (KB)",
+    "title": "Jasseh v The Home Office [2024] EWHC 31 (KB) (12 January 2024)",
+    "true_panel": [
+      "HHJ RICHARD ROBERTS"
+    ],
+    "predictions": [
+      {
+        "judge": "MR CASPAR GLYN KC",
+        "score": 0.7357115507125854
+      },
+      {
+        "judge": "MR JUSTICE SWEENEY",
+        "score": 0.7229782283306121
+      },
+      {
+        "judge": "HHJ RICHARD ROBERTS",
+        "score": 0.6881283462047577
+      }
+    ]
+  },
+  {
+    "case_idx": 761,
+    "case_id": "[2024] EWHC 3144 (KB)",
+    "title": "Hart District Council v Freeman & Anor [2024] EWHC 3144 (KB) (22 November 2024)",
+    "true_panel": [
+      "HIS HONOUR JUDGE AUERBACH"
+    ],
+    "predictions": [
+      {
+        "judge": "HER HONOUR JUDGE EMMA KELLY",
+        "score": 0.7072286628186703
+      },
+      {
+        "judge": "MR JUSTICE SOOLE",
+        "score": 0.6979640780016779
+      },
+      {
+        "judge": "David O'Mahony",
+        "score": 0.6951599031686783
+      }
+    ]
+  },
+  {
+    "case_idx": 764,
+    "case_id": "[2024] EWHC 316 (KB)",
+    "title": "Weldon v Godiva Mortgages Ltd & Anor [2024] EWHC 316 (KB) (15 February 2024)",
+    "true_panel": [
+      "FORDHAM J"
+    ],
+    "predictions": [
+      {
+        "judge": "FORDHAM J",
+        "score": 0.7210149576887488
+      },
+      {
+        "judge": "MASTER YOXALL",
+        "score": 0.6875893600285053
+      },
+      {
+        "judge": "MR JUSTICE KERR",
+        "score": 0.6825336926258527
+      }
+    ]
+  },
+  {
+    "case_idx": 767,
+    "case_id": "[2024] EWHC 318 (KB)",
+    "title": "Eboh v Baird [2024] EWHC 318 (KB) (15 February 2024)",
+    "true_panel": [
+      "FORDHAM J"
+    ],
+    "predictions": [
+      {
+        "judge": "FORDHAM J",
+        "score": 0.7291567439213394
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE HILL DBE",
+        "score": 0.6975492164492607
+      },
+      {
+        "judge": "MR JUSTICE LINDEN",
+        "score": 0.6959367221364607
+      }
+    ]
+  },
+  {
+    "case_idx": 787,
+    "case_id": "[2024] EWHC 3336 (KB)",
+    "title": "Saadati v Dastghaib & Anor [2024] EWHC 3336 (KB) (20 December 2024)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE MORRIS"
+    ],
+    "predictions": [
+      {
+        "judge": "MASTER DAGNALL",
+        "score": 0.7265140887498855
+      },
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.7162031374547793
+      },
+      {
+        "judge": "MASTER THORNETT",
+        "score": 0.708458074596193
+      }
+    ]
+  },
+  {
+    "case_idx": 800,
+    "case_id": "[2024] EWHC 3500 (KB)",
+    "title": "Berresford v Shah & Anor [2024] EWHC 3500 (KB) (03 October 2024)",
+    "true_panel": [
+      "HHJ KAREN WALDEN-SMITH"
+    ],
+    "predictions": [
+      {
+        "judge": "HHJ CAWSON KC",
+        "score": 0.6686945557594299
+      },
+      {
+        "judge": "Simon Tinkler",
+        "score": 0.6652085289359092
+      },
+      {
+        "judge": "SARAH CROWTHER KC",
+        "score": 0.6639064252376556
+      }
+    ]
+  },
+  {
+    "case_idx": 802,
+    "case_id": "[2024] EWHC 3521 (KB)",
+    "title": "Ibrahim v Ministry of Justice [2024] EWHC 3521 (KB) (18 April 2024)",
+    "true_panel": [
+      "MASTER DAVISON"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE LINDEN",
+        "score": 0.667454122006893
+      },
+      {
+        "judge": "LADY JUSTICE MACUR",
+        "score": 0.6590145289897918
+      },
+      {
+        "judge": "MR JUSTICE JOHNSON",
+        "score": 0.657942292590936
+      }
+    ]
+  },
+  {
+    "case_idx": 810,
+    "case_id": "[2024] EWHC 3609 (KB)",
+    "title": "James Fitzpatrick v Ministry of Justice [2024] EWHC 3609 (KB) (28 November 2024 )",
+    "true_panel": [
+      "HIS HONOUR JUDGE GLEN"
+    ],
+    "predictions": [
+      {
+        "judge": "DEXTER DIAS KC",
+        "score": 0.7201971563696861
+      },
+      {
+        "judge": "MASTER STEVENS",
+        "score": 0.702833111770451
+      },
+      {
+        "judge": "Annabel Darlow KC",
+        "score": 0.7015146523714064
+      }
+    ]
+  },
+  {
+    "case_idx": 811,
+    "case_id": "[2024] EWHC 3634 (KB)",
+    "title": "Ibrahim v Ministry of Justice [2024] EWHC 3634 (KB) (18 December 2024)",
+    "true_panel": [
+      "DISTRICT JUDGE RICH"
+    ],
+    "predictions": [
+      {
+        "judge": "The Honourable Mrs Justice Tipples DBE",
+        "score": 0.6638423204421997
+      },
+      {
+        "judge": "MR JUSTICE JOHNSON",
+        "score": 0.6338640873630841
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE GOOSE",
+        "score": 0.6306369692087173
+      }
+    ]
+  },
+  {
+    "case_idx": 816,
+    "case_id": "[2024] EWHC 379 (KB)",
+    "title": "Bell v Commissioner of Police of the Metropolis [2024] EWHC 379 (KB) (21 February 2024)",
+    "true_panel": [
+      "MRS JUSTICE HILL DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "MRS JUSTICE ELLENBOGEN",
+        "score": 0.6737167666355768
+      },
+      {
+        "judge": "MR CASPAR GLYN KC",
+        "score": 0.671289598941803
+      },
+      {
+        "judge": "HHJ RICHARD ROBERTS",
+        "score": 0.6602267146110534
+      }
+    ]
+  },
+  {
+    "case_idx": 820,
+    "case_id": "[2024] EWHC 390 (KB)",
+    "title": "Gahir v Ola [2024] EWHC 390 (KB) (23 February 2024)",
+    "true_panel": [
+      "HIS HONOUR JUDGE ROBINSON"
+    ],
+    "predictions": [
+      {
+        "judge": "HER HONOUR JUDGE MELISSA CLARKE",
+        "score": 0.653789259493351
+      },
+      {
+        "judge": "HHJ Howells",
+        "score": 0.6506201982498169
+      },
+      {
+        "judge": "HIS HONOUR JUDGE TINDAL",
+        "score": 0.6465297237038612
+      }
+    ]
+  },
+  {
+    "case_idx": 822,
+    "case_id": "[2024] EWHC 401 (KB)",
+    "title": "Co Mayo Estates Ltd v Hidden Gem Ltd [2024] EWHC 401 (KB) (26 February 2024)",
+    "true_panel": [
+      "THE HON. MR JUSTICE BOURNE"
+    ],
+    "predictions": [
+      {
+        "judge": "HHJ WORSTER",
+        "score": 0.6590748220682143
+      },
+      {
+        "judge": "MR JUSTICE KERR",
+        "score": 0.6512153901732884
+      },
+      {
+        "judge": "FORDHAM J",
+        "score": 0.6506277864798903
+      }
+    ]
+  },
+  {
+    "case_idx": 823,
+    "case_id": "[2024] EWHC 431 (KB)",
+    "title": "McMahon v Birmingham City Council [2024] EWHC 431 (KB) (29 February 2024)",
+    "true_panel": [
+      "HER HONOUR JUDGE EMMA KELLY"
+    ],
+    "predictions": [
+      {
+        "judge": "MRS JUSTICE ELLENBOGEN",
+        "score": 0.7236195335785547
+      },
+      {
+        "judge": "MR JUSTICE RITCHIE",
+        "score": 0.7118619176576723
+      },
+      {
+        "judge": "HHJ Karen Walden-Smith sitting as a Judge of the High Court",
+        "score": 0.7071715950965881
+      }
+    ]
+  },
+  {
+    "case_idx": 826,
+    "case_id": "[2024] EWHC 44 (KB)",
+    "title": "Hart v Secretary of State for Education & Anor [2024] EWHC 44 (KB) (19 January 2024)",
+    "true_panel": [
+      "MR JUSTICE EYRE"
+    ],
+    "predictions": [
+      {
+        "judge": "MS JUSTICE EADY",
+        "score": 0.7024361312389373
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE SAINI",
+        "score": 0.700627689808607
+      },
+      {
+        "judge": "MR JUSTICE NICKLIN",
+        "score": 0.6979129210114479
+      }
+    ]
+  },
+  {
+    "case_idx": 829,
+    "case_id": "[2024] EWHC 471 (KB)",
+    "title": "Kindertons Ltd v Murtagh & Anor [2024] EWHC 471 (KB) (05 March 2024)",
+    "true_panel": [
+      "THE HON. MR JUSTICE TURNER"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE SWEETING",
+        "score": 0.7073099380731582
+      },
+      {
+        "judge": "MR JUSTICE CONSTABLE",
+        "score": 0.7024531110189854
+      },
+      {
+        "judge": "MR JUSTICE ANDREW BAKER",
+        "score": 0.700629579424858
+      }
+    ]
+  },
+  {
+    "case_idx": 837,
+    "case_id": "[2024] EWHC 542 (KB)",
+    "title": "LZL v HYC & Anor [2024] EWHC 542 (KB) (11 March 2024)",
+    "true_panel": [
+      "THE HONOURABLE MRS JUSTICE FARBEY"
+    ],
+    "predictions": [
+      {
+        "judge": "Mr Justice Cotter",
+        "score": 0.6974291607737542
+      },
+      {
+        "judge": "MASTER STEVENS",
+        "score": 0.6921806482598185
+      },
+      {
+        "judge": "MASTER THORNETT",
+        "score": 0.6896718103024695
+      }
+    ]
+  },
+  {
+    "case_idx": 845,
+    "case_id": "[2024] EWHC 569 (KB)",
+    "title": "Birmingham City Council v Daanyaal & Anor [2024] EWHC 569 (KB) (26 February 2024)",
+    "true_panel": [
+      "HER HONOUR JUDGE EMMA KELLY"
+    ],
+    "predictions": [
+      {
+        "judge": "HER HONOUR JUDGE EMMA KELLY",
+        "score": 0.7607289902865886
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE COTTER",
+        "score": 0.7093868389725685
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MORRIS",
+        "score": 0.7080739751458167
+      }
+    ]
+  },
+  {
+    "case_idx": 849,
+    "case_id": "[2024] EWHC 598 (KB)",
+    "title": "SZR v Blackburn with Darwen Borough Council [2024] EWHC 598 (KB) (15 March 2024)",
+    "true_panel": [
+      "MRS JUSTICE HILL DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "MRS JUSTICE ELLENBOGEN",
+        "score": 0.7211686541636785
+      },
+      {
+        "judge": "MR JUSTICE RITCHIE",
+        "score": 0.7122124168108094
+      },
+      {
+        "judge": "MATTHEW BUTT KC",
+        "score": 0.7070918321609497
+      }
+    ]
+  },
+  {
+    "case_idx": 859,
+    "case_id": "[2024] EWHC 627 (KB)",
+    "title": "Elbanna v Clark [2024] EWHC 627 (KB) (20 March 2024)",
+    "true_panel": [
+      "The Hon. Mr Justice Sweeting"
+    ],
+    "predictions": [
+      {
+        "judge": "HIS HONOUR JUDGE BIRD SITTING AS A JUDGE OF THIS COURT",
+        "score": 0.6007401198148727
+      },
+      {
+        "judge": "His Honour Judge Rajeev Shetty",
+        "score": 0.5957712322473525
+      },
+      {
+        "judge": "Simon Tinkler",
+        "score": 0.5806169614195824
+      }
+    ]
+  },
+  {
+    "case_idx": 865,
+    "case_id": "[2024] EWHC 690 (KB)",
+    "title": "Bush v Chief Constable of Northamptonshire Police [2024] EWHC 690 (KB) (26 March 2024)",
+    "true_panel": [
+      "MR JUSTICE JULIAN KNOWLES"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE LAMBERT DBE",
+        "score": 0.6880861580371856
+      },
+      {
+        "judge": "MRS JUSTICE COLLINS RICE",
+        "score": 0.6779918650786081
+      },
+      {
+        "judge": "MRS JUSTICE HILL DBE",
+        "score": 0.6649057973514904
+      }
+    ]
+  },
+  {
+    "case_idx": 866,
+    "case_id": "[2024] EWHC 695 (KB)",
+    "title": "Various Claimants v Mercedes-Benz Group Ag & Ors [2024] EWHC 695 (KB) (25 March 2024)",
+    "true_panel": [
+      "MRS JUSTICE COCKERILL DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "SENIOR MASTER COOK",
+        "score": 0.727011734672955
+      },
+      {
+        "judge": "SENIOR MASTER FONTAINE",
+        "score": 0.7207048497029712
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE FRASER",
+        "score": 0.7151114106178283
+      }
+    ]
+  },
+  {
+    "case_idx": 867,
+    "case_id": "[2024] EWHC 712 (KB)",
+    "title": "Lonsdale & Ors v Wedlake Bell LLP & Ors [2024] EWHC 712 (KB) (27 March 2024)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE MARTIN SPENCER"
+    ],
+    "predictions": [
+      {
+        "judge": "Master Brown",
+        "score": 0.6948078960180283
+      },
+      {
+        "judge": "MASTER DAGNALL",
+        "score": 0.6674090620279312
+      },
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.6546853460695432
+      }
+    ]
+  },
+  {
+    "case_idx": 879,
+    "case_id": "[2024] EWHC 822 (KB)",
+    "title": "CCP Graduate School Ltd v Secretary of State for Education (Re Costs) [2024] EWHC 822 (KB) (29 January 2024)",
+    "true_panel": [
+      "MASTER DAGNALL"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE BOURNE",
+        "score": 0.7281942933797836
+      },
+      {
+        "judge": "HHJ GRAHAM WOOD KC",
+        "score": 0.7143681466579437
+      },
+      {
+        "judge": "MASTER STEVENS",
+        "score": 0.7128070576116442
+      }
+    ]
+  },
+  {
+    "case_idx": 883,
+    "case_id": "[2024] EWHC 857 (KB)",
+    "title": "QRT v JBE [2024] EWHC 857 (KB) (09 February 2024)",
+    "true_panel": [
+      "MASTER DAGNALL"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE LINDEN",
+        "score": 0.6957235121956238
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MURRAY",
+        "score": 0.6922631867907264
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE FARBEY",
+        "score": 0.6867798887193203
+      }
+    ]
+  },
+  {
+    "case_idx": 884,
+    "case_id": "[2024] EWHC 868 (KB)",
+    "title": "Cole v Chief Constable of Bedfordshire Police [2024] EWHC 868 (KB) (26 January 2024)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE MARTIN SPENCER"
+    ],
+    "predictions": [
+      {
+        "judge": "DEXTER DIAS KC",
+        "score": 0.6871519502997399
+      },
+      {
+        "judge": "HHJ RAJEEV SHETTY",
+        "score": 0.6713953383266926
+      },
+      {
+        "judge": "Elizabeth O'Neill",
+        "score": 0.669744611531496
+      }
+    ]
+  },
+  {
+    "case_idx": 892,
+    "case_id": "[2024] EWHC 944 (KB)",
+    "title": "Johnston v Giving.com Ltd [2024] EWHC 944 (KB) (22 March 2024)",
+    "true_panel": [
+      "MR JUSTICE GOOSE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE SWEETING",
+        "score": 0.6863719487190246
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE PEPPERALL",
+        "score": 0.6731490723111413
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE GOOSE",
+        "score": 0.6729355573654174
+      }
+    ]
+  },
+  {
+    "case_idx": 893,
+    "case_id": "[2024] EWHC 95 (KB)",
+    "title": "Tameside Caravans and Storage Ltd v Viavecto Ltd [2024] EWHC 95 (KB) (23 January 2024)",
+    "true_panel": [
+      "MR JUSTICE CONSTABLE"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.7294600583936857
+      },
+      {
+        "judge": "MR JUSTICE CONSTABLE",
+        "score": 0.721920342836529
+      },
+      {
+        "judge": "MR JUSTICE COTTER",
+        "score": 0.7175320634245872
+      }
+    ]
+  },
+  {
+    "case_idx": 899,
+    "case_id": "[2024] EWHC 990 (KB)",
+    "title": "McLoughlin v Chief Constable of Kent Police [2024] EWHC 990 (KB) (01 May 2024)",
+    "true_panel": [
+      "MR JUSTICE KERR"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE NICKLIN",
+        "score": 0.6829003199934959
+      },
+      {
+        "judge": "MR JUSTICE CHAMBERLAIN",
+        "score": 0.6765705752703879
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MURRAY",
+        "score": 0.672759842059829
+      }
+    ]
+  },
+  {
+    "case_idx": 901,
+    "case_id": "[2025] EWHC 1000 (KB)",
+    "title": "ABC v Huntercombe (No.12) Ltd & Ors [2025] EWHC 1000 (KB) (24 April 2025)",
+    "true_panel": [
+      "HIS HONOUR JUDGE BIRD SITTING AS A JUDGE OF THIS COURT"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE CONSTABLE",
+        "score": 0.6479354306124151
+      },
+      {
+        "judge": "MR JUSTICE ANDREW BAKER",
+        "score": 0.6453079336881637
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE SWEETING",
+        "score": 0.6439996129274368
+      }
+    ]
+  },
+  {
+    "case_idx": 902,
+    "case_id": "[2025] EWHC 1017 (KB)",
+    "title": "KKK v Tsirilna (t/a Blokh Solicitors) [2025] EWHC 1017 (KB) (30 April 2025)",
+    "true_panel": [
+      "DUNCAN ATKINSON KC"
+    ],
+    "predictions": [
+      {
+        "judge": "MASTER DAGNALL",
+        "score": 0.743355255961418
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE NICKLIN",
+        "score": 0.73730613514781
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE HEATHER WILLIAMS DBE",
+        "score": 0.7333165645599364
+      }
+    ]
+  },
+  {
+    "case_idx": 914,
+    "case_id": "[2025] EWHC 1102 (KB)",
+    "title": "Birmingham City Council v Persons Unknown & Ors [2025] EWHC 1102 (KB) (26 February 2025)",
+    "true_panel": [
+      "MR JUSTICE RITCHIE"
+    ],
+    "predictions": [
+      {
+        "judge": "HER HONOUR JUDGE EMMA KELLY",
+        "score": 0.7207398287951946
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MORRIS",
+        "score": 0.6896031633019447
+      },
+      {
+        "judge": "MR JUSTICE BUTCHER",
+        "score": 0.6843701958656311
+      }
+    ]
+  },
+  {
+    "case_idx": 917,
+    "case_id": "[2025] EWHC 1128 (KB)",
+    "title": "Woodhead v WTTV Ltd & Anor [2025] EWHC 1128 (KB) (12 May 2025)",
+    "true_panel": [
+      "MR JUSTICE SWIFT"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE RITCHIE",
+        "score": 0.6646733310987364
+      },
+      {
+        "judge": "MR JUSTICE JAY",
+        "score": 0.6593955762684345
+      },
+      {
+        "judge": "MR JUSTICE MARTIN SPENCER",
+        "score": 0.6586327329277992
+      }
+    ]
+  },
+  {
+    "case_idx": 924,
+    "case_id": "[2025] EWHC 119 (KB)",
+    "title": "Ezeugo v Barnet, Enfield and Haringey Mental Health Trust (aka North London NHS Foundation Trust & Ors) [2025] EWHC 119 (KB) (08 January 2025)",
+    "true_panel": [
+      "THE HONOURABLE MRS JUSTICE HILL DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE EADY",
+        "score": 0.6906609117984771
+      },
+      {
+        "judge": "MRS JUSTICE HILL",
+        "score": 0.6890146564820717
+      },
+      {
+        "judge": "SIR NIGEL SWEENEY",
+        "score": 0.6881623089313507
+      }
+    ]
+  },
+  {
+    "case_idx": 936,
+    "case_id": "[2025] EWHC 1289 (KB)",
+    "title": "JD Wetherspoon PLC v Burger (Re Consequential Matters) [2025] EWHC 1289 (KB) (23 May 2025)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE SWEETING"
+    ],
+    "predictions": [
+      {
+        "judge": "Elizabeth O'Neill",
+        "score": 0.6901063628494739
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE DOVE",
+        "score": 0.6676073513925075
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE SWEETING",
+        "score": 0.651996042728424
+      }
+    ]
+  },
+  {
+    "case_idx": 938,
+    "case_id": "[2025] EWHC 13 (KB)",
+    "title": "Marinakis v Karipidis & Ors [2025] EWHC 13 (KB) (10 January 2025)",
+    "true_panel": [
+      "RICHARD SPEARMAN K.C"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HON. MRS JUSTICE STEYN DBE",
+        "score": 0.7402900571172887
+      },
+      {
+        "judge": "His Honour Judge Lewis",
+        "score": 0.736960987912284
+      },
+      {
+        "judge": "DEPUTY HIGH COURT JUDGE AIDAN EARDLEY KC",
+        "score": 0.7266025781631469
+      }
+    ]
+  },
+  {
+    "case_idx": 941,
+    "case_id": "[2025] EWHC 131 (KB)",
+    "title": "Omanovic v Shamaazi Ltd & Anor [2025] EWHC 131 (KB) (23 January 2025)",
+    "true_panel": [
+      "THE HONOURABLE MR JUSTICE MARTIN SPENCER"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE KERR",
+        "score": 0.6951374582373179
+      },
+      {
+        "judge": "MR JUSTICE FREEDMAN",
+        "score": 0.6950457714174104
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MURRAY",
+        "score": 0.6927469202063301
+      }
+    ]
+  },
+  {
+    "case_idx": 942,
+    "case_id": "[2025] EWHC 1310 (KB)",
+    "title": "Consari & Anor v Bensport Ltd [2025] EWHC 1310 (KB) (29 May 2025)",
+    "true_panel": [
+      "HHJ SIDDIQUE"
+    ],
+    "predictions": [
+      {
+        "judge": "MASTER YOXALL",
+        "score": 0.6537502594292164
+      },
+      {
+        "judge": "FORDHAM J",
+        "score": 0.6536613771691918
+      },
+      {
+        "judge": "Master Thornett",
+        "score": 0.6511336252093315
+      }
+    ]
+  },
+  {
+    "case_idx": 947,
+    "case_id": "[2025] EWHC 1327 (KB)",
+    "title": "Abbotsley Ltd & Anor v Pheasantland Ltd & Ors [2025] EWHC 1327 (KB) (27 May 2025)",
+    "true_panel": [
+      "HHJ KAREN WALDEN-SMITH"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE SHELDON",
+        "score": 0.7307776083548864
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE PEPPERALL",
+        "score": 0.7232169769027016
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE LAMBERT DBE",
+        "score": 0.7154751181602478
+      }
+    ]
+  },
+  {
+    "case_idx": 948,
+    "case_id": "[2025] EWHC 134 (KB)",
+    "title": "Ashley v Revenue And Customs [2025] EWHC 134 (KB) (24 January 2025)",
+    "true_panel": [
+      "MRS JUSTICE HEATHER WILLIAMS DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "SUSIE ALEGRE SITTING AS A DEPUTY HIGH COURT JUDGE",
+        "score": 0.69655721783638
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE HEATHER WILLIAMS DBE",
+        "score": 0.6590624511241913
+      },
+      {
+        "judge": "DEPUTY MASTER ALLEYNE",
+        "score": 0.6486128985881805
+      }
+    ]
+  },
+  {
+    "case_idx": 959,
+    "case_id": "[2025] EWHC 1411 (KB)",
+    "title": "Vince v Associated Newspapers Ltd [2025] EWHC 1411 (KB) (09 June 2025)",
+    "true_panel": [
+      "MR JUSTICE SWIFT"
+    ],
+    "predictions": [
+      {
+        "judge": "His Honour Judge Lewis",
+        "score": 0.7173592491282357
+      },
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE COLLINS RICE",
+        "score": 0.712102304233445
+      },
+      {
+        "judge": "THE HON. MRS JUSTICE STEYN DBE",
+        "score": 0.7078109120780771
+      }
+    ]
+  },
+  {
+    "case_idx": 973,
+    "case_id": "[2025] EWHC 149 (KB)",
+    "title": "Armeniakou v Thomson [2025] EWHC 149 (KB) (29 January 2025)",
+    "true_panel": [
+      "MR JUSTICE LINDEN"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE MOULD",
+        "score": 0.6982217460870742
+      },
+      {
+        "judge": "THE HON MR JUSTICE BUTCHER",
+        "score": 0.6896005868911743
+      },
+      {
+        "judge": "MASTER DAGNALL",
+        "score": 0.6729705098867416
+      }
+    ]
+  },
+  {
+    "case_idx": 974,
+    "case_id": "[2025] EWHC 1508 (KB)",
+    "title": "Wilson v Stroud Green Housing Co-operative Ltd [2025] EWHC 1508 (KB) (19 June 2025)",
+    "true_panel": [
+      "MRS JUSTICE HILL"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE PEPPERALL",
+        "score": 0.7203595034100791
+      },
+      {
+        "judge": "MASTER DAVISON",
+        "score": 0.7203401637077331
+      },
+      {
+        "judge": "MRS JUSTICE HILL DBE",
+        "score": 0.7172008116136898
+      }
+    ]
+  },
+  {
+    "case_idx": 977,
+    "case_id": "[2025] EWHC 1530 (KB)",
+    "title": "Free Zone Utilities LFTZ Enterprise v Bancore Global Services Ltd & Ors [2025] EWHC 1530 (KB) (10 July 2025)",
+    "true_panel": [
+      "MASTER YOXALL"
+    ],
+    "predictions": [
+      {
+        "judge": "MASTER YOXALL",
+        "score": 0.6260735712945461
+      },
+      {
+        "judge": "FORDHAM J",
+        "score": 0.60707124825567
+      },
+      {
+        "judge": "MRS JUSTICE STACEY",
+        "score": 0.6069623947143554
+      }
+    ]
+  },
+  {
+    "case_idx": 978,
+    "case_id": "[2025] EWHC 1537 (KB)",
+    "title": "Appiah & Anor v Leeds City Council & Anor [2025] EWHC 1537 (KB) (19 June 2025)",
+    "true_panel": [
+      "Deputy Master Marzec"
+    ],
+    "predictions": [
+      {
+        "judge": "MRS JUSTICE HILL",
+        "score": 0.7278434563299705
+      },
+      {
+        "judge": "MR JUSTICE RITCHIE",
+        "score": 0.7278222587873351
+      },
+      {
+        "judge": "MRS JUSTICE HILL DBE",
+        "score": 0.7149318705905567
+      }
+    ]
+  },
+  {
+    "case_idx": 985,
+    "case_id": "[2025] EWHC 1561 (KB)",
+    "title": "QRT v JBE (Rev1) [2025] EWHC 1561 (KB) (23 June 2025)",
+    "true_panel": [
+      "DEPUTY HIGH COURT JUDGE AIDAN EARDLEY KC"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE STEYN DBE",
+        "score": 0.6821097299456595
+      },
+      {
+        "judge": "MR JUSTICE LINDEN",
+        "score": 0.6797730958232512
+      },
+      {
+        "judge": "MRS JUSTICE HILL DBE",
+        "score": 0.6673626829277385
+      }
+    ]
+  },
+  {
+    "case_idx": 986,
+    "case_id": "[2025] EWHC 158 (KB)",
+    "title": "Wei & Ors v Long & Ors [2025] EWHC 158 (KB) (31 January 2025)",
+    "true_panel": [
+      "MRS JUSTICE HILL DBE"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MR JUSTICE NICKLIN",
+        "score": 0.7144315667450427
+      },
+      {
+        "judge": "DEPUTY HIGH COURT JUDGE AIDAN EARDLEY KC",
+        "score": 0.7081678986549378
+      },
+      {
+        "judge": "His Honour Judge Lewis",
+        "score": 0.7069269882308111
+      }
+    ]
+  },
+  {
+    "case_idx": 989,
+    "case_id": "[2025] EWHC 1593 (KB)",
+    "title": "Raine v JD Wetherspoon PLC [2025] EWHC 1593 (KB) (27 June 2025)",
+    "true_panel": [
+      "MR JUSTICE BRIGHT"
+    ],
+    "predictions": [
+      {
+        "judge": "THE HONOURABLE MRS JUSTICE HEATHER WILLIAMS DBE",
+        "score": 0.7088423192501068
+      },
+      {
+        "judge": "SUSIE ALEGRE SITTING AS A DEPUTY HIGH COURT JUDGE",
+        "score": 0.7070807456970215
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE NICKLIN",
+        "score": 0.7045452065765858
+      }
+    ]
+  },
+  {
+    "case_idx": 995,
+    "case_id": "[2025] EWHC 1628 (KB)",
+    "title": "Haddon v United Kingdom Council for Psychotherapy [2025] EWHC 1628 (KB) (27 June 2025)",
+    "true_panel": [
+      "Rory Dunlop KC"
+    ],
+    "predictions": [
+      {
+        "judge": "HIS HONOUR JUDGE MITHANI KC,",
+        "score": 0.6776083469390869
+      },
+      {
+        "judge": "MS JUSTICE EADY",
+        "score": 0.6619074583053588
+      },
+      {
+        "judge": "MR JUSTICE RITCHIE",
+        "score": 0.6605304035375703
+      }
+    ]
+  },
+  {
+    "case_idx": 998,
+    "case_id": "[2025] EWHC 1669 (KB)",
+    "title": "HM Attorney General for England And Wales v British Broadcasting Corporation [2025] EWHC 1669 (KB) (02 July 2025)",
+    "true_panel": [
+      "THE LADY CHIEF JUSTICE OF ENGLAND AND WALES"
+    ],
+    "predictions": [
+      {
+        "judge": "MR JUSTICE CHAMBERLAIN",
+        "score": 0.6889748174283239
+      },
+      {
+        "judge": "THE HONOURABLE MR JUSTICE MURRAY",
+        "score": 0.6551980695941232
+      },
+      {
+        "judge": "MRS JUSTICE STEYN",
+        "score": 0.6523852989077568
+      }
+    ]
+  }
+]
