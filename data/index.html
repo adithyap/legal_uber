@@ -19,7 +19,7 @@
 </head>
 <body>
   <h1>Judge Assignment Explorer</h1>
-  <div class="meta">Loads JSONs from GitHub (<code>data/cases_raw.json</code>, <code>data/test_assignments.json</code>, <code>data/judge_profiles_summary.json</code>, <code>data/test_report.json</code>) so you can view without local file access. Works on GitHub Pages.</div>
+  <div class="meta">Loads JSONs from GitHub (<code>data/cases_trimmed.json</code>, <code>data/test_assignments.json</code>, <code>data/judge_profiles_summary.json</code>, <code>data/test_report.json</code>) so you can view without local file access. Works on GitHub Pages.</div>
 
   <div class="grid">
     <div class="card" id="metric-summary">
@@ -29,7 +29,7 @@
     <div class="card">
       <div><strong>Data files</strong></div>
       <ul>
-        <li>cases_raw.json</li>
+        <li>cases_trimmed.json</li>
         <li>test_assignments.json</li>
         <li>judge_profiles_summary.json</li>
         <li>test_report.json</li>
@@ -88,7 +88,7 @@
 
     async function loadAll() {
       const [cases, assigns, judges, report] = await Promise.all([
-        fetch(BASE + 'cases_raw.json').then(r => r.json()),
+        fetch(BASE + 'cases_trimmed.json').then(r => r.json()),
         fetch(BASE + 'test_assignments.json').then(r => r.json()),
         fetch(BASE + 'judge_profiles_summary.json').then(r => r.json()),
         fetch(BASE + 'test_report.json').then(r => r.json())

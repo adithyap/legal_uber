@@ -1,0 +1,5 @@
+# DS_Store
+.DS_Store
+ 
+# Ignore raw file
+data/cases_raw.json
