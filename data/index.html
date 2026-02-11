@@ -46,6 +46,7 @@
           <th>Title</th>
           <th>Judgment date</th>
           <th>Area of law</th>
+          <th>Taxonomy</th>
           <th>True panel</th>
           <th>Top1 predicted</th>
           <th>Top1 score</th>
@@ -66,7 +67,7 @@
           <th>Avg turnaround (days)</th>
           <th>Median turnaround</th>
           <th>Avg complexity</th>
-          <th>Top areas (count)</th>
+          <th>Top taxonomy (score)</th>
           <th>Top keywords (count)</th>
         </tr>
       </thead>
@@ -77,11 +78,25 @@
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <script>
-    const fmtList = (arr, max=6) => {
+    const fmtList = (arr, max = 6, precision = 1) => {
       if (!arr || arr.length === 0) return '';
       const sliced = arr.slice(0, max);
-      const items = sliced.map(x => Array.isArray(x) ? `${x[0]} (${x[1]})` : x);
+      const items = sliced.map(x => {
+        if (!Array.isArray(x)) return x;
+        const [label, rawVal] = x;
+        const num = Number(rawVal);
+        const val = Number.isFinite(num) ? num.toFixed(precision) : rawVal;
+        return rawVal === undefined || rawVal === null || rawVal === '' ? label : `${label} (${val})`;
+      });
       return items.join(', ') + (arr.length > max ? ' …' : '');
+    };
+
+    const fmtTaxonomy = (labels, max = 5) => {
+      if (!labels) return '';
+      const normalized = labels.map(item => Array.isArray(item)
+        ? item
+        : [item.label ?? item[0], item.score ?? item.similarity ?? item[1]]);
+      return fmtList(normalized, max, 2);
     };
 
     const BASE = 'https://raw.githubusercontent.com/adithyap/legal_uber/main/data/';
@@ -103,11 +118,13 @@
         const preds = a.predictions || [];
         const top1 = preds[0] || {};
         const top3 = preds.slice(0,3).map(p => `${p.judge} (${p.score.toFixed(3)})`).join('; ');
+        const taxLabels = c.taxonomy_labels || a.taxonomy_labels || [];
         return {
           case_id: a.case_id || '',
           title: a.title || c.title || '',
           judgment_date: c.judgment_date || '',
           area: c.area_of_law || '',
+          taxonomy: fmtTaxonomy(taxLabels, 3),
           true_panel: (a.true_panel || []).join(', '),
           top1: top1.judge || '',
           top1_score: top1.score != null ? top1.score.toFixed(3) : '',
@@ -122,6 +139,7 @@
           { data: 'title', render: $.fn.dataTable.render.text() },
           { data: 'judgment_date' },
           { data: 'area' },
+          { data: 'taxonomy' },
           { data: 'true_panel' },
           { data: 'top1' },
           { data: 'top1_score' },
@@ -138,8 +156,8 @@
         avg_t: info.avg_turnaround_days != null ? info.avg_turnaround_days.toFixed(1) : '',
         med_t: info.median_turnaround_days != null ? info.median_turnaround_days.toFixed(1) : '',
         avg_c: info.avg_complexity != null ? info.avg_complexity.toFixed(3) : '',
-        areas: fmtList(info.top_areas_of_law || [], 5),
-        kws: fmtList(info.top_keywords || [], 6)
+        tax: fmtTaxonomy(info.top_taxonomy || [], 5),
+        kws: fmtList(info.top_keywords || [], 6, 0)
       }));
 
       $('#judges-table').DataTable({
@@ -150,7 +168,7 @@
           { data: 'avg_t' },
           { data: 'med_t' },
           { data: 'avg_c' },
-          { data: 'areas' },
+          { data: 'tax' },
           { data: 'kws' }
         ],
         pageLength: 25,

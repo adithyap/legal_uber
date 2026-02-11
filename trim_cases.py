@@ -8,7 +8,8 @@ Usage:
 Input format: either a list of case dicts, or {"cases": [...]}.
 
 Keeps only lightweight fields:
-  case_id, title, judgment_date, area_of_law, case_url, opinion_author, justices, hearing_start, hearing_end
+  case_id, title, judgment_date, area_of_law, case_url, opinion_author,
+  justices, hearing_start, hearing_end, taxonomy_labels
 Everything else (full text, analysis_text, etc.) is dropped.
 """
 import argparse
@@ -25,6 +26,7 @@ KEEP_KEYS = {
     "justices",
     "hearing_start",
     "hearing_end",
+    "taxonomy_labels",
 }
 
 def load_cases(path: str) -> List[Dict[str, Any]]:
