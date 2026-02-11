@@ -1,5 +1,5 @@
 # ============================
-# UKSC Case -> Judge Assignment (Monolithic Colab Script)
+# EWHC (KB) Case -> Judge Assignment (High Court only)
 # ============================
 
 import os
@@ -14,11 +14,11 @@ import zipfile
 from pathlib import Path
 import shutil
 from dataclasses import dataclass
+from datetime import datetime
 from typing import List, Dict, Any, Optional, Tuple
 from collections import defaultdict, Counter
 
 import numpy as np
-import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from tqdm.auto import tqdm
@@ -34,18 +34,16 @@ from keybert import KeyBERT
 # Config
 # ============================
 
-COURT_MODE = "highcourt"  # "supremecourt" | "highcourt"
-COURT_MODE_CHOICES = {"supremecourt", "highcourt"}
-if COURT_MODE not in COURT_MODE_CHOICES:
-    raise ValueError(f"Unsupported COURT_MODE={COURT_MODE}. Choose from {sorted(COURT_MODE_CHOICES)}.")
 USE_OPINION_AUTHOR_WEIGHTING = True   # prefer authored opinions when building judge profiles
 OPINION_AUTHOR_WEIGHT = 2.0           # weight multiplier when judge authored the opinion
-PANEL_JUDGES_ONLY = True              # when True, require <panel> tags for High Court; else fall back to heuristics
-CASE_PARSE_VERSION = 4                # bump to invalidate stale per-case cached JSONs (judge parsing etc.)
+PANEL_JUDGES_ONLY = False             # require <panel> tags; set False to fall back to heuristics
+CASE_PARSE_VERSION = 6                # bump when parse logic changes
 ZIP_RESULTS = True                    # zip key outputs at end of run for easy download
+YEARS_BEFORE = 25                     # only process cases within the last N years (based on URL year segment)
+CURRENT_YEAR = datetime.utcnow().year
+MIN_CASE_YEAR = CURRENT_YEAR - YEARS_BEFORE
 
-MAX_CASES = 200               # crawl until we have this many cases with Judgment date
-MAX_LIST_PAGES = 200            # safety stop
+MAX_CASES = 1000               # crawl until we have this many cases with Judgment date
 REQUEST_DELAY_SEC = 0.2         # politeness
 HTTP_TIMEOUT = 30
 RANDOM_SEED = 42
@@ -57,45 +55,27 @@ CHUNK_WORDS = 450
 CHUNK_OVERLAP = 60
 
 # Scoring weights (tweakable)
-W_SIM = 0.70
-W_SPEED = 0.20
-W_COMPLEXITY_FIT = 0.10
+W_SIM = 0.40             # embedding similarity
+W_SPEED = 0.15           # turnaround speed
+W_COMPLEXITY_FIT = 0.10  # complexity match
+W_TAXONOMY = 0.60        # taxonomy similarity (dominant factor)
 
 # if case is urgent, speed matters more
 URGENT_SPEED_BOOST = 0.25  # added to W_SPEED * urgency
 
 DEFAULT_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (compatible; UKSCJudgeAssigner/0.1; +https://www.supremecourt.uk/)"
-}
-BAILII_HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
         "(KHTML, like Gecko) Chrome/121.0 Safari/537.36"
     )
 }
-
-SUPREME_LIST_URL = "https://www.supremecourt.uk/cases"
-SUPREME_BASE_URL = "https://www.supremecourt.uk"
-SITEMAP_URL_SUPREME = "https://www.supremecourt.uk/sitemap.xml"
+BAILII_HEADERS = DEFAULT_HEADERS
 
 HIGHCOURT_LIST_BASE = "https://www.bailii.org/ew/cases/EWHC/KB/"
 HIGHCOURT_TOC_TEMPLATE = HIGHCOURT_LIST_BASE + "toc-{}.html"
 HIGHCOURT_BASE_URL = "https://www.bailii.org"
-
-if COURT_MODE == "supremecourt":
-    BASE_CASES_LIST_URL = SUPREME_LIST_URL
-    BASE_CASE_URL = SUPREME_BASE_URL
-    CASE_LISTING_MODE = "auto"  # "listing", "sitemap", "auto"
-    SITEMAP_URL = SITEMAP_URL_SUPREME
-    CACHE_DIR = "/content/uksc_cache"
-    CASE_SOURCE_NAME = "UK Supreme Court"
-else:
-    BASE_CASES_LIST_URL = HIGHCOURT_LIST_BASE
-    BASE_CASE_URL = HIGHCOURT_BASE_URL
-    CASE_LISTING_MODE = "listing"  # placeholder; not used for BAILII
-    SITEMAP_URL = None
-    CACHE_DIR = "/content/uksc_cache_highcourt"
-    CASE_SOURCE_NAME = "EWHC King's Bench"
+CACHE_DIR = "/content/uksc_cache_highcourt"
+CASE_SOURCE_NAME = "EWHC King's Bench"
 
 os.makedirs(CACHE_DIR, exist_ok=True)
 EXPORT_DIR = os.path.join(CACHE_DIR, "export")
@@ -111,7 +91,7 @@ OVERWRITE_DERIVED_CACHE = False
 DERIVED_CACHE_DIR = os.path.join(CACHE_DIR, "derived")
 DERIVED_META_PATH = os.path.join(DERIVED_CACHE_DIR, "derived_meta.json")
 DERIVED_ARRAYS_PATH = os.path.join(DERIVED_CACHE_DIR, "derived_arrays.npz")
-DERIVED_CACHE_VERSION = 5
+DERIVED_CACHE_VERSION = 6
 TEST_REPORT_PATH = os.path.join(EXPORT_DIR, "test_report.json")
 KEYWORD_DF_MAX_RATIO = 0.1
 KEYWORD_MIN_CHARS = 4
@@ -119,6 +99,23 @@ KEYWORD_TOP_CASE_TERMS = 8
 KEYWORD_TOP_JUDGE_TERMS = 30
 KEYWORD_SIM_THRESHOLD = 0.55
 KEYWORD_SIM_TOP_N = 8
+
+# Minimal practice-area taxonomy (KB) for coarse expertise signals (label, seed terms/description)
+TAXONOMY = [
+    ("Immigration / Asylum / Deportation", "asylum, deportation, removal directions, immigration detention, Home Office, refugee, leave to remain"),
+    ("Judicial Review / Public Law", "judicial review, public law, ultra vires, public body, wednesbury, administrative court"),
+    ("Planning / Environmental", "planning permission, planning inspectorate, green belt, listed building, section 106, environmental law"),
+    ("Police / False Imprisonment / Misfeasance", "police powers, false imprisonment, misfeasance, unlawful arrest, detention, stop and search"),
+    ("Data Protection / Privacy / Information", "data protection, GDPR, privacy, article 8, subject access request, ICO"),
+    ("Defamation / Media", "defamation, libel, slander, serious harm, publication, media law"),
+    ("Personal Injury / Clinical Negligence", "personal injury, clinical negligence, medical negligence, duty of care, causation"),
+    ("Commercial / Contract", "commercial dispute, contract breach, damages, warranty, sale of goods, misrepresentation"),
+    ("Insolvency / Bankruptcy", "insolvency, bankruptcy, liquidation, administration, receiver, proof of debt"),
+    ("Property / Land / Landlord", "landlord and tenant, possession, lease, rent, easement, adverse possession"),
+    ("Employment (High Court)", "employment, restrictive covenant, garden leave, confidential information, injunction"),
+    ("Human Rights / HRA", "human rights act, article 3, article 8, article 10, article 5, proportionality"),
+    ("Costs / Procedure / Contempt", "civil procedure rules, costs, summary assessment, detailed assessment, contempt, sanctions"),
+]
 
 GENERIC_KW_STOPWORDS = {
     "court", "high", "bench", "division", "king", "queen", "england", "wales",
@@ -293,22 +290,6 @@ def zip_outputs(cache_dir: str, zip_results: bool = True) -> Optional[str]:
         pass
     return str(zip_path)
 
-def extract_init_cases_pagination(html: str) -> Optional[Dict[str, int]]:
-    prefix = 'initCasesData\\":{\\"pagination\\":{\\"page\\":'
-    pattern = re.escape(prefix) + r'(\d+),\\"pageSize\\":(\d+),\\"pageCount\\":(\d+),\\"total\\":(\d+)'
-    m = re.search(pattern, html)
-    if not m:
-        return None
-    return {
-        "page": int(m.group(1)),
-        "page_size": int(m.group(2)),
-        "page_count": int(m.group(3)),
-        "total": int(m.group(4)),
-    }
-
-def extract_init_case_ids(html: str) -> List[str]:
-    return re.findall(r'caseId\\\\\":\\\\\"(UKSC/[^\\\\\\\"]+)', html)
-
 def soup_main_text(soup: BeautifulSoup) -> str:
     main = soup.find("main")
     node = main if main else soup
@@ -317,6 +298,14 @@ def soup_main_text(soup: BeautifulSoup) -> str:
 def extract_lines(soup: BeautifulSoup) -> List[str]:
     lines = [x.strip() for x in soup.get_text("\n").splitlines()]
     return [x for x in lines if x and x != "•"]
+
+def highcourt_year_from_url(url: str) -> Optional[int]:
+    """
+    Extract the year segment from a BAILII KB URL, e.g.
+    https://www.bailii.org/ew/cases/EWHC/KB/2026/142.html -> 2026
+    """
+    m = re.search(r"/EWHC/KB/(\d{4})/", url, flags=re.IGNORECASE)
+    return int(m.group(1)) if m else None
 
 def normalize_person_name(s: str) -> str:
     return re.sub(r"\s+", " ", (s or "").strip()).lower()
@@ -372,6 +361,60 @@ def dedup_judges_ordered(judges: List[str]) -> List[str]:
         seen.append(canon)
         out.append(j)
     return out
+
+def is_valid_judge_name(name: str, min_len: int = 4) -> bool:
+    """
+    Basic sanity filter to avoid spurious tokens like ':' or very short strings.
+    """
+    if not name:
+        return False
+    n = name.strip()
+    if len(n) < min_len:
+        return False
+    return bool(re.search(r"[A-Za-z]", n))
+
+def filter_judges(judges: List[str]) -> List[str]:
+    """
+    Apply validity + deduplication in one pass.
+    """
+    out = []
+    seen = set()
+    for j in judges or []:
+        if not is_valid_judge_name(j):
+            continue
+        low = j.strip().lower()
+        if low in seen:
+            continue
+        seen.add(low)
+        out.append(j)
+    return out
+
+def autotune_embed_batch_size(model: SentenceTransformer, device: str, default_bs: int = EMBED_BATCH_SIZE) -> int:
+    """
+    Try descending batch sizes to find the largest that fits GPU memory; fall back to default.
+    """
+    if device != "cuda":
+        return min(default_bs, 32)  # keep CPU memory modest
+
+    candidates = [128, 96, 80, 64, 56, 48, 40, 32, 24, 16]
+    sample = ["autotune batch size"] * max(candidates)
+    for bs in candidates:
+        try:
+            model.encode(
+                sample[:bs],
+                batch_size=bs,
+                convert_to_numpy=True,
+                normalize_embeddings=True,
+                show_progress_bar=False
+            )
+            return bs
+        except RuntimeError as e:
+            if "CUDA out of memory" in str(e):
+                torch.cuda.empty_cache()
+                continue
+            # unknown error: use default
+            break
+    return default_bs
 
 def infer_opinion_author(lines: List[str]) -> Optional[str]:
     """
@@ -461,6 +504,75 @@ def normalize_keyword(s: str) -> str:
 def is_repetitive_keyword(s: str) -> bool:
     parts = s.split()
     return len(parts) > 1 and len(set(parts)) == 1
+
+_TAX_EMB_CACHE: Dict[str, np.ndarray] = {}
+
+def taxonomy_label_embeddings(model: SentenceTransformer) -> Dict[str, np.ndarray]:
+    """
+    Compute (and cache) embeddings for taxonomy labels + seed descriptions.
+    """
+    global _TAX_EMB_CACHE
+    if _TAX_EMB_CACHE:
+        return _TAX_EMB_CACHE
+    texts = [f"{label}: {desc}" for label, desc in TAXONOMY]
+    embs = model.encode(texts, convert_to_numpy=True, normalize_embeddings=True, show_progress_bar=False)
+    for (label, _), emb in zip(TAXONOMY, embs):
+        _TAX_EMB_CACHE[label] = emb
+    return _TAX_EMB_CACHE
+
+def classify_taxonomy_semantic(text: str, title: str, model: SentenceTransformer, top_k: int = 3, threshold: float = 0.2) -> List[Tuple[str, float]]:
+    """
+    Semantic similarity between case text embedding and taxonomy label embeddings.
+    """
+    if not text:
+        return []
+    # Build a compact summary: title + first 800 words
+    words = (text or "").split()
+    snippet = " ".join(words[:800])
+    payload = f"{title}\n{snippet}".strip()
+    case_emb = model.encode([payload], convert_to_numpy=True, normalize_embeddings=True, show_progress_bar=False)[0]
+    label_embs = taxonomy_label_embeddings(model)
+    sims = []
+    for label, emb in label_embs.items():
+        sims.append((label, float(np.dot(case_emb, emb))))
+    sims.sort(key=lambda x: x[1], reverse=True)
+    sims = [(l, s) for l, s in sims if s >= threshold]
+    return sims[:top_k]
+
+def encode_with_backoff(
+    model: SentenceTransformer,
+    texts: List[str],
+    batch_size: int,
+    desc: Optional[str] = None
+) -> np.ndarray:
+    """
+    Encode with dynamic batch downscaling on CUDA OOM.
+    """
+    bs = max(1, batch_size)
+    while bs >= 8:
+        try:
+            return model.encode(
+                texts,
+                batch_size=bs,
+                show_progress_bar=bool(desc),
+                convert_to_numpy=True,
+                normalize_embeddings=True
+            )
+        except RuntimeError as e:
+            if "CUDA out of memory" in str(e):
+                debug_log(f"[embed][oom] batch_size={bs} -> halving")
+                torch.cuda.empty_cache()
+                bs = max(8, bs // 2)
+                continue
+            raise
+    # final attempt with minimal batch
+    return model.encode(
+        texts,
+        batch_size=4,
+        show_progress_bar=bool(desc),
+        convert_to_numpy=True,
+        normalize_embeddings=True
+    )
 
 def compute_cases_hash(cases: List[Dict[str, Any]]) -> str:
     urls = [c.get("case_url", "") or "" for c in cases]
@@ -568,6 +680,7 @@ def serialize_profiles(profiles: Dict[str, "JudgeProfile"]) -> Dict[str, Any]:
             "avg_complexity": p.avg_complexity,
             "area_counts": p.area_counts,
             "keyword_counts": p.keyword_counts,
+            "taxonomy_counts": p.taxonomy_counts,
         }
     return out
 
@@ -599,6 +712,7 @@ def deserialize_profiles(data: Dict[str, Any]) -> Dict[str, "JudgeProfile"]:
             avg_complexity=p.get("avg_complexity"),
             area_counts=p.get("area_counts") or {},
             keyword_counts=p.get("keyword_counts") or {},
+            taxonomy_counts=p.get("taxonomy_counts") or {},
         )
     return out
 
@@ -676,78 +790,6 @@ def save_derived_cache(
 # Crawling / Parsing
 # ============================
 
-def fetch_case_list_page(session: requests.Session, page: int) -> Tuple[List[str], Dict[str, Any]]:
-    url = f"{BASE_CASES_LIST_URL}?p={page}"
-    info = {
-        "url": url,
-        "page": page,
-        "status": None,
-        "html_len": 0,
-        "html_sha1": None,
-        "url_count": 0,
-        "urls_hash": None,
-        "init_pagination": None,
-        "init_case_ids": [],
-    }
-    r = request_get(url, session)
-    if r is None:
-        info["status"] = None
-        return [], info
-
-    info["status"] = r.status_code
-    html = r.text or ""
-    info["html_len"] = len(html)
-    info["html_sha1"] = sha1(html) if html else None
-    info["init_pagination"] = extract_init_cases_pagination(html)
-    info["init_case_ids"] = extract_init_case_ids(html)
-
-    if r.status_code != 200:
-        return [], info
-
-    soup = BeautifulSoup(html, "lxml")
-    urls = set()
-    for a in soup.find_all("a", href=True):
-        href = a["href"].strip()
-        # Typical case pages look like: /cases/uksc-2025-0043
-        if href.startswith("/cases/uksc-") and "/judgments/" not in href:
-            urls.add(BASE_CASE_URL + href)
-    urls = sorted(urls)
-    info["url_count"] = len(urls)
-    info["urls_hash"] = sha1("\n".join(urls)) if urls else None
-    return urls, info
-
-def list_case_urls(session: requests.Session, page: int) -> List[str]:
-    urls, _ = fetch_case_list_page(session, page)
-    return urls
-
-def list_case_urls_from_sitemap(session: requests.Session) -> List[str]:
-    r = request_get(SITEMAP_URL, session)
-    if r is None or r.status_code != 200:
-        debug_log(f"[sitemap][warn] Failed to fetch sitemap: {SITEMAP_URL}")
-        return []
-    html = r.text or ""
-    urls = re.findall(r'https?://(?:www\.)?supremecourt\.uk/cases/uksc-[^<\s]+', html)
-    norm = []
-    for u in urls:
-        u = u.replace("https://supremecourt.uk", BASE_CASE_URL)
-        u = u.replace("http://supremecourt.uk", BASE_CASE_URL)
-        if "/judgments/" in u:
-            continue
-        norm.append(u)
-    # unique, preserve order
-    out = []
-    seen = set()
-    for u in norm:
-        if u in seen:
-            continue
-        seen.add(u)
-        out.append(u)
-    debug_log(f"[sitemap] extracted {len(out)} case URLs from {SITEMAP_URL}")
-    if out:
-        sample = ", ".join(out[:CRAWL_DEBUG_SAMPLE_IDS])
-        debug_log(f"[sitemap] sample URLs: {sample}")
-    return out
-
 def list_highcourt_case_urls(session: requests.Session) -> List[str]:
     """
     BAILII listing: iterate toc-A.html ... toc-Z.html and collect case pages.
@@ -773,6 +815,9 @@ def list_highcourt_case_urls(session: requests.Session) -> List[str]:
             full = href
             if href.startswith("/"):
                 full = HIGHCOURT_BASE_URL.rstrip("/") + href
+            year = highcourt_year_from_url(full)
+            if year is None or year < MIN_CASE_YEAR or year > CURRENT_YEAR:
+                continue
             if full in seen:
                 continue
             seen.add(full)
@@ -786,44 +831,6 @@ def list_highcourt_case_urls(session: requests.Session) -> List[str]:
         sample = ", ".join(urls[:CRAWL_DEBUG_SAMPLE_IDS])
         debug_log(f"[bailii] sample URLs: {sample}")
     return urls
-
-def debug_crawl_page(info: Dict[str, Any], prev_info: Optional[Dict[str, Any]] = None) -> None:
-    if not CRAWL_DEBUG:
-        return
-    sha = (info.get("html_sha1") or "")[:10]
-    debug_log(
-        f"[crawl] page={info.get('page')} url={info.get('url')} status={info.get('status')} "
-        f"urls={info.get('url_count')} html_len={info.get('html_len')} html_sha1={sha}"
-    )
-    pag = info.get("init_pagination")
-    if pag:
-        debug_log(
-            "[crawl] initCasesData pagination "
-            f"page={pag.get('page')} page_count={pag.get('page_count')} "
-            f"total={pag.get('total')} page_size={pag.get('page_size')}"
-        )
-        if pag.get("page") != info.get("page"):
-            debug_log(
-                f"[crawl][warn] initCasesData page={pag.get('page')} does not match requested page={info.get('page')}"
-            )
-    else:
-        debug_log("[crawl][warn] initCasesData pagination not found in HTML")
-
-    case_ids = info.get("init_case_ids") or []
-    if case_ids:
-        sample = ", ".join(case_ids[:CRAWL_DEBUG_SAMPLE_IDS])
-        debug_log(f"[crawl] initCasesData caseId sample: {sample}")
-
-    if prev_info:
-        if info.get("html_sha1") and info.get("html_sha1") == prev_info.get("html_sha1"):
-            debug_log("[crawl][warn] HTML identical to previous page; pagination may be ignored or JS-driven")
-        if info.get("urls_hash") and info.get("urls_hash") == prev_info.get("urls_hash"):
-            debug_log("[crawl][warn] Extracted case URLs identical to previous page")
-
-def get_judgment_page_url(case_url: str) -> str:
-    # case_url: https://www.supremecourt.uk/cases/uksc-2025-0043
-    slug = case_url.rstrip("/").split("/")[-1]
-    return f"{BASE_CASE_URL}/cases/judgments/{slug}"
 
 def cache_path(case_url: str) -> str:
     return os.path.join(CASE_JSON_DIR, f"{sha1(case_url)}.json")
@@ -843,9 +850,33 @@ def extract_panel_judges(soup: BeautifulSoup) -> List[str]:
         name = parts[0]
         name = re.sub(r"\s*\(.*?\)\s*$", "", name)
         name = re.sub(r"\s{2,}", " ", name).strip()
-        if name:
+        if name and is_valid_judge_name(name):
             judges.append(name)
     return dedup_judges_ordered(judges)
+
+def extract_judge_from_before(lines: List[str]) -> Optional[str]:
+    """
+    Heuristic inspired by sample_pdf_parser: look for a "Before" line and
+    pull a judge name such as "MR JUSTICE BLOGGS" that follows it.
+    """
+    judge_pat = re.compile(r"\b(?:MR|MRS|MS)\s+JUSTICE\s+[A-Z][A-Z]+(?:\s+[A-Z][A-Z]+)*\b", re.IGNORECASE)
+    for i, ln in enumerate(lines[:200]):
+        if not ln.lower().startswith("before"):
+            continue
+        m = judge_pat.search(ln)
+        if m:
+            j = m.group(0).title().replace("Mr ", "MR ").replace("Mrs ", "MRS ").replace("Ms ", "MS ")
+            return j
+        # sometimes judge name sits on next line
+        if i + 1 < len(lines):
+            nxt = lines[i + 1]
+            m2 = judge_pat.search(nxt)
+            if m2:
+                j = m2.group(0).title().replace("Mr ", "MR ").replace("Mrs ", "MRS ").replace("Ms ", "MS ")
+                return j
+            if nxt.strip():
+                return nxt.strip()
+    return None
 
 def extract_bailii_judges(lines: List[str]) -> List[str]:
     """
@@ -871,7 +902,8 @@ def extract_bailii_judges(lines: List[str]) -> List[str]:
                     continue
                 if not re.search(r"[A-Za-z]", cand):
                     continue
-                judges.append(cand)
+                if is_valid_judge_name(cand):
+                    judges.append(cand)
             break
 
     if not judges:
@@ -882,11 +914,17 @@ def extract_bailii_judges(lines: List[str]) -> List[str]:
             if "adjudged" in low or "judgment" in low:
                 continue
             if re.match(r"^(the hon\.?\s+)?(lord|lady|mr|mrs|ms|miss|sir|dame)\b.*(justice|judge)", ln, re.IGNORECASE):
-                judges.append(ln.strip())
+                cand = ln.strip()
+                if is_valid_judge_name(cand):
+                    judges.append(cand)
             elif re.search(r"\b(his|her)\s+honour\s+judge\b", low):
-                judges.append(ln.strip())
+                cand = ln.strip()
+                if is_valid_judge_name(cand):
+                    judges.append(cand)
             elif re.search(r"\bhhj\b", low) and "judge" in low:
-                judges.append(ln.strip())
+                cand = ln.strip()
+                if is_valid_judge_name(cand):
+                    judges.append(cand)
         judges = judges[:3]
 
     return dedup_judges_ordered(judges)
@@ -895,7 +933,29 @@ def parse_highcourt_case(case_url: str, session: requests.Session) -> Optional[D
     """
     Parse a BAILII High Court (KB) case page.
     """
+    def parse_hearing_start(text: str, lines: List[str]) -> Optional[str]:
+        # Text-wide patterns
+        m = re.search(r"\bHearing\s+date[s]?:\s*([^\n]+)", text, flags=re.IGNORECASE)
+        if not m:
+            m = re.search(r"\bDate\s+of\s+hearing[s]?:\s*([^\n]+)", text, flags=re.IGNORECASE)
+        if m:
+            raw = re.split(r"[;,]", m.group(1))[0].strip()
+            dt = parse_date_maybe(raw)
+            if dt:
+                return dt
+        # Line-wise fallback
+        for ln in lines[:150]:
+            m2 = re.search(r"\b[Hh]earing\s+date[s]?\s*[:-]\s*([A-Za-z0-9 ,/]+)", ln)
+            if m2:
+                dt = parse_date_maybe(m2.group(1))
+                if dt:
+                    return dt
+        return None
     cpath = cache_path(case_url)
+    yr = highcourt_year_from_url(case_url)
+    if yr is None or yr < MIN_CASE_YEAR or yr > CURRENT_YEAR:
+        debug_log(f"[bailii][skip] {case_url} year={yr} outside range {MIN_CASE_YEAR}-{CURRENT_YEAR}")
+        return None
     if os.path.exists(cpath):
         try:
             with open(cpath, "r", encoding="utf-8") as f:
@@ -911,6 +971,7 @@ def parse_highcourt_case(case_url: str, session: requests.Session) -> Optional[D
 
     soup = BeautifulSoup(r.text, "lxml")
     lines = extract_lines(soup)
+    flat_text = "\n".join(lines)
     panel_judges = extract_panel_judges(soup)
     opinion_author = infer_opinion_author(lines)
 
@@ -919,12 +980,20 @@ def parse_highcourt_case(case_url: str, session: requests.Session) -> Optional[D
 
     # Neutral citation / case id
     case_id = None
+    case_no = None
+    m_case_no = re.search(r"Case\s*No:\s*([A-Z]{1,5}-\d{4}-\d+)", flat_text, flags=re.IGNORECASE)
+    if m_case_no:
+        case_no = m_case_no.group(1).strip()
     citation_pattern = r"\[\d{4}\]\s*EWHC\s*\d+\s*\([A-Za-z]{2,5}\)"
     for ln in lines[:200]:
         m = re.search(citation_pattern, ln)
         if m:
             case_id = m.group(0)
             break
+    if not case_id:
+        m = re.search(citation_pattern, flat_text)
+        if m:
+            case_id = m.group(0)
     if not case_id and title:
         m = re.search(citation_pattern, title)
         if m:
@@ -938,8 +1007,10 @@ def parse_highcourt_case(case_url: str, session: requests.Session) -> Optional[D
             if year and num:
                 case_id = f"[{year}] EWHC {num} (KB)"
 
-    # Judgment date
+    # Judgment / hearing dates
     judgment_date = None
+    hearing_start = None
+    hearing_end = None
     for dt in soup.find_all("date"):
         jd = parse_date_maybe(dt.get_text(" "))
         if jd:
@@ -955,22 +1026,40 @@ def parse_highcourt_case(case_url: str, session: requests.Session) -> Optional[D
             if m:
                 judgment_date = parse_date_maybe(m.group(0))
                 break
+    if not judgment_date:
+        m = re.search(r"\bDate:\s*([0-3]?\d/[01]?\d/\d{4})\b", flat_text, flags=re.IGNORECASE)
+        if not m:
+            m = re.search(r"\bDate:\s*([0-3]?\d\s+[A-Za-z]+\s+\d{4})\b", flat_text, flags=re.IGNORECASE)
+        if m:
+            judgment_date = parse_date_maybe(m.group(1))
+
+    if not hearing_start:
+        hearing_start = parse_hearing_start(flat_text, lines)
 
     justices = panel_judges
     if not justices:
         if PANEL_JUDGES_ONLY:
             debug_log(f"[bailii][warn] No <panel> judges found; skipping case {case_url}")
             return None
-        justices = extract_bailii_judges(lines)
-    if opinion_author and opinion_author not in justices:
+        judge_from_before = extract_judge_from_before(lines)
+        if judge_from_before and is_valid_judge_name(judge_from_before):
+            justices = [judge_from_before]
+        else:
+            justices = extract_bailii_judges(lines)
+
+    # Drop obviously bad parses (too short / no alpha)
+    justices = filter_judges(justices)
+
+    if opinion_author and is_valid_judge_name(opinion_author) and opinion_author not in justices:
         justices.append(opinion_author)
     # Deduplicate but preserve first entry order; keep only first name to avoid duplicates of same judge wording
     seen = set()
     dedup = []
     for j in justices:
-        if j.lower() in seen:
+        low = j.lower()
+        if low in seen:
             continue
-        seen.add(j.lower())
+        seen.add(low)
         dedup.append(j)
     if dedup:
         justices = [dedup[0]]  # High Court cases are typically single-judge; keep the first parsed
@@ -994,196 +1083,41 @@ def parse_highcourt_case(case_url: str, session: requests.Session) -> Optional[D
             area_of_law = ln.strip()
             break
 
+    # Require both start and end dates; otherwise skip to keep turnaround reliable
+    if not hearing_start or not judgment_date:
+        debug_log(f"[bailii][skip] missing hearing/judgment date for {case_url} (hearing={hearing_start}, judgment={judgment_date})")
+        return None
+
     out = {
         "case_url": case_url,
         "judgment_url": case_url,
         "case_id": case_id or "",
+        "case_no": case_no or "",
         "title": title or "",
         "area_of_law": area_of_law,
         "issue": "",
         "facts": "",
         "date_of_issue": None,
         "judgment_date": judgment_date,
-        "hearing_start": None,
-        "hearing_end": None,
+        "hearing_start": hearing_start,
+        "hearing_end": hearing_end,
         "justices": justices,
         "opinion_author": opinion_author or "",
         "text_full": text_full[:2_000_000],
         "analysis_text": analysis_text[:2_000_000],
         "source_urls": {"case": case_url, "judgment": case_url},
         "_parse_version": CASE_PARSE_VERSION,
+        # taxonomy labels populated later once embeddings are available
+        "taxonomy_labels": [],
     }
 
-    if not out.get("judgment_date"):
-        return None
+    out["justices"] = filter_judges(out.get("justices"))
 
     with open(cpath, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
 
     return out
 
-def parse_case(case_url: str, session: requests.Session) -> Optional[Dict[str, Any]]:
-    """
-    Parse both the /cases/<slug> page (metadata) and /cases/judgments/<slug> (full text if present).
-    Returns dict with keys:
-      case_id, title, area_of_law, issue, facts, date_of_issue, judgment_date,
-      hearing_start, hearing_end, justices, text_full, source_urls
-    """
-    # Cache
-    cpath = cache_path(case_url)
-    if os.path.exists(cpath):
-        try:
-            with open(cpath, "r", encoding="utf-8") as f:
-                cached = json.load(f)
-            if cached.get("_parse_version") == CASE_PARSE_VERSION:
-                return cached
-        except Exception:
-            pass
-
-    # --- fetch case page ---
-    r = request_get(case_url, session)
-    if r is None or r.status_code != 200:
-        return None
-    soup_case = BeautifulSoup(r.text, "lxml")
-    lines_case = extract_lines(soup_case)
-    opinion_author = None
-
-    # Title
-    h1 = soup_case.find("h1")
-    title = clean_text(h1.get_text(" ")) if h1 else None
-
-    # Case ID
-    # Often appears as UKSC/2025/0043 in text
-    case_id = None
-    for ln in lines_case[:200]:
-        m = re.search(r"\bUKSC/\d{4}/\d{4}(?:/[A-Z])?\b", ln)
-        if m:
-            case_id = m.group(0)
-            break
-    # Area of law: often right after case id in early lines
-    area_of_law = None
-    if case_id:
-        try:
-            idx = lines_case.index(case_id)
-            # find next uppercase-ish phrase within next few lines
-            for j in range(idx + 1, min(idx + 10, len(lines_case))):
-                cand = lines_case[j].strip()
-                if cand and len(cand) < 80 and cand.upper() == cand and re.search(r"[A-Z]", cand):
-                    area_of_law = cand
-                    break
-        except ValueError:
-            pass
-
-    issue = find_block_after_label(
-        lines_case,
-        "Issue",
-        stop_labels=["Facts", "Date of issue", "Case origin", "Written arguments", "Statements of Facts and Issues", "Judgment details", "Appeal", "Change log"]
-    )
-    facts = find_block_after_label(
-        lines_case,
-        "Facts",
-        stop_labels=["Date of issue", "Case origin", "Written arguments", "Statements of Facts and Issues", "Judgment details", "Appeal", "Change log"]
-    )
-
-    date_of_issue = parse_date_maybe(find_value_after_label(lines_case, "Date of issue") or "")
-    judgment_date = parse_date_maybe(find_value_after_label(lines_case, "Judgment date") or "")
-
-    hearing_start = parse_date_maybe(find_value_after_label(lines_case, "Start date") or "")
-    hearing_end = parse_date_maybe(find_value_after_label(lines_case, "End date") or "")
-
-    # --- judgment page (full text + reliable justices/hearing/judgment dates) ---
-    judgment_url = get_judgment_page_url(case_url)
-    justices = []
-    text_full = ""
-    judgment_date_j = None
-    hearing_start_j = None
-    hearing_end_j = None
-
-    rj = request_get(judgment_url, session)
-    if rj is not None and rj.status_code == 200:
-        soup_j = BeautifulSoup(rj.text, "lxml")
-        lines_j = extract_lines(soup_j)
-
-        # override with judgment page metadata if present
-        judgment_date_j = parse_date_maybe(find_value_after_label(lines_j, "Judgment date") or "")
-        hearing_start_j = parse_date_maybe(find_value_after_label(lines_j, "Start date") or "")
-        hearing_end_j = parse_date_maybe(find_value_after_label(lines_j, "End date") or "")
-        opinion_author = infer_opinion_author(lines_j)
-
-        # Justices: collect names after "Justices" until we hit "Judgment details"
-        js = []
-        for i in range(len(lines_j)):
-            if lines_j[i].strip().lower() == "justices":
-                for j in range(i + 1, min(i + 30, len(lines_j))):
-                    if lines_j[j].strip().lower() in {"judgment details", "judgment date", "neutral citation", "hearing dates"}:
-                        break
-                    name = lines_j[j].strip()
-                    if re.match(r"^(Lord|Lady)\s", name) or name in {"Lord Burnett"}:
-                        js.append(name)
-                break
-        justices = sorted(set(js))
-
-        # Full text from main
-        text_full = soup_main_text(soup_j)
-
-    # Decide final fields
-    if judgment_date_j:
-        judgment_date = judgment_date_j
-    if hearing_start_j:
-        hearing_start = hearing_start_j
-    if hearing_end_j:
-        hearing_end = hearing_end_j
-
-    # If no justices found from judgment page, try case page "Justices" section (less reliable)
-    if not justices:
-        # collect a tags whose text looks like a justice name
-        js = []
-        for a in soup_case.find_all("a"):
-            t = (a.get_text(" ") or "").strip()
-            if re.match(r"^(Lord|Lady)\s", t) or t in {"Lord Burnett"}:
-                js.append(t)
-        justices = sorted(set(js))
-    if not opinion_author:
-        opinion_author = infer_opinion_author(lines_case)
-    if opinion_author and opinion_author not in justices:
-        justices.append(opinion_author)
-
-    # Require a judgment date for this pipeline (since urgency profiling depends on it)
-    if not judgment_date:
-        return None
-
-    # Build "analysis text" used for embedding and keywords
-    # (use full judgment if available; else fall back to case summary sections)
-    summary_text = " ".join([x for x in [title, area_of_law, issue, facts] if x])
-    if text_full and len(text_full) > len(summary_text) + 500:
-        analysis_text = text_full
-    else:
-        analysis_text = summary_text
-
-    out = {
-        "case_url": case_url,
-        "judgment_url": judgment_url,
-        "case_id": case_id or "",
-        "title": title or "",
-        "area_of_law": area_of_law or "",
-        "issue": issue or "",
-        "facts": facts or "",
-        "date_of_issue": date_of_issue,
-        "judgment_date": judgment_date,
-        "hearing_start": hearing_start,
-        "hearing_end": hearing_end,
-        "justices": justices,
-        "opinion_author": opinion_author or "",
-        "text_full": text_full[:2_000_000],  # safety cap
-        "analysis_text": analysis_text[:2_000_000],
-        "source_urls": {"case": case_url, "judgment": judgment_url},
-        "_parse_version": CASE_PARSE_VERSION,
-    }
-
-    with open(cpath, "w", encoding="utf-8") as f:
-        json.dump(out, f, ensure_ascii=False, indent=2)
-
-    return out
 
 def crawl_cases(
     n_cases: int,
@@ -1197,7 +1131,7 @@ def crawl_cases(
         return found[:n_cases]
 
     last_saved = len(found)
-    parse_fn = parse_case if COURT_MODE == "supremecourt" else parse_highcourt_case
+    parse_fn = parse_highcourt_case
 
     def handle_urls(urls: List[str], progress_desc: Optional[str] = None) -> bool:
         nonlocal last_saved
@@ -1220,6 +1154,12 @@ def crawl_cases(
                 # still keep (some older entries might be sparse), but warn
                 pass
 
+            case["justices"] = filter_judges(case.get("justices", []))
+            if CRAWL_DEBUG:
+                debug_log(
+                    f"[bailii][parsed] {case.get('case_id','')} "
+                    f"hearing_start={case.get('hearing_start')} judgment_date={case.get('judgment_date')}"
+                )
             found.append(case)
 
             if cache_path and (len(found) - last_saved) >= CACHE_SAVE_EVERY:
@@ -1232,55 +1172,12 @@ def crawl_cases(
                 return True
         return False
 
-    if COURT_MODE == "highcourt":
-        print_block("HIGH COURT LISTING")
-        urls = list_highcourt_case_urls(session)
-        if urls:
-            if handle_urls(urls, progress_desc="Parsing High Court cases"):
-                return found
-        else:
-            debug_log("[bailii][warn] No High Court case URLs extracted; returning cached/seed cases.")
-        if cache_path:
-            save_cases_cache(cache_path, found)
-        return found
-
-    use_sitemap = CASE_LISTING_MODE == "sitemap"
-    auto_fallback = CASE_LISTING_MODE == "auto"
-
-    if not use_sitemap:
-        prev_info: Optional[Dict[str, Any]] = None
-        print_block("LISTING PAGES")
-        for page in tqdm(range(1, MAX_LIST_PAGES + 1), desc="Listing pages"):
-            urls, info = fetch_case_list_page(session, page)
-            debug_crawl_page(info, prev_info)
-
-            if auto_fallback and page > 1:
-                pag = info.get("init_pagination") or {}
-                if (pag and pag.get("page") != page) or (
-                    prev_info and info.get("html_sha1") == prev_info.get("html_sha1")
-                ):
-                    debug_log("[crawl][warn] Pagination appears static; switching to sitemap crawl.")
-                    use_sitemap = True
-                    break
-
-            if not urls:
-                debug_log(f"[crawl][warn] No case URLs extracted for page {page}")
-                prev_info = info
-                continue
-
-            if handle_urls(urls):
-                return found
-
-            prev_info = info
-
-    if use_sitemap:
-        print_block("SITEMAP LISTING")
-        urls = list_case_urls_from_sitemap(session)
-        if urls:
-            if handle_urls(urls, progress_desc="Parsing sitemap cases"):
-                return found
-        else:
-            debug_log("[sitemap][warn] No case URLs extracted; returning what we have.")
+    print_block("HIGH COURT LISTING")
+    urls = list_highcourt_case_urls(session)
+    if urls:
+        handle_urls(urls, progress_desc="Parsing High Court cases")
+    else:
+        debug_log("[bailii][warn] No High Court case URLs extracted; returning cached/seed cases.")
 
     if cache_path:
         save_cases_cache(cache_path, found)
@@ -1307,13 +1204,12 @@ def build_embeddings(cases: List[Dict[str, Any]], model: SentenceTransformer) ->
         all_chunks.extend(chunks)
         case_to_chunk_idxs[i] = list(range(start, start + len(chunks)))
 
-    # Encode
-    chunk_embs = model.encode(
+    # Encode with backoff to avoid OOM
+    chunk_embs = encode_with_backoff(
+        model,
         all_chunks,
         batch_size=EMBED_BATCH_SIZE,
-        show_progress_bar=True,
-        convert_to_numpy=True,
-        normalize_embeddings=True
+        desc="Encoding chunks"
     )
 
     # Pool to case embedding
@@ -1325,6 +1221,21 @@ def build_embeddings(cases: List[Dict[str, Any]], model: SentenceTransformer) ->
         case_embs.append(ce)
 
     return np.vstack(case_embs), case_to_chunk_idxs
+
+def assign_taxonomy_labels(cases: List[Dict[str, Any]], case_embs: np.ndarray, model: SentenceTransformer, top_k: int = 3, threshold: float = 0.2) -> None:
+    """
+    Populate taxonomy_labels for each case using semantic similarity to taxonomy embeddings.
+    """
+    label_embs = taxonomy_label_embeddings(model)
+    labels = list(label_embs.keys())
+    emb_matrix = np.vstack([label_embs[l] for l in labels])
+    # dot product since all normalized
+    sims = case_embs @ emb_matrix.T
+    for i, c in enumerate(cases):
+        row = sims[i]
+        ranked = sorted(zip(labels, row.tolist()), key=lambda x: x[1], reverse=True)
+        ranked = [(l, s) for l, s in ranked if s >= threshold][:top_k]
+        c["taxonomy_labels"] = ranked
 
 def compute_complexity(cases: List[Dict[str, Any]], case_embs: np.ndarray, model: SentenceTransformer) -> np.ndarray:
     """
@@ -1351,7 +1262,12 @@ def compute_complexity(cases: List[Dict[str, Any]], case_embs: np.ndarray, model
             idx = min(len(chunks)-1, int(frac * (len(chunks)-1)))
             pick.append(chunks[idx])
         pick = list(dict.fromkeys(pick))  # unique
-        em = model.encode(pick, batch_size=32, convert_to_numpy=True, normalize_embeddings=True)
+        em = encode_with_backoff(
+            model,
+            pick,
+            batch_size=EMBED_BATCH_SIZE,
+            desc=None
+        )
         centroid = em.mean(axis=0)
         centroid = centroid / (np.linalg.norm(centroid) + 1e-12)
         # average cosine distance
@@ -1412,6 +1328,7 @@ class JudgeProfile:
     avg_complexity: Optional[float]
     area_counts: Dict[str, int]
     keyword_counts: Dict[str, int]
+    taxonomy_counts: Dict[str, float]
 
 def build_judge_profiles(
     cases: List[Dict[str, Any]],
@@ -1426,6 +1343,7 @@ def build_judge_profiles(
     by_judge_comp = defaultdict(list)   # list of (comp, weight)
     by_judge_area = defaultdict(Counter)  # weighted counts
     by_judge_kw = defaultdict(Counter)    # weighted counts
+    by_judge_tax = defaultdict(Counter)   # taxonomy label weights
 
     for idx in train_indices:
         c = cases[idx]
@@ -1436,7 +1354,8 @@ def build_judge_profiles(
         kws = case_keywords[idx] or []
         op_author = normalize_person_name(c.get("opinion_author") or "")
 
-        for j in c.get("justices", []) or []:
+        judges = filter_judges(c.get("justices", []) or [])
+        for j in judges:
             w = 1.0
             if USE_OPINION_AUTHOR_WEIGHTING and op_author and normalize_person_name(j) == op_author:
                 w = OPINION_AUTHOR_WEIGHT
@@ -1452,6 +1371,8 @@ def build_judge_profiles(
                 nk = normalize_keyword(kw)
                 if nk:
                     by_judge_kw[j][nk] += w
+            for label, score in c.get("taxonomy_labels", []) or []:
+                by_judge_tax[j][label] += w * (score or 1.0)
 
     profiles = {}
     for j, w_sum in by_judge_emb_w.items():
@@ -1484,6 +1405,7 @@ def build_judge_profiles(
             avg_complexity=avg_c,
             area_counts=dict(by_judge_area[j]),
             keyword_counts=dict(by_judge_kw[j]),
+            taxonomy_counts=dict(by_judge_tax[j]),
         )
     return profiles
 
@@ -1520,6 +1442,7 @@ def score_judges_for_case(
     emb = case_embs[case_idx]
     comp = float(case_complexity[case_idx])
     urgency = estimate_case_urgency(" ".join([cases[case_idx].get("issue", ""), cases[case_idx].get("facts", "")]))
+    case_tax = cases[case_idx].get("taxonomy_labels") or []
 
     scores = []
     for j, p in profiles.items():
@@ -1532,14 +1455,27 @@ def score_judges_for_case(
         else:
             cfit = 1.0 - min(1.0, abs(comp - float(p.avg_complexity)))
 
+        # Taxonomy match: weighted overlap using semantic label scores
+        tax_score = 0.0
+        if case_tax and p.taxonomy_counts:
+            num = 0.0
+            denom = 0.0
+            for label, cscore in case_tax:
+                jt = p.taxonomy_counts.get(label, 0.0)
+                num += cscore * jt
+                denom += cscore
+            if denom > 0:
+                tax_score = num / denom
+
         w_speed = W_SPEED + URGENT_SPEED_BOOST * urgency
-        score = (W_SIM * sim) + (w_speed * spd) + (W_COMPLEXITY_FIT * cfit)
+        score = (W_SIM * sim) + (w_speed * spd) + (W_COMPLEXITY_FIT * cfit) + (W_TAXONOMY * tax_score)
         scores.append({
             "judge": j,
             "score": float(score),
             "sim": float(sim),
             "spd": float(spd),
             "cfit": float(cfit),
+            "tax": float(tax_score),
             "urgency": float(urgency),
             "w_speed": float(w_speed),
         })
@@ -1806,11 +1742,26 @@ def explain_assignment(
             embed_model
         )
 
+    # Recompute taxonomy overlap for explanation (same as scoring)
+    tax_score = 0.0
+    case_tax = c.get("taxonomy_labels") or []
+    if case_tax and prof.taxonomy_counts:
+        num = 0.0
+        denom = 0.0
+        for label, cscore in case_tax:
+            jt = prof.taxonomy_counts.get(label, 0.0)
+            num += cscore * jt
+            denom += cscore
+        if denom > 0:
+            tax_score = num / denom
+
     reasons = [
         {"factor": "expertise_similarity", "value": sim, "detail": "Cosine similarity between case embedding and judge profile embedding."},
         {"factor": "speed_fit", "value": spd, "detail": "Normalized speed score from historical hearing→judgment turnaround (higher = faster)."},
         {"factor": "complexity_fit", "value": cfit, "detail": "How close the case complexity is to this judge’s historical average complexity."},
+        {"factor": "taxonomy_overlap", "value": tax_score, "detail": "Semantic overlap between case taxonomy labels and judge’s taxonomy history."},
         {"factor": "urgency_estimate", "value": urgency, "detail": "Heuristic urgency score from issue/facts (used to upweight speed)."},
+        {"factor": "weights", "value": {"taxonomy": W_TAXONOMY, "sim": W_SIM, "speed": W_SPEED, "complexity": W_COMPLEXITY_FIT}, "detail": "Scoring weights applied."},
     ]
 
     explanation = {
@@ -1865,7 +1816,12 @@ def print_explanation(expl: Dict[str, Any]) -> None:
         print(f"Top areas: {areas}")
     print("-"*90)
     for r in expl["why"]:
-        print(f"{r['factor']}: {r['value']:.4f} — {r['detail']}")
+        val = r.get("value")
+        if isinstance(val, (int, float)):
+            val_str = f"{val:.4f}"
+        else:
+            val_str = str(val)
+        print(f"{r['factor']}: {val_str} — {r['detail']}")
     print("-"*90)
     top = expl.get("top_assignments") or []
     if top:
@@ -1901,11 +1857,12 @@ def print_explanation(expl: Dict[str, Any]) -> None:
 # ============================
 
 def main():
+    global EMBED_BATCH_SIZE
     session = requests.Session()
     model = None
 
     print_block("CASE INGESTION")
-    print(f"court_mode={COURT_MODE} | source={CASE_SOURCE_NAME}")
+    print(f"source={CASE_SOURCE_NAME}")
     print(f"cache_dir={CACHE_DIR}")
     seed_cases = []
     if USE_CACHED_CASES:
@@ -1915,6 +1872,8 @@ def main():
 
     if len(seed_cases) >= MAX_CASES:
         cases = seed_cases[:MAX_CASES]
+        for c in cases:
+            c["justices"] = filter_judges(c.get("justices", []))
         print("Using cached cases; skipping crawl.")
     else:
         if seed_cases:
@@ -1925,7 +1884,7 @@ def main():
         print(f"Collected {len(cases)} cases.")
 
     if len(cases) < 30:
-        print("Too few cases collected. Consider increasing MAX_LIST_PAGES, disabling USE_CACHED_CASES, or checking connectivity.")
+        print("Too few cases collected. Consider increasing MAX_CASES, disabling USE_CACHED_CASES, or checking connectivity.")
         return
 
     # Save raw dataset
@@ -1956,6 +1915,9 @@ def main():
         train_by_judge = derived.get("train_by_judge") or build_train_indices_by_judge(cases, train_idx)
         if not keyword_idf:
             keyword_idf = compute_keyword_idf(case_keywords)
+        # ensure taxonomy labels exist based on embeddings
+        tmp_model = SentenceTransformer(EMBED_MODEL_NAME, device="cuda" if torch.cuda.is_available() else "cpu")
+        assign_taxonomy_labels(cases, case_embs, tmp_model)
         print(f"Train cases: {len(train_idx)} | Test cases: {len(test_idx)}")
         print(f"Loaded profiles for {len(profiles)} judges.")
         if CRAWL_DEBUG:
@@ -1965,11 +1927,17 @@ def main():
         device = "cuda" if torch.cuda.is_available() else "cpu"
         print(f"Loading embedding model on {device}: {EMBED_MODEL_NAME}")
         model = SentenceTransformer(EMBED_MODEL_NAME, device=device)
+        # Autotune batch size for better GPU utilisation
+        tuned_bs = autotune_embed_batch_size(model, device)
+        if tuned_bs != EMBED_BATCH_SIZE:
+            EMBED_BATCH_SIZE = tuned_bs
+        print(f"Using embed batch size: {EMBED_BATCH_SIZE}")
 
         print_block("EMBEDDINGS")
         print("Building embeddings...")
         case_embs, _ = build_embeddings(cases, model)
         print(f"Embeddings shape: {case_embs.shape}")
+        assign_taxonomy_labels(cases, case_embs, model)
 
         print_block("COMPLEXITY")
         print("Computing complexity...")
@@ -2019,6 +1987,10 @@ def main():
         device = "cuda" if torch.cuda.is_available() else "cpu"
         print(f"Loading embedding model on {device}: {EMBED_MODEL_NAME}")
         model = SentenceTransformer(EMBED_MODEL_NAME, device=device)
+        tuned_bs = autotune_embed_batch_size(model, device)
+        if tuned_bs != EMBED_BATCH_SIZE:
+            EMBED_BATCH_SIZE = tuned_bs
+        print(f"Using embed batch size: {EMBED_BATCH_SIZE}")
 
     print_block("ASSIGNMENTS")
     assignments = []
@@ -2058,6 +2030,7 @@ def main():
     print_block("SAVING PROFILES")
     prof_out = {}
     for j, p in profiles.items():
+        top_tax = sorted(p.taxonomy_counts.items(), key=lambda x: x[1], reverse=True)[:10]
         prof_out[j] = {
             "n_train_cases": p.n_train_cases,
             "avg_turnaround_days": p.avg_turnaround_days,
@@ -2065,6 +2038,7 @@ def main():
             "avg_complexity": p.avg_complexity,
             "top_areas_of_law": sorted(p.area_counts.items(), key=lambda x: x[1], reverse=True)[:10],
             "top_keywords": Counter(p.keyword_counts).most_common(25),
+            "top_taxonomy": top_tax,
         }
     prof_path = os.path.join(EXPORT_DIR, "judge_profiles_summary.json")
     with open(prof_path, "w", encoding="utf-8") as f:
