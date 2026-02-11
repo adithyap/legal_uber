@@ -46,7 +46,6 @@
           <th>Title</th>
           <th>Judgment date</th>
           <th>Area of law</th>
-          <th>Taxonomy</th>
           <th>True panel</th>
           <th>Top1 predicted</th>
           <th>Top1 score</th>
@@ -118,13 +117,11 @@
         const preds = a.predictions || [];
         const top1 = preds[0] || {};
         const top3 = preds.slice(0,3).map(p => `${p.judge} (${p.score.toFixed(3)})`).join('; ');
-        const taxLabels = c.taxonomy_labels || a.taxonomy_labels || [];
         return {
           case_id: a.case_id || '',
           title: a.title || c.title || '',
           judgment_date: c.judgment_date || '',
           area: c.area_of_law || '',
-          taxonomy: fmtTaxonomy(taxLabels, 3),
           true_panel: (a.true_panel || []).join(', '),
           top1: top1.judge || '',
           top1_score: top1.score != null ? top1.score.toFixed(3) : '',
@@ -139,7 +136,6 @@
           { data: 'title', render: $.fn.dataTable.render.text() },
           { data: 'judgment_date' },
           { data: 'area' },
-          { data: 'taxonomy' },
           { data: 'true_panel' },
           { data: 'top1' },
           { data: 'top1_score' },

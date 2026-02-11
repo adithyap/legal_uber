@@ -43,7 +43,7 @@ YEARS_BEFORE = 25                     # only process cases within the last N yea
 CURRENT_YEAR = datetime.utcnow().year
 MIN_CASE_YEAR = CURRENT_YEAR - YEARS_BEFORE
 
-MAX_CASES = 1000               # crawl until we have this many cases with Judgment date
+MAX_CASES = 500               # crawl until we have this many cases with Judgment date
 REQUEST_DELAY_SEC = 0.2         # politeness
 HTTP_TIMEOUT = 30
 RANDOM_SEED = 42
@@ -55,10 +55,28 @@ CHUNK_WORDS = 450
 CHUNK_OVERLAP = 60
 
 # Scoring weights (tweakable)
-W_SIM = 0.40             # embedding similarity
+W_SIM = 0.5             # embedding similarity
 W_SPEED = 0.15           # turnaround speed
 W_COMPLEXITY_FIT = 0.10  # complexity match
-W_TAXONOMY = 0.60        # taxonomy similarity (dominant factor)
+W_TAXONOMY = 0.25        # taxonomy similarity
+
+# Training balancing
+CAP_TRAIN_CASES_PER_JUDGE = 50     # cap contributions per judge; set 0/None to disable
+INVERSE_FREQ_WEIGHT = True         # downweight judges as they accrue many training cases (1/sqrt(freq))
+
+# Taxonomy controls
+TAXONOMY_TOP_K = 2
+TAXONOMY_THRESHOLD = 0.30
+TAXONOMY_USE_SCALED = True           # use sqrt-normalized taxonomy weights to damp caseload dominance
+
+# Caseload prior (mildly penalize judges with very large training volume)
+CASELOAD_PRIOR_BASE = 0.85           # multiplier floor
+CASELOAD_PRIOR_WEIGHT = 0.15         # weight for prior factor in final score
+
+# Grid search controls (uses derived cache; no re-embedding)
+RUN_GRID_SEARCH = False              # set True to sweep weights on cached embeddings/profiles
+GRID_SEARCH_ONLY = False             # if True, run grid search then exit
+GRID_SEARCH_CONFIGS = []             # optional explicit list of param dicts; if empty a default grid is generated
 
 # if case is urgent, speed matters more
 URGENT_SPEED_BOOST = 0.25  # added to W_SPEED * urgency
@@ -91,7 +109,7 @@ OVERWRITE_DERIVED_CACHE = False
 DERIVED_CACHE_DIR = os.path.join(CACHE_DIR, "derived")
 DERIVED_META_PATH = os.path.join(DERIVED_CACHE_DIR, "derived_meta.json")
 DERIVED_ARRAYS_PATH = os.path.join(DERIVED_CACHE_DIR, "derived_arrays.npz")
-DERIVED_CACHE_VERSION = 6
+DERIVED_CACHE_VERSION = 7
 TEST_REPORT_PATH = os.path.join(EXPORT_DIR, "test_report.json")
 KEYWORD_DF_MAX_RATIO = 0.1
 KEYWORD_MIN_CHARS = 4
@@ -172,6 +190,13 @@ def days_between(d1_iso: Optional[str], d2_iso: Optional[str]) -> Optional[int]:
 def cosine_sim(a: np.ndarray, b: np.ndarray) -> float:
     denom = (np.linalg.norm(a) * np.linalg.norm(b) + 1e-12)
     return float(np.dot(a, b) / denom)
+
+def caseload_prior(n_cases: int) -> float:
+    """
+    Mild penalty for very high-volume judges; returns value in (0,1].
+    """
+    n = max(0, n_cases)
+    return float(1.0 / (1.0 + math.log1p(n)))
 
 def request_get(
     url: str,
@@ -396,7 +421,7 @@ def autotune_embed_batch_size(model: SentenceTransformer, device: str, default_b
     if device != "cuda":
         return min(default_bs, 32)  # keep CPU memory modest
 
-    candidates = [128, 96, 80, 64, 56, 48, 40, 32, 24, 16]
+    candidates = [256, 128, 96, 80, 64, 56, 48, 40, 32, 24, 16]
     sample = ["autotune batch size"] * max(candidates)
     for bs in candidates:
         try:
@@ -681,6 +706,8 @@ def serialize_profiles(profiles: Dict[str, "JudgeProfile"]) -> Dict[str, Any]:
             "area_counts": p.area_counts,
             "keyword_counts": p.keyword_counts,
             "taxonomy_counts": p.taxonomy_counts,
+            "taxonomy_probs": p.taxonomy_probs,
+            "taxonomy_scaled_probs": p.taxonomy_scaled_probs,
         }
     return out
 
@@ -713,6 +740,8 @@ def deserialize_profiles(data: Dict[str, Any]) -> Dict[str, "JudgeProfile"]:
             area_counts=p.get("area_counts") or {},
             keyword_counts=p.get("keyword_counts") or {},
             taxonomy_counts=p.get("taxonomy_counts") or {},
+            taxonomy_probs=p.get("taxonomy_probs") or {},
+            taxonomy_scaled_probs=p.get("taxonomy_scaled_probs") or {},
         )
     return out
 
@@ -1222,7 +1251,13 @@ def build_embeddings(cases: List[Dict[str, Any]], model: SentenceTransformer) ->
 
     return np.vstack(case_embs), case_to_chunk_idxs
 
-def assign_taxonomy_labels(cases: List[Dict[str, Any]], case_embs: np.ndarray, model: SentenceTransformer, top_k: int = 3, threshold: float = 0.2) -> None:
+def assign_taxonomy_labels(
+    cases: List[Dict[str, Any]],
+    case_embs: np.ndarray,
+    model: SentenceTransformer,
+    top_k: int = TAXONOMY_TOP_K,
+    threshold: float = TAXONOMY_THRESHOLD
+) -> None:
     """
     Populate taxonomy_labels for each case using semantic similarity to taxonomy embeddings.
     """
@@ -1329,6 +1364,8 @@ class JudgeProfile:
     area_counts: Dict[str, int]
     keyword_counts: Dict[str, int]
     taxonomy_counts: Dict[str, float]
+    taxonomy_probs: Dict[str, float]
+    taxonomy_scaled_probs: Dict[str, float]
 
 def build_judge_profiles(
     cases: List[Dict[str, Any]],
@@ -1344,6 +1381,7 @@ def build_judge_profiles(
     by_judge_area = defaultdict(Counter)  # weighted counts
     by_judge_kw = defaultdict(Counter)    # weighted counts
     by_judge_tax = defaultdict(Counter)   # taxonomy label weights
+    contrib_counts = defaultdict(int)     # number of training cases actually used per judge
 
     for idx in train_indices:
         c = cases[idx]
@@ -1356,9 +1394,15 @@ def build_judge_profiles(
 
         judges = filter_judges(c.get("justices", []) or [])
         for j in judges:
+            # optional cap on per-judge training contributions
+            if CAP_TRAIN_CASES_PER_JUDGE and contrib_counts[j] >= CAP_TRAIN_CASES_PER_JUDGE:
+                continue
+
             w = 1.0
             if USE_OPINION_AUTHOR_WEIGHTING and op_author and normalize_person_name(j) == op_author:
                 w = OPINION_AUTHOR_WEIGHT
+            if INVERSE_FREQ_WEIGHT:
+                w *= 1.0 / math.sqrt(contrib_counts[j] + 1.0)
 
             by_judge_emb_sum[j] += emb * w
             by_judge_emb_w[j] += w
@@ -1373,6 +1417,8 @@ def build_judge_profiles(
                     by_judge_kw[j][nk] += w
             for label, score in c.get("taxonomy_labels", []) or []:
                 by_judge_tax[j][label] += w * (score or 1.0)
+
+            contrib_counts[j] += 1
 
     profiles = {}
     for j, w_sum in by_judge_emb_w.items():
@@ -1396,6 +1442,16 @@ def build_judge_profiles(
             comp_w = [w for _, w in by_judge_comp[j]]
             avg_c = float(np.average(comp_vals, weights=comp_w))
 
+        tax_counts = dict(by_judge_tax[j])
+        total_tax = float(sum(tax_counts.values()))
+        tax_probs = {lbl: (cnt / total_tax) for lbl, cnt in tax_counts.items()} if total_tax > 0 else {}
+        if TAXONOMY_USE_SCALED:
+            scaled = {lbl: math.sqrt(cnt) for lbl, cnt in tax_counts.items()}
+            scaled_total = float(sum(scaled.values()))
+            tax_scaled_probs = {lbl: (val / scaled_total) for lbl, val in scaled.items()} if scaled_total > 0 else {}
+        else:
+            tax_scaled_probs = tax_probs
+
         profiles[j] = JudgeProfile(
             name=j,
             embedding=centroid,
@@ -1405,7 +1461,9 @@ def build_judge_profiles(
             avg_complexity=avg_c,
             area_counts=dict(by_judge_area[j]),
             keyword_counts=dict(by_judge_kw[j]),
-            taxonomy_counts=dict(by_judge_tax[j]),
+            taxonomy_counts=tax_counts,
+            taxonomy_probs=tax_probs,
+            taxonomy_scaled_probs=tax_scaled_probs,
         )
     return profiles
 
@@ -1437,8 +1495,21 @@ def score_judges_for_case(
     case_embs: np.ndarray,
     case_complexity: np.ndarray,
     profiles: Dict[str, JudgeProfile],
-    speed_scores: Dict[str, float]
+    speed_scores: Dict[str, float],
+    weights: Optional[Dict[str, float]] = None,
+    use_scaled_taxonomy: bool = TAXONOMY_USE_SCALED,
+    caseload_params: Optional[Dict[str, float]] = None
 ) -> List[Dict[str, Any]]:
+    w = weights or {}
+    w_sim = w.get("sim", W_SIM)
+    w_speed_base = w.get("speed", W_SPEED)
+    w_cfit = w.get("complexity_fit", W_COMPLEXITY_FIT)
+    w_tax = w.get("taxonomy", W_TAXONOMY)
+
+    cp = caseload_params or {"base": CASELOAD_PRIOR_BASE, "weight": CASELOAD_PRIOR_WEIGHT}
+    prior_base = cp.get("base", CASELOAD_PRIOR_BASE)
+    prior_w = cp.get("weight", CASELOAD_PRIOR_WEIGHT)
+
     emb = case_embs[case_idx]
     comp = float(case_complexity[case_idx])
     urgency = estimate_case_urgency(" ".join([cases[case_idx].get("issue", ""), cases[case_idx].get("facts", "")]))
@@ -1457,18 +1528,21 @@ def score_judges_for_case(
 
         # Taxonomy match: weighted overlap using semantic label scores
         tax_score = 0.0
-        if case_tax and p.taxonomy_counts:
+        if case_tax:
+            judge_tax = p.taxonomy_scaled_probs if use_scaled_taxonomy else p.taxonomy_probs
             num = 0.0
             denom = 0.0
             for label, cscore in case_tax:
-                jt = p.taxonomy_counts.get(label, 0.0)
+                jt = judge_tax.get(label, 0.0)
                 num += cscore * jt
                 denom += cscore
             if denom > 0:
                 tax_score = num / denom
 
-        w_speed = W_SPEED + URGENT_SPEED_BOOST * urgency
-        score = (W_SIM * sim) + (w_speed * spd) + (W_COMPLEXITY_FIT * cfit) + (W_TAXONOMY * tax_score)
+        w_speed = w_speed_base + URGENT_SPEED_BOOST * urgency
+        base_score = (w_sim * sim) + (w_speed * spd) + (w_cfit * cfit) + (w_tax * tax_score)
+        prior = caseload_prior(p.n_train_cases)
+        score = base_score * (prior_base + prior_w * prior)
         scores.append({
             "judge": j,
             "score": float(score),
@@ -1478,6 +1552,7 @@ def score_judges_for_case(
             "tax": float(tax_score),
             "urgency": float(urgency),
             "w_speed": float(w_speed),
+            "caseload_prior": float(prior),
         })
 
     scores.sort(key=lambda x: x["score"], reverse=True)
@@ -1491,12 +1566,25 @@ def assign_judge(
     profiles: Dict[str, JudgeProfile],
     speed_scores: Dict[str, float],
     train_indices_by_judge: Dict[str, List[int]],
-    top_k: int = 3
+    top_k: int = 3,
+    weights: Optional[Dict[str, float]] = None,
+    use_scaled_taxonomy: bool = TAXONOMY_USE_SCALED,
+    caseload_params: Optional[Dict[str, float]] = None
 ) -> List[Tuple[str, float]]:
     """
     Returns top_k (judge, score) sorted desc.
     """
-    scores = score_judges_for_case(case_idx, cases, case_embs, case_complexity, profiles, speed_scores)
+    scores = score_judges_for_case(
+        case_idx,
+        cases,
+        case_embs,
+        case_complexity,
+        profiles,
+        speed_scores,
+        weights=weights,
+        use_scaled_taxonomy=use_scaled_taxonomy,
+        caseload_params=caseload_params
+    )
     return [(s["judge"], s["score"]) for s in scores[:top_k]]
 
 def evaluate_assignments(
@@ -1507,7 +1595,10 @@ def evaluate_assignments(
     profiles: Dict[str, JudgeProfile],
     speed_scores: Dict[str, float],
     train_indices_by_judge: Dict[str, List[int]],
-    top_k: int = 3
+    top_k: int = 3,
+    weights: Optional[Dict[str, float]] = None,
+    use_scaled_taxonomy: bool = TAXONOMY_USE_SCALED,
+    caseload_params: Optional[Dict[str, float]] = None
 ) -> Dict[str, float]:
     """
     Top-1 / Top-3 accuracy against the true panel membership.
@@ -1518,12 +1609,29 @@ def evaluate_assignments(
     overlap_cases = 0
     overlap_total = 0
     n = 0
+    known_judges = set(profiles.keys())
+    skipped_unknown = 0
 
     for idx in test_indices:
         true_panel = set(cases[idx].get("justices", []) or [])
         if not true_panel:
             continue
-        preds = assign_judge(idx, cases, case_embs, case_complexity, profiles, speed_scores, train_indices_by_judge, top_k=top_k)
+        if not (true_panel & known_judges):
+            skipped_unknown += 1
+            continue
+        preds = assign_judge(
+            idx,
+            cases,
+            case_embs,
+            case_complexity,
+            profiles,
+            speed_scores,
+            train_indices_by_judge,
+            top_k=top_k,
+            weights=weights,
+            use_scaled_taxonomy=use_scaled_taxonomy,
+            caseload_params=caseload_params
+        )
         ranked = [j for j, _ in preds]
 
         n += 1
@@ -1551,8 +1659,79 @@ def evaluate_assignments(
         f"top{top_k}": topk / n,
         "mrr": mrr / n,
         "overlap_cases": overlap_cases,
-        "avg_overlap": overlap_total / n
+        "avg_overlap": overlap_total / n,
+        "skipped_unknown_judges": skipped_unknown
     }
+
+def _default_grid_configs() -> List[Dict[str, Any]]:
+    if GRID_SEARCH_CONFIGS:
+        return GRID_SEARCH_CONFIGS
+    configs = []
+    for w_tax in [0.25, 0.35, 0.45]:
+        for w_sim in [0.40, 0.50]:
+            for use_scaled in [True, False]:
+                for c_w in [0.10, 0.20]:
+                    cfg = {
+                        "weights": {
+                            "sim": w_sim,
+                            "taxonomy": w_tax,
+                            "speed": W_SPEED,
+                            "complexity_fit": W_COMPLEXITY_FIT
+                        },
+                        "use_scaled_taxonomy": use_scaled,
+                        "caseload": {"base": CASELOAD_PRIOR_BASE, "weight": c_w},
+                        "top_k": 3
+                    }
+                    configs.append(cfg)
+    return configs
+
+def grid_search_weights(
+    cases: List[Dict[str, Any]],
+    case_embs: np.ndarray,
+    case_complexity: np.ndarray,
+    profiles: Dict[str, JudgeProfile],
+    speed_scores: Dict[str, float],
+    train_indices_by_judge: Dict[str, List[int]],
+    test_indices: List[int]
+) -> List[Tuple[Dict[str, Any], Dict[str, float]]]:
+    """
+    Lightweight sweep over weight/caseload/taxonomy settings using cached embeddings.
+    """
+    configs = _default_grid_configs()
+    results: List[Tuple[Dict[str, Any], Dict[str, float]]] = []
+    print_block("GRID SEARCH")
+    print(f"Configs to test: {len(configs)}")
+    for i, cfg in enumerate(configs, start=1):
+        weights = cfg.get("weights") or {}
+        use_scaled = cfg.get("use_scaled_taxonomy", TAXONOMY_USE_SCALED)
+        caseload = cfg.get("caseload")
+        top_k = cfg.get("top_k", 3)
+        metrics = evaluate_assignments(
+            test_indices,
+            cases,
+            case_embs,
+            case_complexity,
+            profiles,
+            speed_scores,
+            train_indices_by_judge,
+            top_k=top_k,
+            weights=weights,
+            use_scaled_taxonomy=use_scaled,
+            caseload_params=caseload
+        )
+        results.append((cfg, metrics))
+        print(
+            f"[{i}/{len(configs)}] "
+            f"sim={weights.get('sim')} tax={weights.get('taxonomy')} scaled={use_scaled} "
+            f"caseload_w={caseload.get('weight') if caseload else None} "
+            f"top1={metrics.get('top1'):.3f} top{top_k}={metrics.get(f'top{top_k}'):.3f} mrr={metrics.get('mrr'):.3f}"
+        )
+    # sort by top1 then topk
+    results.sort(key=lambda x: (x[1].get("top1", 0.0), x[1].get("top3", x[1].get(f"top{configs[0].get('top_k',3)}", 0.0))), reverse=True)
+    best_cfg, best_metrics = results[0]
+    print("\nBest config:")
+    print(json.dumps({"config": best_cfg, "metrics": best_metrics}, indent=2))
+    return results
 
 def build_test_report(
     assignments: List[Dict[str, Any]],
@@ -1711,6 +1890,7 @@ def explain_assignment(
     cfit = 0.5 if prof.avg_complexity is None else 1.0 - min(1.0, abs(comp - float(prof.avg_complexity)))
 
     urgency = estimate_case_urgency(" ".join([c.get("issue",""), c.get("facts","")]))
+    prior = caseload_prior(prof.n_train_cases)
 
     # Judge expertise areas
     areas_sorted = sorted(prof.area_counts.items(), key=lambda x: x[1], reverse=True)[:5]
@@ -1745,11 +1925,12 @@ def explain_assignment(
     # Recompute taxonomy overlap for explanation (same as scoring)
     tax_score = 0.0
     case_tax = c.get("taxonomy_labels") or []
-    if case_tax and prof.taxonomy_counts:
+    if case_tax:
+        judge_tax = prof.taxonomy_scaled_probs if TAXONOMY_USE_SCALED else prof.taxonomy_probs
         num = 0.0
         denom = 0.0
         for label, cscore in case_tax:
-            jt = prof.taxonomy_counts.get(label, 0.0)
+            jt = judge_tax.get(label, 0.0)
             num += cscore * jt
             denom += cscore
         if denom > 0:
@@ -1761,6 +1942,7 @@ def explain_assignment(
         {"factor": "complexity_fit", "value": cfit, "detail": "How close the case complexity is to this judge’s historical average complexity."},
         {"factor": "taxonomy_overlap", "value": tax_score, "detail": "Semantic overlap between case taxonomy labels and judge’s taxonomy history."},
         {"factor": "urgency_estimate", "value": urgency, "detail": "Heuristic urgency score from issue/facts (used to upweight speed)."},
+        {"factor": "caseload_prior", "value": prior, "detail": "Penalty for very large training volume (log-damped)."},
         {"factor": "weights", "value": {"taxonomy": W_TAXONOMY, "sim": W_SIM, "speed": W_SPEED, "complexity": W_COMPLEXITY_FIT}, "detail": "Scoring weights applied."},
     ]
 
@@ -1983,6 +2165,19 @@ def main():
             train_by_judge
         )
 
+    if RUN_GRID_SEARCH or GRID_SEARCH_ONLY:
+        grid_search_weights(
+            cases,
+            case_embs,
+            case_complexity,
+            profiles,
+            speed_scores,
+            train_by_judge,
+            test_idx
+        )
+        if GRID_SEARCH_ONLY:
+            return
+
     if model is None:
         device = "cuda" if torch.cuda.is_available() else "cpu"
         print(f"Loading embedding model on {device}: {EMBED_MODEL_NAME}")
@@ -1994,7 +2189,14 @@ def main():
 
     print_block("ASSIGNMENTS")
     assignments = []
+    known_judges = set(profiles.keys())
+    skipped_unknown = 0
     for idx in tqdm(test_idx, desc="Assigning test cases"):
+        true_panel = set(cases[idx].get("justices", []) or [])
+        if true_panel and not (true_panel & known_judges):
+            skipped_unknown += 1
+            continue  # skip evaluation when ground-truth judges were never seen in training
+
         preds = assign_judge(idx, cases, case_embs, case_complexity, profiles, speed_scores, train_by_judge, top_k=3)
         assignments.append({
             "case_idx": idx,
@@ -2003,6 +2205,9 @@ def main():
             "true_panel": cases[idx].get("justices"),
             "predictions": [{"judge": j, "score": s} for j, s in preds]
         })
+
+    if skipped_unknown:
+        print(f"Skipped {skipped_unknown} test cases where none of the true panel judges appeared in training/profiles.")
 
     out_path = os.path.join(EXPORT_DIR, "test_assignments.json")
     with open(out_path, "w", encoding="utf-8") as f:
