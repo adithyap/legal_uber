@@ -78,6 +78,12 @@ RUN_GRID_SEARCH = False              # set True to sweep weights on cached embed
 GRID_SEARCH_ONLY = False             # if True, run grid search then exit
 GRID_SEARCH_CONFIGS = []             # optional explicit list of param dicts; if empty a default grid is generated
 
+# Speed-only mode (skip embeddings; predict judge from turnaround speed alone)
+SPEED_ONLY_MODE = False
+SPEED_ONLY_TOP_K = 3
+# When False (full model run), also run a speed-only diagnostic assignment pass using same split
+RUN_SPEED_ONLY_WITH_FULL = True
+
 # if case is urgent, speed matters more
 URGENT_SPEED_BOOST = 0.25  # added to W_SPEED * urgency
 
@@ -109,8 +115,15 @@ OVERWRITE_DERIVED_CACHE = False
 DERIVED_CACHE_DIR = os.path.join(CACHE_DIR, "derived")
 DERIVED_META_PATH = os.path.join(DERIVED_CACHE_DIR, "derived_meta.json")
 DERIVED_ARRAYS_PATH = os.path.join(DERIVED_CACHE_DIR, "derived_arrays.npz")
-DERIVED_CACHE_VERSION = 7
+# Persistent cache that reuses CACHE_DIR (Colab-friendly; no __file__ dependency)
+LOCAL_DERIVED_DIR = Path(CACHE_DIR) / "derived_cache_local"
+LOCAL_DERIVED_META_PATH = LOCAL_DERIVED_DIR / "derived_meta.json"
+LOCAL_DERIVED_ARRAYS_PATH = LOCAL_DERIVED_DIR / "derived_arrays.npz"
+os.makedirs(LOCAL_DERIVED_DIR, exist_ok=True)
+DERIVED_CACHE_VERSION = 8
 TEST_REPORT_PATH = os.path.join(EXPORT_DIR, "test_report.json")
+SPEED_REPORT_PATH = os.path.join(EXPORT_DIR, "speed_diagnostic.json")
+SPEED_ASSIGNMENTS_PATH = os.path.join(EXPORT_DIR, "speed_assignments.json")
 KEYWORD_DF_MAX_RATIO = 0.1
 KEYWORD_MIN_CHARS = 4
 KEYWORD_TOP_CASE_TERMS = 8
@@ -186,6 +199,45 @@ def days_between(d1_iso: Optional[str], d2_iso: Optional[str]) -> Optional[int]:
         return int((d2 - d1).days)
     except Exception:
         return None
+
+
+def compute_turnaround_days(case: Dict[str, Any]) -> Optional[int]:
+    """
+    Convenience helper to compute hearing→judgment turnaround in days.
+    Stored on each case as `turnaround_days` for reuse across modules.
+    """
+    delta = days_between(case.get("hearing_start"), case.get("judgment_date"))
+    # Drop obviously bad values where hearing date parses after judgment date
+    if delta is None or delta < 0:
+        return None
+    return delta
+
+
+def annotate_turnaround_days(cases: List[Dict[str, Any]]) -> None:
+    """
+    Attach `turnaround_days` to every case so downstream components
+    can rely on a consistent field rather than recomputing ad‑hoc.
+    """
+    for c in cases:
+        c["turnaround_days"] = compute_turnaround_days(c)
+
+
+def drop_negative_turnaround_cases(cases: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Remove cases with negative turnaround (bad/misaligned hearing vs judgment dates).
+    """
+    cleaned = []
+    dropped = 0
+    for c in cases:
+        t = c.get("turnaround_days")
+        raw_delta = days_between(c.get("hearing_start"), c.get("judgment_date"))
+        if (t is not None and t < 0) or (raw_delta is not None and raw_delta < 0):
+            dropped += 1
+            continue
+        cleaned.append(c)
+    if dropped and CRAWL_DEBUG:
+        debug_log(f"[cleanup] Dropped {dropped} cases with negative turnaround days")
+    return cleaned
 
 def cosine_sim(a: np.ndarray, b: np.ndarray) -> float:
     denom = (np.linalg.norm(a) * np.linalg.norm(b) + 1e-12)
@@ -268,6 +320,11 @@ def sync_export_files():
     report_src = os.path.join(CACHE_DIR, "report.html")
     if os.path.exists(report_src):
         shutil.copy2(report_src, os.path.join(EXPORT_DIR, "report.html"))
+    # derived cache (embeddings + meta) for reuse
+    if os.path.exists(DERIVED_META_PATH):
+        shutil.copy2(DERIVED_META_PATH, os.path.join(EXPORT_DIR, "derived_meta.json"))
+    if os.path.exists(DERIVED_ARRAYS_PATH):
+        shutil.copy2(DERIVED_ARRAYS_PATH, os.path.join(EXPORT_DIR, "derived_arrays.npz"))
 
 def zip_outputs(cache_dir: str, zip_results: bool = True) -> Optional[str]:
     """
@@ -745,37 +802,46 @@ def deserialize_profiles(data: Dict[str, Any]) -> Dict[str, "JudgeProfile"]:
         )
     return out
 
+def _load_derived_bundle(meta_path: str, arrays_path: str, cases: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    if not os.path.exists(meta_path) or not os.path.exists(arrays_path):
+        return None
+    with open(meta_path, "r", encoding="utf-8") as f:
+        meta = json.load(f)
+    if meta.get("version") != DERIVED_CACHE_VERSION:
+        return None
+    if meta.get("embed_model") != EMBED_MODEL_NAME:
+        return None
+    if meta.get("test_size") != TEST_SIZE:
+        return None
+    if meta.get("cases_hash") != compute_cases_hash(cases):
+        return None
+    arrays = np.load(arrays_path)
+    return {
+        "case_embs": arrays["case_embs"],
+        "case_complexity": arrays["case_complexity"],
+        "case_keywords": meta.get("case_keywords") or [],
+        "keyword_idf": meta.get("keyword_idf") or {},
+        "train_idx": meta.get("train_idx") or [],
+        "test_idx": meta.get("test_idx") or [],
+        "profiles": deserialize_profiles(meta.get("profiles") or {}),
+        "speed_scores": meta.get("speed_scores") or {},
+        "train_by_judge": meta.get("train_by_judge") or {},
+    }
+
 def load_derived_cache(cases: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
     if not USE_DERIVED_CACHE or OVERWRITE_DERIVED_CACHE:
         return None
-    if not os.path.exists(DERIVED_META_PATH) or not os.path.exists(DERIVED_ARRAYS_PATH):
-        return None
     try:
-        with open(DERIVED_META_PATH, "r", encoding="utf-8") as f:
-            meta = json.load(f)
-        if meta.get("version") != DERIVED_CACHE_VERSION:
-            return None
-        if meta.get("embed_model") != EMBED_MODEL_NAME:
-            return None
-        if meta.get("test_size") != TEST_SIZE:
-            return None
-        if meta.get("cases_hash") != compute_cases_hash(cases):
-            return None
-        arrays = np.load(DERIVED_ARRAYS_PATH)
-        return {
-            "case_embs": arrays["case_embs"],
-            "case_complexity": arrays["case_complexity"],
-            "case_keywords": meta.get("case_keywords") or [],
-            "keyword_idf": meta.get("keyword_idf") or {},
-            "train_idx": meta.get("train_idx") or [],
-            "test_idx": meta.get("test_idx") or [],
-            "profiles": deserialize_profiles(meta.get("profiles") or {}),
-            "speed_scores": meta.get("speed_scores") or {},
-            "train_by_judge": meta.get("train_by_judge") or {},
-        }
+        primary = _load_derived_bundle(DERIVED_META_PATH, DERIVED_ARRAYS_PATH, cases)
+        if primary:
+            return primary
+        fallback = _load_derived_bundle(str(LOCAL_DERIVED_META_PATH), str(LOCAL_DERIVED_ARRAYS_PATH), cases)
+        if fallback:
+            debug_log("[cache] Loaded derived cache from local data/derived_cache")
+            return fallback
     except Exception as exc:
         debug_log(f"[cache] Failed to load derived cache: {exc}")
-        return None
+    return None
 
 def save_derived_cache(
     cases: List[Dict[str, Any]],
@@ -813,6 +879,12 @@ def save_derived_cache(
         case_embs=case_embs,
         case_complexity=case_complexity
     )
+    # Also persist a copy inside the repo for reuse across runs
+    try:
+        shutil.copy2(DERIVED_META_PATH, LOCAL_DERIVED_META_PATH)
+        shutil.copy2(DERIVED_ARRAYS_PATH, LOCAL_DERIVED_ARRAYS_PATH)
+    except Exception as exc:
+        debug_log(f"[cache] Failed to copy derived cache to local data dir: {exc}")
 
 
 # ============================
@@ -1387,7 +1459,9 @@ def build_judge_profiles(
         c = cases[idx]
         emb = case_embs[idx]
         comp = float(case_complexity[idx])
-        tdays = days_between(c.get("hearing_start"), c.get("judgment_date"))
+        tdays = c.get("turnaround_days")
+        if tdays is None:
+            tdays = days_between(c.get("hearing_start"), c.get("judgment_date"))
         area = (c.get("area_of_law") or "").strip()
         kws = case_keywords[idx] or []
         op_author = normalize_person_name(c.get("opinion_author") or "")
@@ -1662,6 +1736,147 @@ def evaluate_assignments(
         "avg_overlap": overlap_total / n,
         "skipped_unknown_judges": skipped_unknown
     }
+
+
+# ============================
+# Speed -> Judge diagnostic
+# ============================
+
+def build_speed_model(cases: List[Dict[str, Any]], train_indices: List[int]) -> Dict[str, Dict[str, float]]:
+    """
+    Simple per-judge turnaround model: mean/std over training cases.
+    Returns {judge: {mu, sigma, n}}.
+    """
+    stats: Dict[str, List[float]] = defaultdict(list)
+    for idx in train_indices:
+        c = cases[idx]
+        t = c.get("turnaround_days")
+        if t is None:
+            continue
+        judges = filter_judges(c.get("justices", []) or [])
+        if not judges:
+            continue
+        stats[judges[0]].append(float(t))
+
+    model: Dict[str, Dict[str, float]] = {}
+    for j, vals in stats.items():
+        if not vals:
+            continue
+        mu = float(np.mean(vals))
+        sigma = float(np.std(vals))
+        if sigma < 1.0:
+            sigma = 1.0  # avoid degenerate likelihoods
+        model[j] = {"mu": mu, "sigma": sigma, "n": float(len(vals))}
+    return model
+
+
+def predict_judge_from_speed(
+    turnaround_days: float,
+    speed_model: Dict[str, Dict[str, float]],
+    top_k: int = 3
+) -> List[Tuple[str, float]]:
+    """
+    Rank judges by Gaussian likelihood of observed turnaround_days.
+    """
+    scores = []
+    for j, s in speed_model.items():
+        mu = s["mu"]
+        sigma = s["sigma"]
+        # log likelihood up to constant
+        ll = -0.5 * ((turnaround_days - mu) / sigma) ** 2 - math.log(sigma + 1e-6)
+        # mild prior on judge frequency
+        ll += math.log(s["n"] + 1.0)
+        scores.append((j, ll))
+    scores.sort(key=lambda x: x[1], reverse=True)
+    return scores[:top_k]
+
+
+def evaluate_speed_based_prediction(
+    cases: List[Dict[str, Any]],
+    train_indices: List[int],
+    test_indices: List[int],
+    top_k: int = 3
+) -> Dict[str, Any]:
+    """
+    Diagnostic: how predictive is turnaround speed for judge identity?
+    Uses a per-judge Gaussian over turnaround_days (observed ex-post).
+    """
+    model = build_speed_model(cases, train_indices)
+    if not model:
+        return {"n": 0}
+
+    top1 = topk = 0
+    mrr = 0.0
+    n = 0
+    skipped_no_speed = 0
+    for idx in test_indices:
+        c = cases[idx]
+        t = c.get("turnaround_days")
+        judges = filter_judges(c.get("justices", []) or [])
+        if t is None or not judges:
+            skipped_no_speed += 1
+            continue
+        true_judge = judges[0]
+        preds = predict_judge_from_speed(float(t), model, top_k=top_k)
+        ranked = [p for p, _ in preds]
+        if not ranked:
+            continue
+        n += 1
+        if ranked[0] == true_judge:
+            top1 += 1
+        if true_judge in ranked[:top_k]:
+            topk += 1
+        rr = 0.0
+        for r, j in enumerate(ranked, start=1):
+            if j == true_judge:
+                rr = 1.0 / r
+                break
+        mrr += rr
+
+    if n == 0:
+        return {"n": 0, "skipped_no_speed": skipped_no_speed}
+
+    return {
+        "n": n,
+        "top1": top1 / n,
+        f"top{top_k}": topk / n,
+        "mrr": mrr / n,
+        "skipped_no_speed": skipped_no_speed,
+        "judges_in_model": len(model),
+    }
+
+
+def build_speed_assignments(
+    cases: List[Dict[str, Any]],
+    train_indices: List[int],
+    test_indices: List[int],
+    top_k: int = 3
+) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
+    """
+    Build speed-only predictions + metrics using a per-judge Gaussian model.
+    Returns (assignments, metrics).
+    """
+    speed_model = build_speed_model(cases, train_indices)
+    assignments = []
+    if not speed_model:
+        return assignments, {"n": 0}
+
+    for idx in test_indices:
+        c = cases[idx]
+        preds = []
+        if c.get("turnaround_days") is not None:
+            preds = predict_judge_from_speed(float(c["turnaround_days"]), speed_model, top_k=top_k)
+        assignments.append({
+            "case_idx": idx,
+            "case_id": c.get("case_id"),
+            "title": c.get("title"),
+            "turnaround_days": c.get("turnaround_days"),
+            "true_panel": c.get("justices"),
+            "predictions": [{"judge": j, "score": s} for j, s in preds]
+        })
+
+    metrics = evaluate_speed_based_prediction(cases, train_indices, test_indices, top_k=top_k)
+    return assignments, metrics
 
 def _default_grid_configs() -> List[Dict[str, Any]]:
     if GRID_SEARCH_CONFIGS:
@@ -2056,6 +2271,8 @@ def main():
         cases = seed_cases[:MAX_CASES]
         for c in cases:
             c["justices"] = filter_judges(c.get("justices", []))
+        annotate_turnaround_days(cases)
+        cases = drop_negative_turnaround_cases(cases)
         print("Using cached cases; skipping crawl.")
     else:
         if seed_cases:
@@ -2063,7 +2280,49 @@ def main():
         else:
             print("Crawling cases (with judgment dates)...")
         cases = crawl_cases(MAX_CASES, session, cache_path=CASES_CACHE_PATH, seed_cases=seed_cases)
+        annotate_turnaround_days(cases)
+        cases = drop_negative_turnaround_cases(cases)
         print(f"Collected {len(cases)} cases.")
+
+    # Optional: speed-only experiment (skip embeddings/keywords/taxonomy)
+    if SPEED_ONLY_MODE:
+        print_block("SPEED-ONLY MODE")
+        if len(cases) < 30:
+            print("Too few cases collected for speed-only evaluation.")
+            return
+        cases = drop_negative_turnaround_cases(cases)
+        idxs = list(range(len(cases)))
+        train_idx, test_idx = train_test_split(idxs, test_size=TEST_SIZE, random_state=RANDOM_SEED)
+        train_idx = sorted(train_idx)
+        test_idx = sorted(test_idx)
+        print(f"Train cases: {len(train_idx)} | Test cases: {len(test_idx)}")
+
+        assignments, speed_diag = build_speed_assignments(cases, train_idx, test_idx, top_k=SPEED_ONLY_TOP_K)
+        if speed_diag.get("n", 0) == 0:
+            print("Speed model empty (no turnaround_days in training).")
+            return
+        print(json.dumps(speed_diag, indent=2))
+
+        with open(SPEED_ASSIGNMENTS_PATH, "w", encoding="utf-8") as f:
+            json.dump(assignments, f, ensure_ascii=False, indent=2)
+        with open(SPEED_REPORT_PATH, "w", encoding="utf-8") as f:
+            json.dump({
+                "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "config": {
+                    "speed_only": True,
+                    "top_k": SPEED_ONLY_TOP_K,
+                    "test_size": TEST_SIZE
+                },
+                "metrics": speed_diag
+            }, f, ensure_ascii=False, indent=2)
+        sync_export_files()
+        zip_path = zip_outputs(CACHE_DIR, ZIP_RESULTS)
+        if zip_path:
+            print_block("ZIP EXPORT")
+            print(f"Zipped outputs to: {zip_path}")
+        print("\nDone.")
+        print(f"Cache directory: {CACHE_DIR}")
+        return
 
     if len(cases) < 30:
         print("Too few cases collected. Consider increasing MAX_CASES, disabling USE_CACHED_CASES, or checking connectivity.")
@@ -2146,7 +2405,7 @@ def main():
         profiles = build_judge_profiles(cases, case_embs, case_complexity, case_keywords, train_idx)
         print(f"Built profiles for {len(profiles)} judges.")
 
-        # Speed score normalization
+        # Speed score normalization (judge turnaround)
         speed_scores = normalize_speed_scores(profiles)
 
         # Judge -> training indices mapping
@@ -2230,6 +2489,33 @@ def main():
     with open(TEST_REPORT_PATH, "w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
     print(f"Saved test report to: {TEST_REPORT_PATH}")
+
+    # Speed -> judge diagnostic
+    print_block("SPEED → JUDGE (DIAGNOSTIC)")
+    speed_assignments = []
+    speed_diag = {"n": 0}
+    if RUN_SPEED_ONLY_WITH_FULL:
+        speed_assignments, speed_diag = build_speed_assignments(cases, train_idx, test_idx, top_k=3)
+    else:
+        speed_diag = evaluate_speed_based_prediction(cases, train_idx, test_idx, top_k=3)
+
+    if speed_diag.get("n", 0) == 0:
+        print("Not enough cases with turnaround_days to run speed-based diagnostic.")
+    else:
+        print(json.dumps(speed_diag, indent=2))
+        if RUN_SPEED_ONLY_WITH_FULL and speed_assignments:
+            with open(SPEED_ASSIGNMENTS_PATH, "w", encoding="utf-8") as f:
+                json.dump(speed_assignments, f, ensure_ascii=False, indent=2)
+        with open(SPEED_REPORT_PATH, "w", encoding="utf-8") as f:
+            json.dump({
+                "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "config": {
+                    "speed_only": False,
+                    "top_k": 3,
+                    "test_size": TEST_SIZE
+                },
+                "metrics": speed_diag
+            }, f, ensure_ascii=False, indent=2)
 
     # Save judge profiles (serializable)
     print_block("SAVING PROFILES")
