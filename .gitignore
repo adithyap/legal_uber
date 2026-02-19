@@ -3,3 +3,6 @@
  
 # Ignore raw file
 data/cases_raw.json
+data/cases_raw_all.json
+data/derived_arrays.npz
+data/derived_meta.json
