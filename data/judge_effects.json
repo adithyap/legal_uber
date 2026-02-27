@@ -1,0 +1,2290 @@
+[
+  {
+    "judge": "DEXTER DIAS QC",
+    "n_cases": 1,
+    "mean_turnaround": 6209.0,
+    "median_turnaround": 6209.0,
+    "effect_days": -272.6537874391561,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE SALMON",
+    "n_cases": 1,
+    "mean_turnaround": 3882.0,
+    "median_turnaround": 3882.0,
+    "effect_days": -261.4384172114387,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ RICHARD ROBERTS",
+    "n_cases": 2,
+    "mean_turnaround": 33.0,
+    "median_turnaround": 33.0,
+    "effect_days": -241.48781991758082,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE MAY DBE",
+    "n_cases": 3,
+    "mean_turnaround": 2015.0,
+    "median_turnaround": 1929.0,
+    "effect_days": -212.6436694331071,
+    "is_baseline": false
+  },
+  {
+    "judge": "Master Armstrong",
+    "n_cases": 1,
+    "mean_turnaround": 63.0,
+    "median_turnaround": 63.0,
+    "effect_days": -198.6719345937763,
+    "is_baseline": false
+  },
+  {
+    "judge": "Malcolm Sheehan KC",
+    "n_cases": 1,
+    "mean_turnaround": 1934.0,
+    "median_turnaround": 1934.0,
+    "effect_days": -198.0901020124245,
+    "is_baseline": false
+  },
+  {
+    "judge": "LORD JUSTICE BIRSS",
+    "n_cases": 1,
+    "mean_turnaround": 64.0,
+    "median_turnaround": 64.0,
+    "effect_days": -197.67193459380383,
+    "is_baseline": false
+  },
+  {
+    "judge": "His Honour Judge Harrison",
+    "n_cases": 1,
+    "mean_turnaround": 4837.0,
+    "median_turnaround": 4837.0,
+    "effect_days": -190.6145168419922,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ PARFITT",
+    "n_cases": 5,
+    "mean_turnaround": 2000.2,
+    "median_turnaround": 55.0,
+    "effect_days": -181.6107440679492,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MR JUSTICE DOVE",
+    "n_cases": 1,
+    "mean_turnaround": 83.0,
+    "median_turnaround": 83.0,
+    "effect_days": -178.6719345937554,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE FARBEY",
+    "n_cases": 2,
+    "mean_turnaround": 73.0,
+    "median_turnaround": 73.0,
+    "effect_days": -172.22662035108715,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE MAY",
+    "n_cases": 1,
+    "mean_turnaround": 101.0,
+    "median_turnaround": 101.0,
+    "effect_days": -160.67193459377359,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE LEWIS",
+    "n_cases": 3,
+    "mean_turnaround": 104.66666666666667,
+    "median_turnaround": 106.0,
+    "effect_days": -140.55995368444587,
+    "is_baseline": false
+  },
+  {
+    "judge": "HON. MR JUSTICE BOURNE",
+    "n_cases": 1,
+    "mean_turnaround": 2643.0,
+    "median_turnaround": 2643.0,
+    "effect_days": -133.14318692417038,
+    "is_baseline": false
+  },
+  {
+    "judge": "ROBERT PALMER KC",
+    "n_cases": 1,
+    "mean_turnaround": 883.0,
+    "median_turnaround": 883.0,
+    "effect_days": -116.41096818397352,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr Justice Sheldon",
+    "n_cases": 1,
+    "mean_turnaround": 20.0,
+    "median_turnaround": 20.0,
+    "effect_days": -116.20853927563104,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ RUSSEN KC",
+    "n_cases": 1,
+    "mean_turnaround": 146.0,
+    "median_turnaround": 146.0,
+    "effect_days": -115.67193459375855,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE CHOUDHURY",
+    "n_cases": 2,
+    "mean_turnaround": 132.0,
+    "median_turnaround": 132.0,
+    "effect_days": -113.22662035108402,
+    "is_baseline": false
+  },
+  {
+    "judge": "MARCUS PILGERSTORFER KC",
+    "n_cases": 1,
+    "mean_turnaround": 2663.0,
+    "median_turnaround": 2663.0,
+    "effect_days": -113.14318692417584,
+    "is_baseline": false
+  },
+  {
+    "judge": "HH Judge Richard Parkes KC",
+    "n_cases": 1,
+    "mean_turnaround": 2291.0,
+    "median_turnaround": 2291.0,
+    "effect_days": -100.89870190518177,
+    "is_baseline": false
+  },
+  {
+    "judge": "RICHARD SPEARMAN K.C",
+    "n_cases": 2,
+    "mean_turnaround": 42.5,
+    "median_turnaround": 42.5,
+    "effect_days": -100.74390995879426,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HON. MR JUSTICE BRYAN",
+    "n_cases": 3,
+    "mean_turnaround": 4031.92,
+    "median_turnaround": 4758.0,
+    "effect_days": -96.24643536160247,
+    "is_baseline": false
+  },
+  {
+    "judge": "SUSIE ALEGRE SITTING AS A DEPUTY HIGH COURT JUDGE",
+    "n_cases": 1,
+    "mean_turnaround": 3673.0,
+    "median_turnaround": 3673.0,
+    "effect_days": -95.33753912470515,
+    "is_baseline": false
+  },
+  {
+    "judge": "Master Brown",
+    "n_cases": 1,
+    "mean_turnaround": 5143.0,
+    "median_turnaround": 5143.0,
+    "effect_days": -94.28629578501608,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr Justice Mansfield",
+    "n_cases": 1,
+    "mean_turnaround": 50.0,
+    "median_turnaround": 50.0,
+    "effect_days": -86.2085392756274,
+    "is_baseline": false
+  },
+  {
+    "judge": "HER HONOUR JUDGE EMMA KELLY",
+    "n_cases": 2,
+    "mean_turnaround": 51.0,
+    "median_turnaround": 51.0,
+    "effect_days": -85.83596729688583,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE BLAIR KC",
+    "n_cases": 3,
+    "mean_turnaround": 25.666666666666668,
+    "median_turnaround": 14.0,
+    "effect_days": -83.20972433780084,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr Justice Lavender",
+    "n_cases": 2,
+    "mean_turnaround": 60.5,
+    "median_turnaround": 60.5,
+    "effect_days": -82.74390995879969,
+    "is_baseline": false
+  },
+  {
+    "judge": "Senior Master Fontaine",
+    "n_cases": 1,
+    "mean_turnaround": 3051.0,
+    "median_turnaround": 3051.0,
+    "effect_days": -82.17425315691202,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR CASPAR GLYN KC",
+    "n_cases": 1,
+    "mean_turnaround": 3315.0,
+    "median_turnaround": 3315.0,
+    "effect_days": -81.80852837749609,
+    "is_baseline": false
+  },
+  {
+    "judge": "JEREMY HYAM KC",
+    "n_cases": 3,
+    "mean_turnaround": 4900.253333333333,
+    "median_turnaround": 7334.0,
+    "effect_days": -81.41960940557419,
+    "is_baseline": false
+  },
+  {
+    "judge": "Jonathan Moffett KC, sitting as a Deputy High Court Judge",
+    "n_cases": 1,
+    "mean_turnaround": 58.0,
+    "median_turnaround": 58.0,
+    "effect_days": -78.20853927563417,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE TIPPLES DBE",
+    "n_cases": 2,
+    "mean_turnaround": 993.5,
+    "median_turnaround": 993.5,
+    "effect_days": -77.20544099380926,
+    "is_baseline": false
+  },
+  {
+    "judge": "HH RICHARD PARKES KC",
+    "n_cases": 1,
+    "mean_turnaround": 7064.0,
+    "median_turnaround": 7064.0,
+    "effect_days": -67.8231555752846,
+    "is_baseline": false
+  },
+  {
+    "judge": "Kirsty Brimelow KC",
+    "n_cases": 1,
+    "mean_turnaround": 69.0,
+    "median_turnaround": 69.0,
+    "effect_days": -67.2085392756374,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MR JUSTICE FRASER",
+    "n_cases": 1,
+    "mean_turnaround": 1828.0,
+    "median_turnaround": 1828.0,
+    "effect_days": -65.5761714752106,
+    "is_baseline": false
+  },
+  {
+    "judge": "Dexter Dias KC",
+    "n_cases": 5,
+    "mean_turnaround": 54.2,
+    "median_turnaround": 56.0,
+    "effect_days": -63.20366347008073,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HON MR JUSTICE BUTCHER",
+    "n_cases": 1,
+    "mean_turnaround": 3307.0,
+    "median_turnaround": 3307.0,
+    "effect_days": -62.00896366931778,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MR JUSTICE MURRAY",
+    "n_cases": 11,
+    "mean_turnaround": 464.3636363636364,
+    "median_turnaround": 63.0,
+    "effect_days": -60.13037952239466,
+    "is_baseline": false
+  },
+  {
+    "judge": "DEXTER DIAS KC",
+    "n_cases": 10,
+    "mean_turnaround": 11.8,
+    "median_turnaround": 8.5,
+    "effect_days": -58.43672136756231,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ RICHARD PARKES KC",
+    "n_cases": 1,
+    "mean_turnaround": 204.0,
+    "median_turnaround": 204.0,
+    "effect_days": -57.671934593758266,
+    "is_baseline": false
+  },
+  {
+    "judge": "MASTER COOK",
+    "n_cases": 4,
+    "mean_turnaround": 24.5,
+    "median_turnaround": 23.5,
+    "effect_days": -56.18457314881192,
+    "is_baseline": false
+  },
+  {
+    "judge": "Judge Brown sitting as a Master of the KB",
+    "n_cases": 1,
+    "mean_turnaround": 3713.0,
+    "median_turnaround": 3713.0,
+    "effect_days": -55.33753912471646,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE SWEENEY",
+    "n_cases": 1,
+    "mean_turnaround": 504.0,
+    "median_turnaround": 504.0,
+    "effect_days": -53.46965165874337,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE STACEY",
+    "n_cases": 2,
+    "mean_turnaround": 100.5,
+    "median_turnaround": 100.5,
+    "effect_days": -49.33581542201428,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR HEALY-PRATT",
+    "n_cases": 3,
+    "mean_turnaround": 801.0,
+    "median_turnaround": 135.0,
+    "effect_days": -48.62816697555789,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MRS JUSTICE TIPPLES DBE",
+    "n_cases": 3,
+    "mean_turnaround": 2472.0,
+    "median_turnaround": 2443.0,
+    "effect_days": -47.068407209326324,
+    "is_baseline": false
+  },
+  {
+    "judge": "MATTHEW BUTT KC",
+    "n_cases": 1,
+    "mean_turnaround": 2231.0,
+    "median_turnaround": 2231.0,
+    "effect_days": -46.82065649423953,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ KAREN WALDEN-SMITH",
+    "n_cases": 4,
+    "mean_turnaround": 1770.25,
+    "median_turnaround": 47.5,
+    "effect_days": -42.020853280715016,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE JEFFORD",
+    "n_cases": 1,
+    "mean_turnaround": 97.0,
+    "median_turnaround": 97.0,
+    "effect_days": -39.208539275634735,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR DEXTER DIAS KC",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -39.12001433828864,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ Kramer sitting as a Commissioner",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -39.120014338281734,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HON. MR JUSTICE BOURNE",
+    "n_cases": 5,
+    "mean_turnaround": 42.2,
+    "median_turnaround": 28.0,
+    "effect_days": -38.56957258647287,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MR JUSTICE SAINI",
+    "n_cases": 6,
+    "mean_turnaround": 1226.6266666666668,
+    "median_turnaround": 5.0,
+    "effect_days": -36.61998357690243,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HON. MR JUSTICE HOLGATE",
+    "n_cases": 1,
+    "mean_turnaround": 3.0,
+    "median_turnaround": 3.0,
+    "effect_days": -36.12001433835296,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr Justice Lavender:",
+    "n_cases": 1,
+    "mean_turnaround": 1834.0,
+    "median_turnaround": 1834.0,
+    "effect_days": -35.60228209483513,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE CHAMBERLAIN",
+    "n_cases": 9,
+    "mean_turnaround": 356.77777777777777,
+    "median_turnaround": 70.0,
+    "effect_days": -34.32971858791973,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE HILL",
+    "n_cases": 15,
+    "mean_turnaround": 381.93333333333334,
+    "median_turnaround": 10.0,
+    "effect_days": -34.30751735249402,
+    "is_baseline": false
+  },
+  {
+    "judge": "Master Fontaine",
+    "n_cases": 5,
+    "mean_turnaround": 35.8,
+    "median_turnaround": 29.0,
+    "effect_days": -33.971088354098214,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE FREEDMAN",
+    "n_cases": 23,
+    "mean_turnaround": 687.9565217391304,
+    "median_turnaround": 91.0,
+    "effect_days": -32.63341742852786,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE LINDEN",
+    "n_cases": 12,
+    "mean_turnaround": 1180.4166666666667,
+    "median_turnaround": 24.5,
+    "effect_days": -30.999804485869447,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE LAVENDER",
+    "n_cases": 8,
+    "mean_turnaround": 126.75,
+    "median_turnaround": 118.0,
+    "effect_days": -29.788646335036674,
+    "is_baseline": false
+  },
+  {
+    "judge": "DEPUTY MASTER LORNA SKINNER KC",
+    "n_cases": 3,
+    "mean_turnaround": 2459.0,
+    "median_turnaround": 145.0,
+    "effect_days": -27.166667477712508,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE HILL DBE",
+    "n_cases": 21,
+    "mean_turnaround": 383.6190476190476,
+    "median_turnaround": 15.0,
+    "effect_days": -26.697042759214128,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr Justice Picken",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -25.83722408142805,
+    "is_baseline": false
+  },
+  {
+    "judge": "His Honour Judge Tindal",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -25.837224081412028,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE SHETTY",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -25.83722408139871,
+    "is_baseline": false
+  },
+  {
+    "judge": "The Honourable Mrs Justice Lambert",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -25.83722408138069,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE FREEDMAN",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -25.837224081373108,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE PRESIDENT OF THE KING'S BENCH DIVISION",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -25.83722408135708,
+    "is_baseline": false
+  },
+  {
+    "judge": "SIR PETER LANE",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -25.183810926469363,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr Justice Cavanagh",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -25.18381092646628,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ Lt Col (Retd) Siddique",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -25.18381092646122,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MR JUSTICE WALL",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -25.18381092645437,
+    "is_baseline": false
+  },
+  {
+    "judge": "JUDGE DAVID O'MAHONY",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -25.183810926449624,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE WALL",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -25.183810926426276,
+    "is_baseline": false
+  },
+  {
+    "judge": "DAVID O'MAHONY",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -25.1838109264188,
+    "is_baseline": false
+  },
+  {
+    "judge": "LADY JUSTICE WHIPPLE",
+    "n_cases": 1,
+    "mean_turnaround": 1.0,
+    "median_turnaround": 1.0,
+    "effect_days": -24.83722408137191,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE SAINI",
+    "n_cases": 2,
+    "mean_turnaround": 1.0,
+    "median_turnaround": 1.0,
+    "effect_days": -24.83722408136473,
+    "is_baseline": false
+  },
+  {
+    "judge": "SIR DUNCAN OUSELEY",
+    "n_cases": 1,
+    "mean_turnaround": 1.0,
+    "median_turnaround": 1.0,
+    "effect_days": -24.837224081354915,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MRS JUSTICE DIAS",
+    "n_cases": 2,
+    "mean_turnaround": 0.5,
+    "median_turnaround": 0.5,
+    "effect_days": -24.683810926449695,
+    "is_baseline": false
+  },
+  {
+    "judge": "CLARE PADLEY",
+    "n_cases": 2,
+    "mean_turnaround": 3145.5,
+    "median_turnaround": 3145.5,
+    "effect_days": -24.532261749910504,
+    "is_baseline": false
+  },
+  {
+    "judge": "ANDREW BURNS KC",
+    "n_cases": 1,
+    "mean_turnaround": 2.0,
+    "median_turnaround": 2.0,
+    "effect_days": -23.837224081428076,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ Lickley KC sitting as a Judge of the High Court",
+    "n_cases": 1,
+    "mean_turnaround": 16.0,
+    "median_turnaround": 16.0,
+    "effect_days": -23.120014338236714,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr Justice Ritchie:",
+    "n_cases": 1,
+    "mean_turnaround": 3.0,
+    "median_turnaround": 3.0,
+    "effect_days": -22.83722408135811,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MR JUSTICE PEPPERALL",
+    "n_cases": 18,
+    "mean_turnaround": 95.55555555555556,
+    "median_turnaround": 67.5,
+    "effect_days": -22.521395745843563,
+    "is_baseline": false
+  },
+  {
+    "judge": "SARAH CROWTHER KC",
+    "n_cases": 1,
+    "mean_turnaround": 17.0,
+    "median_turnaround": 17.0,
+    "effect_days": -22.120014338270494,
+    "is_baseline": false
+  },
+  {
+    "judge": "DEPUTY HIGH COURT JUDGE AIDAN EARDLEY KC",
+    "n_cases": 13,
+    "mean_turnaround": 882.4615384615385,
+    "median_turnaround": 10.0,
+    "effect_days": -21.98523078296637,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE DIGHT CBE",
+    "n_cases": 1,
+    "mean_turnaround": 4.0,
+    "median_turnaround": 4.0,
+    "effect_days": -21.837224081385955,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr David Lock KC,",
+    "n_cases": 1,
+    "mean_turnaround": 4.0,
+    "median_turnaround": 4.0,
+    "effect_days": -21.837224081353085,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE ELLENBOGEN",
+    "n_cases": 4,
+    "mean_turnaround": 329.5,
+    "median_turnaround": 316.0,
+    "effect_days": -21.11211549813379,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE SOOLE",
+    "n_cases": 11,
+    "mean_turnaround": 862.0909090909091,
+    "median_turnaround": 54.0,
+    "effect_days": -20.4832189835912,
+    "is_baseline": false
+  },
+  {
+    "judge": "Susan Coombs (Litigant in Person)",
+    "n_cases": 1,
+    "mean_turnaround": 5.0,
+    "median_turnaround": 5.0,
+    "effect_days": -20.1838109264436,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MRS JUSTICE COLLINS RICE DBE CB",
+    "n_cases": 6,
+    "mean_turnaround": 1495.8333333333333,
+    "median_turnaround": 39.5,
+    "effect_days": -20.16066359569365,
+    "is_baseline": false
+  },
+  {
+    "judge": "ADAM VAITILINGAM KC",
+    "n_cases": 1,
+    "mean_turnaround": 6.0,
+    "median_turnaround": 6.0,
+    "effect_days": -19.837224081484237,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MRS JUSTICE JENNIFER EADY DBE",
+    "n_cases": 4,
+    "mean_turnaround": 1847.94,
+    "median_turnaround": 19.5,
+    "effect_days": -19.525602068057253,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE EADY DBE",
+    "n_cases": 1,
+    "mean_turnaround": 6.0,
+    "median_turnaround": 6.0,
+    "effect_days": -19.183810926468027,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE EADY",
+    "n_cases": 1,
+    "mean_turnaround": 6.0,
+    "median_turnaround": 6.0,
+    "effect_days": -19.183810926450974,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ RAJEEV SHETTY",
+    "n_cases": 2,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -18.91861204067314,
+    "is_baseline": false
+  },
+  {
+    "judge": "His Honour Judge Bird",
+    "n_cases": 1,
+    "mean_turnaround": 7.0,
+    "median_turnaround": 7.0,
+    "effect_days": -18.8372240814003,
+    "is_baseline": false
+  },
+  {
+    "judge": "DAVID LOCK KC",
+    "n_cases": 1,
+    "mean_turnaround": 7.0,
+    "median_turnaround": 7.0,
+    "effect_days": -18.837224081373733,
+    "is_baseline": false
+  },
+  {
+    "judge": "DEPUTY HIGH COURT JUDGE GUY VASSALL-ADAMS KC",
+    "n_cases": 2,
+    "mean_turnaround": 6.5,
+    "median_turnaround": 6.5,
+    "effect_days": -18.683810926434347,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr Jonathan Glasson KC sitting as a Deputy Judge of the High Court",
+    "n_cases": 1,
+    "mean_turnaround": 7.0,
+    "median_turnaround": 7.0,
+    "effect_days": -18.1838109264462,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE STEYN DBE",
+    "n_cases": 2,
+    "mean_turnaround": 1.0,
+    "median_turnaround": 1.0,
+    "effect_days": -17.91861204067589,
+    "is_baseline": false
+  },
+  {
+    "judge": "SUSIE ALEGRE, SITTING AS A DEPUTY JUDGE OF THE HIGH COURT",
+    "n_cases": 1,
+    "mean_turnaround": 8.0,
+    "median_turnaround": 8.0,
+    "effect_days": -17.837224081358258,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE JACOBS",
+    "n_cases": 1,
+    "mean_turnaround": 8.0,
+    "median_turnaround": 8.0,
+    "effect_days": -17.837224081355153,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HON. MR JUSTICE CHAMBERLAIN",
+    "n_cases": 2,
+    "mean_turnaround": 8.0,
+    "median_turnaround": 8.0,
+    "effect_days": -17.837224081347237,
+    "is_baseline": false
+  },
+  {
+    "judge": "KIRSTY BRIMELOW KC sitting as a Deputy Judge",
+    "n_cases": 1,
+    "mean_turnaround": 8.0,
+    "median_turnaround": 8.0,
+    "effect_days": -17.183810926477136,
+    "is_baseline": false
+  },
+  {
+    "judge": "FORDHAM J",
+    "n_cases": 15,
+    "mean_turnaround": 3.4,
+    "median_turnaround": 0.0,
+    "effect_days": -16.510286555875496,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr Justice Constable",
+    "n_cases": 3,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -16.39460364215296,
+    "is_baseline": false
+  },
+  {
+    "judge": "His Honour Judge Tariq Sadiq",
+    "n_cases": 1,
+    "mean_turnaround": 9.0,
+    "median_turnaround": 9.0,
+    "effect_days": -16.183810926478614,
+    "is_baseline": false
+  },
+  {
+    "judge": "The Honourable Mrs Justice Dias",
+    "n_cases": 1,
+    "mean_turnaround": 9.0,
+    "median_turnaround": 9.0,
+    "effect_days": -16.183810926455536,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MRS JUSTICE HEATHER WILLIAMS DBE",
+    "n_cases": 10,
+    "mean_turnaround": 872.0,
+    "median_turnaround": 35.5,
+    "effect_days": -15.530405280480863,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE CONSTABLE",
+    "n_cases": 20,
+    "mean_turnaround": 316.2,
+    "median_turnaround": 5.0,
+    "effect_days": -14.897611757251923,
+    "is_baseline": false
+  },
+  {
+    "judge": "His Honour Judge Pearce",
+    "n_cases": 1,
+    "mean_turnaround": 11.0,
+    "median_turnaround": 11.0,
+    "effect_days": -14.837224081333538,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HON. MR JUSTICE TURNER",
+    "n_cases": 3,
+    "mean_turnaround": 94.33333333333333,
+    "median_turnaround": 88.0,
+    "effect_days": -14.543057671140431,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE JARMAN KC",
+    "n_cases": 1,
+    "mean_turnaround": 11.0,
+    "median_turnaround": 11.0,
+    "effect_days": -14.183810926451855,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE RITCHIE",
+    "n_cases": 33,
+    "mean_turnaround": 884.3636363636364,
+    "median_turnaround": 11.0,
+    "effect_days": -14.173267721299737,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE COTTER",
+    "n_cases": 14,
+    "mean_turnaround": 26.285714285714285,
+    "median_turnaround": 25.0,
+    "effect_days": -13.88763764143664,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR. NIGEL COOPER K.C.",
+    "n_cases": 1,
+    "mean_turnaround": 12.0,
+    "median_turnaround": 12.0,
+    "effect_days": -13.8372240813733,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE CAVANAGH",
+    "n_cases": 8,
+    "mean_turnaround": 295.0,
+    "median_turnaround": 11.5,
+    "effect_days": -13.587118693273851,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE SWIFT",
+    "n_cases": 1,
+    "mean_turnaround": 12.0,
+    "median_turnaround": 12.0,
+    "effect_days": -13.18381092644914,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE BIRD",
+    "n_cases": 3,
+    "mean_turnaround": 9.0,
+    "median_turnaround": 9.0,
+    "effect_days": -12.22481605422928,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE BRIGHT",
+    "n_cases": 2,
+    "mean_turnaround": 13.0,
+    "median_turnaround": 13.0,
+    "effect_days": -12.183810926472816,
+    "is_baseline": false
+  },
+  {
+    "judge": "Richard Wright KC Sitting as a Deputy Judge of the High Court",
+    "n_cases": 1,
+    "mean_turnaround": 13.0,
+    "median_turnaround": 13.0,
+    "effect_days": -12.183810926459344,
+    "is_baseline": false
+  },
+  {
+    "judge": "Annabel Darlow KC",
+    "n_cases": 1,
+    "mean_turnaround": 13.0,
+    "median_turnaround": 13.0,
+    "effect_days": -12.183810926459046,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JONATHAN GLASSON KC",
+    "n_cases": 2,
+    "mean_turnaround": 13.0,
+    "median_turnaround": 13.0,
+    "effect_days": -12.18381092640874,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MRS JUSTICE COLLINS RICE",
+    "n_cases": 13,
+    "mean_turnaround": 1149.2307692307693,
+    "median_turnaround": 29.0,
+    "effect_days": -12.066046169306446,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE TINDAL",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -12.000000000019888,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mrs Justice Cockerill",
+    "n_cases": 3,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -11.999999999993364,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MR JUSTICE GOOSE",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -11.999999999984055,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ RAJEEV SHETTY SITTING AS A JUDGE OF THE HIGH COURT",
+    "n_cases": 1,
+    "mean_turnaround": 0.0,
+    "median_turnaround": 0.0,
+    "effect_days": -11.999999999961027,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR. JUSTICE SHELDON",
+    "n_cases": 1,
+    "mean_turnaround": 6283.0,
+    "median_turnaround": 6283.0,
+    "effect_days": -10.958885801631908,
+    "is_baseline": false
+  },
+  {
+    "judge": "Dan Squires KC",
+    "n_cases": 1,
+    "mean_turnaround": 15.0,
+    "median_turnaround": 15.0,
+    "effect_days": -10.837224081377599,
+    "is_baseline": false
+  },
+  {
+    "judge": "His Honour Judge Bird sitting as a Judge of this Court",
+    "n_cases": 3,
+    "mean_turnaround": 3968.3333333333335,
+    "median_turnaround": 5182.0,
+    "effect_days": -10.682229745658788,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE ANDREW BAKER",
+    "n_cases": 2,
+    "mean_turnaround": 15.5,
+    "median_turnaround": 15.5,
+    "effect_days": -10.337224081375382,
+    "is_baseline": false
+  },
+  {
+    "judge": "CHRISTOPHER KENNEDY KC",
+    "n_cases": 1,
+    "mean_turnaround": 15.0,
+    "median_turnaround": 15.0,
+    "effect_days": -10.183810926445858,
+    "is_baseline": false
+  },
+  {
+    "judge": "Elizabeth O'Neill",
+    "n_cases": 2,
+    "mean_turnaround": 2.0,
+    "median_turnaround": 2.0,
+    "effect_days": -9.999999999988106,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE FOSTER SITTING AS ELECTION COMMISSIONER",
+    "n_cases": 1,
+    "mean_turnaround": 16.0,
+    "median_turnaround": 16.0,
+    "effect_days": -9.837224081415982,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE LANE",
+    "n_cases": 1,
+    "mean_turnaround": 16.0,
+    "median_turnaround": 16.0,
+    "effect_days": -9.837224081378643,
+    "is_baseline": false
+  },
+  {
+    "judge": "MASTER THORNETT",
+    "n_cases": 10,
+    "mean_turnaround": 60.8,
+    "median_turnaround": 50.5,
+    "effect_days": -9.213802793877562,
+    "is_baseline": false
+  },
+  {
+    "judge": "SUSIE ALEGRE",
+    "n_cases": 2,
+    "mean_turnaround": 9.5,
+    "median_turnaround": 9.5,
+    "effect_days": -9.09190546323569,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE MELLOR",
+    "n_cases": 1,
+    "mean_turnaround": 3.0,
+    "median_turnaround": 3.0,
+    "effect_days": -9.000000000001123,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE DIAS",
+    "n_cases": 1,
+    "mean_turnaround": 3.0,
+    "median_turnaround": 3.0,
+    "effect_days": -8.99999999998279,
+    "is_baseline": false
+  },
+  {
+    "judge": "Alison Morgan KC",
+    "n_cases": 1,
+    "mean_turnaround": 3.0,
+    "median_turnaround": 3.0,
+    "effect_days": -8.99999999996453,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MRS JUSTICE STEYN DBE",
+    "n_cases": 1,
+    "mean_turnaround": 4.0,
+    "median_turnaround": 4.0,
+    "effect_days": -8.000000000001094,
+    "is_baseline": false
+  },
+  {
+    "judge": "MS CLARE AMBROSE",
+    "n_cases": 1,
+    "mean_turnaround": 18.0,
+    "median_turnaround": 18.0,
+    "effect_days": -7.837224081380064,
+    "is_baseline": false
+  },
+  {
+    "judge": "David O'Mahony, sitting as a Deputy Judge of the High Court",
+    "n_cases": 1,
+    "mean_turnaround": 18.0,
+    "median_turnaround": 18.0,
+    "effect_days": -7.183810926462684,
+    "is_baseline": false
+  },
+  {
+    "judge": "DHCJ GUY VASSALL-ADAMS KC",
+    "n_cases": 2,
+    "mean_turnaround": 18.0,
+    "median_turnaround": 18.0,
+    "effect_days": -7.183810926415163,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MRS JUSTICE EADY DBE",
+    "n_cases": 2,
+    "mean_turnaround": 18.5,
+    "median_turnaround": 18.5,
+    "effect_days": -7.010517503908922,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ RICHARD ROBERTS,",
+    "n_cases": 1,
+    "mean_turnaround": 5.0,
+    "median_turnaround": 5.0,
+    "effect_days": -7.000000000011454,
+    "is_baseline": false
+  },
+  {
+    "judge": "John Kimbell KC",
+    "n_cases": 1,
+    "mean_turnaround": 6683.0,
+    "median_turnaround": 6683.0,
+    "effect_days": -6.881839050111921,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE JOHNSON",
+    "n_cases": 17,
+    "mean_turnaround": 245.2941176470588,
+    "median_turnaround": 5.0,
+    "effect_days": -6.3017456281367,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr Jonathan Glasson KC",
+    "n_cases": 1,
+    "mean_turnaround": 19.0,
+    "median_turnaround": 19.0,
+    "effect_days": -6.183810926444352,
+    "is_baseline": false
+  },
+  {
+    "judge": "HER HONOUR JUDGE CLAIRE EVANS",
+    "n_cases": 1,
+    "mean_turnaround": 19.0,
+    "median_turnaround": 19.0,
+    "effect_days": -6.183810926424243,
+    "is_baseline": false
+  },
+  {
+    "judge": "SENIOR MASTER FONTAINE",
+    "n_cases": 9,
+    "mean_turnaround": 81.0,
+    "median_turnaround": 71.0,
+    "effect_days": -5.8539027184576184,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE BIRT",
+    "n_cases": 1,
+    "mean_turnaround": 1.0,
+    "median_turnaround": 1.0,
+    "effect_days": -5.505766955876084,
+    "is_baseline": false
+  },
+  {
+    "judge": "Rory Dunlop KC",
+    "n_cases": 1,
+    "mean_turnaround": 20.0,
+    "median_turnaround": 20.0,
+    "effect_days": -5.183810926432912,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ SIDDIQUE",
+    "n_cases": 1,
+    "mean_turnaround": 7.0,
+    "median_turnaround": 7.0,
+    "effect_days": -5.000000000013927,
+    "is_baseline": false
+  },
+  {
+    "judge": "LORD JUSTICE POPPLEWELL",
+    "n_cases": 1,
+    "mean_turnaround": 7.0,
+    "median_turnaround": 7.0,
+    "effect_days": -5.000000000005713,
+    "is_baseline": false
+  },
+  {
+    "judge": "The Hon. Mr Justice Sweeting",
+    "n_cases": 1,
+    "mean_turnaround": 7.0,
+    "median_turnaround": 7.0,
+    "effect_days": -4.9999999999962625,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MR JUSTICE MARTIN SPENCER",
+    "n_cases": 9,
+    "mean_turnaround": 2057.6666666666665,
+    "median_turnaround": 45.0,
+    "effect_days": -3.6934550073237915,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE GRIFFITHS",
+    "n_cases": 8,
+    "mean_turnaround": 610.0,
+    "median_turnaround": 13.5,
+    "effect_days": -3.2104273200046123,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ Karen Walden-Smith sitting as a Judge of the High Court",
+    "n_cases": 1,
+    "mean_turnaround": 9.0,
+    "median_turnaround": 9.0,
+    "effect_days": -3.0000000000242864,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE HEATHER WILLIAMS DBE",
+    "n_cases": 1,
+    "mean_turnaround": 9.0,
+    "median_turnaround": 9.0,
+    "effect_days": -3.0000000000182467,
+    "is_baseline": false
+  },
+  {
+    "judge": "The Hon. Mr Justice Bryan",
+    "n_cases": 1,
+    "mean_turnaround": 9.0,
+    "median_turnaround": 9.0,
+    "effect_days": -3.0000000000031193,
+    "is_baseline": false
+  },
+  {
+    "judge": "DAVID PITTAWAY KC",
+    "n_cases": 1,
+    "mean_turnaround": 23.0,
+    "median_turnaround": 23.0,
+    "effect_days": -2.8372240813519056,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE KERR",
+    "n_cases": 12,
+    "mean_turnaround": 1307.1666666666667,
+    "median_turnaround": 35.0,
+    "effect_days": -2.6199623464207207,
+    "is_baseline": false
+  },
+  {
+    "judge": "Her Honour Judge EMMA KELLY",
+    "n_cases": 1,
+    "mean_turnaround": 23.0,
+    "median_turnaround": 23.0,
+    "effect_days": -2.1838109264581647,
+    "is_baseline": false
+  },
+  {
+    "judge": "The Honourable Mr Justice Dexter Dias",
+    "n_cases": 1,
+    "mean_turnaround": 10.0,
+    "median_turnaround": 10.0,
+    "effect_days": -2.0000000000072404,
+    "is_baseline": false
+  },
+  {
+    "judge": "Deputy High Court Judge Susie Alegre",
+    "n_cases": 1,
+    "mean_turnaround": 10.0,
+    "median_turnaround": 10.0,
+    "effect_days": -2.0000000000063665,
+    "is_baseline": false
+  },
+  {
+    "judge": "MASTER ARMSTRONG",
+    "n_cases": 2,
+    "mean_turnaround": 72.5,
+    "median_turnaround": 72.5,
+    "effect_days": -1.6042696378212558,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ KAREN WALDEN-SMITH sitting as a Judge of the High Court",
+    "n_cases": 1,
+    "mean_turnaround": 24.0,
+    "median_turnaround": 24.0,
+    "effect_days": -1.1838109264203354,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ KAREN WALDEN-SMITH, Sitting as a Judge of the High Court",
+    "n_cases": 1,
+    "mean_turnaround": 11.0,
+    "median_turnaround": 11.0,
+    "effect_days": -1.0000000000058051,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MR JUSTICE BOURNE",
+    "n_cases": 8,
+    "mean_turnaround": 581.875,
+    "median_turnaround": 22.5,
+    "effect_days": -0.7067931493019728,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE BOURNE",
+    "n_cases": 1,
+    "mean_turnaround": 6.0,
+    "median_turnaround": 6.0,
+    "effect_days": -0.50576695588029,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr Justice Sweeting",
+    "n_cases": 1,
+    "mean_turnaround": 25.0,
+    "median_turnaround": 25.0,
+    "effect_days": -0.18381092645563513,
+    "is_baseline": false
+  },
+  {
+    "judge": ": MRS JUSTICE COCKERILL DBE",
+    "n_cases": 1,
+    "mean_turnaround": 12.0,
+    "median_turnaround": 12.0,
+    "effect_days": 0.0,
+    "is_baseline": true
+  },
+  {
+    "judge": "MRS JUSTICE JENNIFER EADY DBE",
+    "n_cases": 1,
+    "mean_turnaround": 26.0,
+    "median_turnaround": 26.0,
+    "effect_days": 0.8161890735439101,
+    "is_baseline": false
+  },
+  {
+    "judge": "MASTER GIDDEN",
+    "n_cases": 1,
+    "mean_turnaround": 13.0,
+    "median_turnaround": 13.0,
+    "effect_days": 0.9999999999938183,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MR JUSTICE SWEETING",
+    "n_cases": 15,
+    "mean_turnaround": 100.13333333333334,
+    "median_turnaround": 68.0,
+    "effect_days": 1.066804785966724,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE JEFFORD DBE",
+    "n_cases": 2,
+    "mean_turnaround": 2751.0,
+    "median_turnaround": 2751.0,
+    "effect_days": 1.520884810623869,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr Justice Birt",
+    "n_cases": 1,
+    "mean_turnaround": 27.0,
+    "median_turnaround": 27.0,
+    "effect_days": 1.8161890735452033,
+    "is_baseline": false
+  },
+  {
+    "judge": "DEPUTY HIGH COURT JUDGE SUSIE ALEGRE",
+    "n_cases": 4,
+    "mean_turnaround": 20.75,
+    "median_turnaround": 17.0,
+    "effect_days": 2.1580945367634286,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ WORSTER",
+    "n_cases": 2,
+    "mean_turnaround": 21.5,
+    "median_turnaround": 21.5,
+    "effect_days": 2.581387959293515,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MR JUSTICE MOULD",
+    "n_cases": 1,
+    "mean_turnaround": 15.0,
+    "median_turnaround": 15.0,
+    "effect_days": 3.0000000000038582,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE LADY CHIEF JUSTICE OF ENGLAND AND WALES",
+    "n_cases": 1,
+    "mean_turnaround": 29.0,
+    "median_turnaround": 29.0,
+    "effect_days": 3.8161890735479176,
+    "is_baseline": false
+  },
+  {
+    "judge": "ALISON MORGAN KC",
+    "n_cases": 2,
+    "mean_turnaround": 22.5,
+    "median_turnaround": 22.5,
+    "effect_days": 3.9080945367288678,
+    "is_baseline": false
+  },
+  {
+    "judge": "LORD JUSTICE DINGEMANS",
+    "n_cases": 1,
+    "mean_turnaround": 30.0,
+    "median_turnaround": 30.0,
+    "effect_days": 4.1627759185315725,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE MICHAEL GREEN",
+    "n_cases": 1,
+    "mean_turnaround": 30.0,
+    "median_turnaround": 30.0,
+    "effect_days": 4.1627759186239786,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE GRIMSHAW",
+    "n_cases": 1,
+    "mean_turnaround": 30.0,
+    "median_turnaround": 30.0,
+    "effect_days": 4.8161890735333515,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ Lickley KC Sitting as a Judge of the High Court",
+    "n_cases": 1,
+    "mean_turnaround": 44.0,
+    "median_turnaround": 44.0,
+    "effect_days": 4.8799856616928565,
+    "is_baseline": false
+  },
+  {
+    "judge": "RORY DUNLOP KC",
+    "n_cases": 1,
+    "mean_turnaround": 17.0,
+    "median_turnaround": 17.0,
+    "effect_days": 5.000000000006295,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE YIP",
+    "n_cases": 2,
+    "mean_turnaround": 18.0,
+    "median_turnaround": 18.0,
+    "effect_days": 5.999999999961489,
+    "is_baseline": false
+  },
+  {
+    "judge": "Her Honour Judge Karen Walden-Smith, sitting as a Judge of the High Court",
+    "n_cases": 1,
+    "mean_turnaround": 18.0,
+    "median_turnaround": 18.0,
+    "effect_days": 5.999999999995644,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HON. MRS JUSTICE STEYN DBE",
+    "n_cases": 18,
+    "mean_turnaround": 865.9866666666667,
+    "median_turnaround": 25.0,
+    "effect_days": 6.728810903374637,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE BUTCHER",
+    "n_cases": 2,
+    "mean_turnaround": 32.5,
+    "median_turnaround": 32.5,
+    "effect_days": 7.316189073504262,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR CHRISTOPHER KENNEDY KC",
+    "n_cases": 2,
+    "mean_turnaround": 27.0,
+    "median_turnaround": 27.0,
+    "effect_days": 8.40809453676546,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE JAY",
+    "n_cases": 13,
+    "mean_turnaround": 1251.2307692307693,
+    "median_turnaround": 14.0,
+    "effect_days": 8.986181512294706,
+    "is_baseline": false
+  },
+  {
+    "judge": "His Honour Judge Antony Dunne",
+    "n_cases": 2,
+    "mean_turnaround": 28.5,
+    "median_turnaround": 28.5,
+    "effect_days": 9.58138795930914,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE YIP DBE",
+    "n_cases": 1,
+    "mean_turnaround": 22.0,
+    "median_turnaround": 22.0,
+    "effect_days": 9.9999999999715,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR DAVID LOCK QC SITTING AS A DEPUTY JUDGE OF THE HIGH COURT",
+    "n_cases": 1,
+    "mean_turnaround": 50.0,
+    "median_turnaround": 50.0,
+    "effect_days": 10.879985661751448,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE FOSTER",
+    "n_cases": 2,
+    "mean_turnaround": 286.0,
+    "median_turnaround": 286.0,
+    "effect_days": 11.51218008243454,
+    "is_baseline": false
+  },
+  {
+    "judge": "Ms Clare Ambrose sitting as a Deputy High Court Judge",
+    "n_cases": 1,
+    "mean_turnaround": 5486.0,
+    "median_turnaround": 5486.0,
+    "effect_days": 12.878993702602372,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr Justice Dexter Dias",
+    "n_cases": 10,
+    "mean_turnaround": 760.1,
+    "median_turnaround": 35.5,
+    "effect_days": 13.139551098512129,
+    "is_baseline": false
+  },
+  {
+    "judge": "HON SIR PETER LANE",
+    "n_cases": 2,
+    "mean_turnaround": 39.5,
+    "median_turnaround": 39.5,
+    "effect_days": 14.316189073534431,
+    "is_baseline": false
+  },
+  {
+    "judge": "KAREN RIDGE SITTING AS A DEPUTY HIGH COURT JUDGE",
+    "n_cases": 1,
+    "mean_turnaround": 40.0,
+    "median_turnaround": 40.0,
+    "effect_days": 14.816189073536748,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HON. MRS JUSTICE THORNTON DBE",
+    "n_cases": 1,
+    "mean_turnaround": 41.0,
+    "median_turnaround": 41.0,
+    "effect_days": 15.162775918628448,
+    "is_baseline": false
+  },
+  {
+    "judge": "SENIOR MASTER COOK",
+    "n_cases": 13,
+    "mean_turnaround": 411.2307692307692,
+    "median_turnaround": 21.0,
+    "effect_days": 15.48466859724249,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JONATHAN GLASSON KC SITTING AS A DEPUTY HIGH COURT JUDGE",
+    "n_cases": 1,
+    "mean_turnaround": 28.0,
+    "median_turnaround": 28.0,
+    "effect_days": 15.999999999994643,
+    "is_baseline": false
+  },
+  {
+    "judge": "Master Thornett",
+    "n_cases": 1,
+    "mean_turnaround": 42.0,
+    "median_turnaround": 42.0,
+    "effect_days": 16.16277591864244,
+    "is_baseline": false
+  },
+  {
+    "judge": "Deputy Master SABIC KC",
+    "n_cases": 1,
+    "mean_turnaround": 29.0,
+    "median_turnaround": 29.0,
+    "effect_days": 16.999999999992724,
+    "is_baseline": false
+  },
+  {
+    "judge": "GERAINT WEBB KC",
+    "n_cases": 5,
+    "mean_turnaround": 1655.0,
+    "median_turnaround": 1883.0,
+    "effect_days": 17.113517538498968,
+    "is_baseline": false
+  },
+  {
+    "judge": "ANDREW KINNIER K.C.",
+    "n_cases": 3,
+    "mean_turnaround": 42.333333333333336,
+    "median_turnaround": 36.0,
+    "effect_days": 17.149522406913093,
+    "is_baseline": false
+  },
+  {
+    "judge": "Tim Moloney KC",
+    "n_cases": 1,
+    "mean_turnaround": 24.0,
+    "median_turnaround": 24.0,
+    "effect_days": 17.494233044116072,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE KEYSER KC",
+    "n_cases": 1,
+    "mean_turnaround": 4023.0,
+    "median_turnaround": 4023.0,
+    "effect_days": 18.82775036290326,
+    "is_baseline": false
+  },
+  {
+    "judge": "Deputy Master Marzec",
+    "n_cases": 3,
+    "mean_turnaround": 35.333333333333336,
+    "median_turnaround": 41.0,
+    "effect_days": 18.938729691165463,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE JULIAN KNOWLES",
+    "n_cases": 24,
+    "mean_turnaround": 1112.0833333333333,
+    "median_turnaround": 190.0,
+    "effect_days": 20.778798440099422,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE CUTTS",
+    "n_cases": 1,
+    "mean_turnaround": 46.0,
+    "median_turnaround": 46.0,
+    "effect_days": 20.816189073565724,
+    "is_baseline": false
+  },
+  {
+    "judge": "MASTER DAVISON",
+    "n_cases": 9,
+    "mean_turnaround": 1121.3333333333333,
+    "median_turnaround": 26.0,
+    "effect_days": 20.887229116645585,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mrs Justice Lambert DBE",
+    "n_cases": 3,
+    "mean_turnaround": 2372.3333333333335,
+    "median_turnaround": 3315.0,
+    "effect_days": 20.952487984748984,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mrs Justice Stacey",
+    "n_cases": 1,
+    "mean_turnaround": 34.0,
+    "median_turnaround": 34.0,
+    "effect_days": 21.99999999999973,
+    "is_baseline": false
+  },
+  {
+    "judge": "DEPUTY MASTER SABIC",
+    "n_cases": 1,
+    "mean_turnaround": 34.0,
+    "median_turnaround": 34.0,
+    "effect_days": 22.000000000026603,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE YIP AND MR JUSTICE BUTCHER",
+    "n_cases": 1,
+    "mean_turnaround": 48.0,
+    "median_turnaround": 48.0,
+    "effect_days": 22.81618907355886,
+    "is_baseline": false
+  },
+  {
+    "judge": ": Master Brown",
+    "n_cases": 1,
+    "mean_turnaround": 35.0,
+    "median_turnaround": 35.0,
+    "effect_days": 22.999999999959982,
+    "is_baseline": false
+  },
+  {
+    "judge": "CLIVE SHELDON KC",
+    "n_cases": 1,
+    "mean_turnaround": 1917.0,
+    "median_turnaround": 1917.0,
+    "effect_days": 23.423828524756118,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ Howells",
+    "n_cases": 1,
+    "mean_turnaround": 49.0,
+    "median_turnaround": 49.0,
+    "effect_days": 23.81618907355177,
+    "is_baseline": false
+  },
+  {
+    "judge": "MASTER FONTAINE",
+    "n_cases": 3,
+    "mean_turnaround": 82.66666666666667,
+    "median_turnaround": 114.0,
+    "effect_days": 24.869216599305084,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE GOSNELL",
+    "n_cases": 1,
+    "mean_turnaround": 51.0,
+    "median_turnaround": 51.0,
+    "effect_days": 25.162775918620802,
+    "is_baseline": false
+  },
+  {
+    "judge": "JASON BEER KC",
+    "n_cases": 3,
+    "mean_turnaround": 51.0,
+    "median_turnaround": 18.0,
+    "effect_days": 25.59838468856033,
+    "is_baseline": false
+  },
+  {
+    "judge": "DEPUTY MASTER ALLEYNE",
+    "n_cases": 1,
+    "mean_turnaround": 38.0,
+    "median_turnaround": 38.0,
+    "effect_days": 26.00000000000773,
+    "is_baseline": false
+  },
+  {
+    "judge": "His Honour Judge Lewis",
+    "n_cases": 7,
+    "mean_turnaround": 145.14285714285714,
+    "median_turnaround": 97.0,
+    "effect_days": 26.51318376856875,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE SHELDON",
+    "n_cases": 10,
+    "mean_turnaround": 1543.0,
+    "median_turnaround": 66.5,
+    "effect_days": 26.586324144999566,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ EMMA KELLY",
+    "n_cases": 2,
+    "mean_turnaround": 53.0,
+    "median_turnaround": 53.0,
+    "effect_days": 27.816189073527596,
+    "is_baseline": false
+  },
+  {
+    "judge": "DUNCAN ATKINSON KC",
+    "n_cases": 3,
+    "mean_turnaround": 52.666666666666664,
+    "median_turnaround": 54.0,
+    "effect_days": 31.877459382360485,
+    "is_baseline": false
+  },
+  {
+    "judge": "DEPUTY MASTER GRIMSHAW",
+    "n_cases": 1,
+    "mean_turnaround": 44.0,
+    "median_turnaround": 44.0,
+    "effect_days": 32.00000000001944,
+    "is_baseline": false
+  },
+  {
+    "judge": "District Judge Maddison",
+    "n_cases": 1,
+    "mean_turnaround": 59.0,
+    "median_turnaround": 59.0,
+    "effect_days": 33.81618907354897,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ Emma Kelly sitting as a Judge of the High Court",
+    "n_cases": 2,
+    "mean_turnaround": 2420.0,
+    "median_turnaround": 2420.0,
+    "effect_days": 34.776507154420145,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE STACEY DBE",
+    "n_cases": 1,
+    "mean_turnaround": 61.0,
+    "median_turnaround": 61.0,
+    "effect_days": 35.8161890735569,
+    "is_baseline": false
+  },
+  {
+    "judge": "MASTER STEVENS",
+    "n_cases": 12,
+    "mean_turnaround": 483.75,
+    "median_turnaround": 118.5,
+    "effect_days": 36.92787505122675,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr Justice Cotter",
+    "n_cases": 1,
+    "mean_turnaround": 63.0,
+    "median_turnaround": 63.0,
+    "effect_days": 37.162775918626885,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE GARNHAM",
+    "n_cases": 4,
+    "mean_turnaround": 1849.69,
+    "median_turnaround": 24.5,
+    "effect_days": 37.414010277558106,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MRS JUSTICE FARBEY",
+    "n_cases": 4,
+    "mean_turnaround": 60.75,
+    "median_turnaround": 61.0,
+    "effect_days": 38.37208193900159,
+    "is_baseline": false
+  },
+  {
+    "judge": "MS SARAH CLARKE KC",
+    "n_cases": 1,
+    "mean_turnaround": 6962.0,
+    "median_turnaround": 6962.0,
+    "effect_days": 38.40489603566505,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE ROBINSON sitting as a Judge of the High Court",
+    "n_cases": 2,
+    "mean_turnaround": 3701.38,
+    "median_turnaround": 3701.38,
+    "effect_days": 39.16277591860148,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MR JUSTICE TURNER",
+    "n_cases": 6,
+    "mean_turnaround": 138.5,
+    "median_turnaround": 79.0,
+    "effect_days": 40.29312629461458,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR. EDMUND BURGE K.C.",
+    "n_cases": 1,
+    "mean_turnaround": 7337.76,
+    "median_turnaround": 7337.76,
+    "effect_days": 40.65234776890111,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE BIRD SITTING AS A JUDGE OF THIS COURT",
+    "n_cases": 1,
+    "mean_turnaround": 66.0,
+    "median_turnaround": 66.0,
+    "effect_days": 40.81618907353973,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE MOULD",
+    "n_cases": 3,
+    "mean_turnaround": 4011.0,
+    "median_turnaround": 4164.0,
+    "effect_days": 43.556965740429916,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE AUERBACH",
+    "n_cases": 5,
+    "mean_turnaround": 2209.2,
+    "median_turnaround": 1176.0,
+    "effect_days": 47.26039702391904,
+    "is_baseline": false
+  },
+  {
+    "judge": "RICHARD SPEARMAN K.C.",
+    "n_cases": 5,
+    "mean_turnaround": 319.8,
+    "median_turnaround": 16.0,
+    "effect_days": 47.273193638518876,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE EYRE",
+    "n_cases": 9,
+    "mean_turnaround": 514.6666666666666,
+    "median_turnaround": 25.0,
+    "effect_days": 49.72039029225721,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mrs Justice Tipples DBE",
+    "n_cases": 1,
+    "mean_turnaround": 75.0,
+    "median_turnaround": 75.0,
+    "effect_days": 49.816189073519425,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MR JUSTICE MORRIS",
+    "n_cases": 5,
+    "mean_turnaround": 1117.0,
+    "median_turnaround": 189.0,
+    "effect_days": 51.31226808168228,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE FOSTER DBE",
+    "n_cases": 3,
+    "mean_turnaround": 2515.3333333333335,
+    "median_turnaround": 268.0,
+    "effect_days": 53.06878853460307,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE MARTIN SPENCER",
+    "n_cases": 1,
+    "mean_turnaround": 83.0,
+    "median_turnaround": 83.0,
+    "effect_days": 57.81618907355103,
+    "is_baseline": false
+  },
+  {
+    "judge": "MASTER DAGNALL",
+    "n_cases": 4,
+    "mean_turnaround": 3583.44,
+    "median_turnaround": 3498.0,
+    "effect_days": 64.14947049764066,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr Justice Freedman",
+    "n_cases": 1,
+    "mean_turnaround": 105.0,
+    "median_turnaround": 105.0,
+    "effect_days": 65.87998566201767,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr. Justice Eyre",
+    "n_cases": 1,
+    "mean_turnaround": 80.0,
+    "median_turnaround": 80.0,
+    "effect_days": 68.00000000000148,
+    "is_baseline": false
+  },
+  {
+    "judge": "MASTER YOXALL",
+    "n_cases": 2,
+    "mean_turnaround": 87.5,
+    "median_turnaround": 87.5,
+    "effect_days": 68.5813879593317,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MR JUSTICE NICKLIN",
+    "n_cases": 13,
+    "mean_turnaround": 1609.289230769231,
+    "median_turnaround": 148.0,
+    "effect_days": 72.87281335831727,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR JUSTICE SWEETING",
+    "n_cases": 9,
+    "mean_turnaround": 1711.2222222222222,
+    "median_turnaround": 282.0,
+    "effect_days": 73.10086642650185,
+    "is_baseline": false
+  },
+  {
+    "judge": "MASTER SULLIVAN",
+    "n_cases": 7,
+    "mean_turnaround": 490.57142857142856,
+    "median_turnaround": 91.0,
+    "effect_days": 73.3978175273869,
+    "is_baseline": false
+  },
+  {
+    "judge": "Deputy Master Skinner KC",
+    "n_cases": 2,
+    "mean_turnaround": 3365.0,
+    "median_turnaround": 3365.0,
+    "effect_days": 83.64228845718225,
+    "is_baseline": false
+  },
+  {
+    "judge": "GAVIN MANSFIELD KC",
+    "n_cases": 1,
+    "mean_turnaround": 4829.0,
+    "median_turnaround": 4829.0,
+    "effect_days": 83.73682523524195,
+    "is_baseline": false
+  },
+  {
+    "judge": "HHJ Sarah Richardson",
+    "n_cases": 1,
+    "mean_turnaround": 1958.0,
+    "median_turnaround": 1958.0,
+    "effect_days": 88.39771790508556,
+    "is_baseline": false
+  },
+  {
+    "judge": "BRUCE CARR KC",
+    "n_cases": 1,
+    "mean_turnaround": 115.0,
+    "median_turnaround": 115.0,
+    "effect_days": 89.16277591863764,
+    "is_baseline": false
+  },
+  {
+    "judge": "HER HONOUR JUDGE CARMEL WALL SITTING AS A JUDGE OF THE HIGH COURT",
+    "n_cases": 2,
+    "mean_turnaround": 2612.5,
+    "median_turnaround": 2612.5,
+    "effect_days": 95.7058906181712,
+    "is_baseline": false
+  },
+  {
+    "judge": "His Honour Judge Martin Picton",
+    "n_cases": 1,
+    "mean_turnaround": 2610.0,
+    "median_turnaround": 2610.0,
+    "effect_days": 96.34463299341164,
+    "is_baseline": false
+  },
+  {
+    "judge": "His Honour Judge Freedman",
+    "n_cases": 1,
+    "mean_turnaround": 366.0,
+    "median_turnaround": 366.0,
+    "effect_days": 104.32806540625339,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE ROBINSON",
+    "n_cases": 1,
+    "mean_turnaround": 3737.0,
+    "median_turnaround": 3737.0,
+    "effect_days": 104.35676111011117,
+    "is_baseline": false
+  },
+  {
+    "judge": "The Honourable Mrs Justice Tipples DBE",
+    "n_cases": 1,
+    "mean_turnaround": 119.0,
+    "median_turnaround": 119.0,
+    "effect_days": 106.99999999999247,
+    "is_baseline": false
+  },
+  {
+    "judge": "HER HONOUR JUDGE CARMEL WALL",
+    "n_cases": 1,
+    "mean_turnaround": 4487.0,
+    "median_turnaround": 4487.0,
+    "effect_days": 107.72687227621947,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr James Healy-Pratt",
+    "n_cases": 1,
+    "mean_turnaround": 1125.0,
+    "median_turnaround": 1125.0,
+    "effect_days": 125.58903181600547,
+    "is_baseline": false
+  },
+  {
+    "judge": "MR STEVEN GASZTOWICZ KC",
+    "n_cases": 1,
+    "mean_turnaround": 394.0,
+    "median_turnaround": 394.0,
+    "effect_days": 148.77337964892968,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MRS JUSTICE ELLENBOGEN DBE",
+    "n_cases": 1,
+    "mean_turnaround": 430.0,
+    "median_turnaround": 430.0,
+    "effect_days": 155.51218008241563,
+    "is_baseline": false
+  },
+  {
+    "judge": "THE HONOURABLE MR JUSTICE LINDEN",
+    "n_cases": 3,
+    "mean_turnaround": 2120.3333333333335,
+    "median_turnaround": 1179.0,
+    "effect_days": 187.84349285866062,
+    "is_baseline": false
+  },
+  {
+    "judge": "MRS JUSTICE LAMBERT DBE",
+    "n_cases": 2,
+    "mean_turnaround": 435.5,
+    "median_turnaround": 435.5,
+    "effect_days": 191.71645109031442,
+    "is_baseline": false
+  },
+  {
+    "judge": "KIRSTY BRIMELOW KC sitting as a Deputy Judge of the High Court",
+    "n_cases": 1,
+    "mean_turnaround": 1468.0,
+    "median_turnaround": 1468.0,
+    "effect_days": 206.10121189845842,
+    "is_baseline": false
+  },
+  {
+    "judge": "CLARE PADLEY (SITTING AS A DEPUTY HIGH COURT JUDGE)",
+    "n_cases": 1,
+    "mean_turnaround": 2951.0,
+    "median_turnaround": 2951.0,
+    "effect_days": 214.97698171318916,
+    "is_baseline": false
+  },
+  {
+    "judge": "Mr Justice Garnham",
+    "n_cases": 1,
+    "mean_turnaround": 2608.0,
+    "median_turnaround": 2608.0,
+    "effect_days": 216.10129809482652,
+    "is_baseline": false
+  },
+  {
+    "judge": "JASON BEER QC",
+    "n_cases": 1,
+    "mean_turnaround": 5535.0,
+    "median_turnaround": 5535.0,
+    "effect_days": 244.89766324043558,
+    "is_baseline": false
+  },
+  {
+    "judge": "NEIL MOODY KC",
+    "n_cases": 1,
+    "mean_turnaround": 3016.0,
+    "median_turnaround": 3016.0,
+    "effect_days": 279.97698171322105,
+    "is_baseline": false
+  },
+  {
+    "judge": "SARAH CLARKE KC SITTING AS A DEPUTY JUDGE OF THE HIGH COURT",
+    "n_cases": 1,
+    "mean_turnaround": 3330.0,
+    "median_turnaround": 3330.0,
+    "effect_days": 331.4891617956464,
+    "is_baseline": false
+  },
+  {
+    "judge": "HIS HONOUR JUDGE SIMON",
+    "n_cases": 1,
+    "mean_turnaround": 857.0,
+    "median_turnaround": 857.0,
+    "effect_days": 332.8402454886524,
+    "is_baseline": false
+  },
+  {
+    "judge": "David O'Mahony,",
+    "n_cases": 1,
+    "mean_turnaround": 4777.0,
+    "median_turnaround": 4777.0,
+    "effect_days": 399.31520209612086,
+    "is_baseline": false
+  }
+]

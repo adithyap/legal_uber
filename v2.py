@@ -1,91 +1,78 @@
-# ============================
-# EWHC (KB) Case -> Judge Assignment (High Court only)
-# ============================
+#!/usr/bin/env python3
+"""
+EWHC (KB) turnaround-speed analysis
+===================================
+Goal: test whether judges differ systematically in hearing->judgment speed.
+Outputs:
+  - data/cases_speed.json      : cleaned cases with turnaround_days and controls
+  - data/judge_effects.json    : judge fixed-effect estimates + descriptive stats
+  - data/speed_results.json    : model fit, F-test for judge effects, dispersion metrics
 
-import os
-import re
+This replaces the prior judge-identity prediction pipeline with a simpler, classical
+fixed-effects setup: speed_ij = alpha + gamma_judge + delta_year + epsilon_ij.
+"""
+from __future__ import annotations
+
 import json
-import time
 import math
+import os
 import random
+import re
+import time
 import hashlib
-import subprocess
-import zipfile
 from pathlib import Path
-import shutil
-from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Dict, Any, Optional, Tuple
-from collections import defaultdict, Counter
+from typing import Any, Dict, List, Optional, Tuple
+from collections import defaultdict
 
 import numpy as np
 import requests
 from bs4 import BeautifulSoup
 from tqdm.auto import tqdm
 from dateutil import parser as dateparser
-from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
 
-import torch
-from sentence_transformers import SentenceTransformer
-from keybert import KeyBERT
+try:
+    from scipy.stats import f as f_dist
+except Exception:  # scipy may not be available in lightweight envs
+    f_dist = None
 
-
-# ============================
+# -----------------------------
 # Config
-# ============================
+# -----------------------------
+RANDOM_SEED = 42
+random.seed(RANDOM_SEED)
+np.random.seed(RANDOM_SEED)
 
-USE_OPINION_AUTHOR_WEIGHTING = True   # prefer authored opinions when building judge profiles
-OPINION_AUTHOR_WEIGHT = 2.0           # weight multiplier when judge authored the opinion
-PANEL_JUDGES_ONLY = False             # require <panel> tags; set False to fall back to heuristics
-CASE_PARSE_VERSION = 6                # bump when parse logic changes
-ZIP_RESULTS = True                    # zip key outputs at end of run for easy download
-YEARS_BEFORE = 25                     # only process cases within the last N years (based on URL year segment)
+YEARS_BEFORE = 25
 CURRENT_YEAR = datetime.utcnow().year
 MIN_CASE_YEAR = CURRENT_YEAR - YEARS_BEFORE
 
-MAX_CASES = 500               # crawl until we have this many cases with Judgment date
-REQUEST_DELAY_SEC = 0.2         # politeness
+MAX_CASES = 2000
+REQUEST_DELAY_SEC = 0.2
 HTTP_TIMEOUT = 30
-RANDOM_SEED = 42
 
-TEST_SIZE = 0.2
-EMBED_MODEL_NAME = "sentence-transformers/all-mpnet-base-v2"  # strong general embedding model
-EMBED_BATCH_SIZE = 64
-CHUNK_WORDS = 450
-CHUNK_OVERLAP = 60
+CASE_PARSE_VERSION = 7  # bump when parse logic changes
+CACHE_DIR = Path("data/cache_highcourt")
+CASE_JSON_DIR = CACHE_DIR / "case_json"
+CASES_CACHE_PATH = CACHE_DIR / "cases_raw.json"
+CACHE_SAVE_EVERY = 20
 
-# Scoring weights (tweakable)
-W_SIM = 0.5             # embedding similarity
-W_SPEED = 0.15           # turnaround speed
-W_COMPLEXITY_FIT = 0.10  # complexity match
-W_TAXONOMY = 0.25        # taxonomy similarity
+OUTPUT_DIR = Path("data")
+CASES_OUTPUT_PATH = OUTPUT_DIR / "cases_speed.json"
+JUDGE_EFFECTS_PATH = OUTPUT_DIR / "judge_effects.json"
+SPEED_RESULTS_PATH = OUTPUT_DIR / "speed_results.json"
+PLOTS_DIR = OUTPUT_DIR / "plots"
 
-# Training balancing
-CAP_TRAIN_CASES_PER_JUDGE = 50     # cap contributions per judge; set 0/None to disable
-INVERSE_FREQ_WEIGHT = True         # downweight judges as they accrue many training cases (1/sqrt(freq))
-
-# Taxonomy controls
-TAXONOMY_TOP_K = 2
-TAXONOMY_THRESHOLD = 0.30
-TAXONOMY_USE_SCALED = True           # use sqrt-normalized taxonomy weights to damp caseload dominance
-
-# Caseload prior (mildly penalize judges with very large training volume)
-CASELOAD_PRIOR_BASE = 0.85           # multiplier floor
-CASELOAD_PRIOR_WEIGHT = 0.15         # weight for prior factor in final score
-
-# Grid search controls (uses derived cache; no re-embedding)
-RUN_GRID_SEARCH = False              # set True to sweep weights on cached embeddings/profiles
-GRID_SEARCH_ONLY = False             # if True, run grid search then exit
-GRID_SEARCH_CONFIGS = []             # optional explicit list of param dicts; if empty a default grid is generated
-
-# Speed-only mode (skip embeddings; predict judge from turnaround speed alone)
-SPEED_ONLY_MODE = False
-SPEED_ONLY_TOP_K = 3
-# When False (full model run), also run a speed-only diagnostic assignment pass using same split
-RUN_SPEED_ONLY_WITH_FULL = True
-
-# if case is urgent, speed matters more
-URGENT_SPEED_BOOST = 0.25  # added to W_SPEED * urgency
+# Analysis options
+WINSOR_HIGH_PCTL = 0.99          # clip turnaround at this upper percentile (set to None to disable)
+WINSOR_LOW_PCTL = 0.0            # lower percentile clip (keep 0 for turnaround)
+USE_LOG_MODEL = True             # also run model on log(turnaround_days + 1)
+INCLUDE_HEARING_YEAR = True      # add hearing_year fixed effects
+INCLUDE_JUDGMENT_YEAR = True     # keep judgment_year fixed effects
+INCLUDE_AREA_FE = True           # include area_of_law fixed effects (baseline dropped)
+TRIM_LOW_PCTL = 0.0              # drop cases below this percentile (set None to disable)
+TRIM_HIGH_PCTL = 0.99            # drop cases above this percentile (set None to disable)
 
 DEFAULT_HEADERS = {
     "User-Agent": (
@@ -98,76 +85,15 @@ BAILII_HEADERS = DEFAULT_HEADERS
 HIGHCOURT_LIST_BASE = "https://www.bailii.org/ew/cases/EWHC/KB/"
 HIGHCOURT_TOC_TEMPLATE = HIGHCOURT_LIST_BASE + "toc-{}.html"
 HIGHCOURT_BASE_URL = "https://www.bailii.org"
-CACHE_DIR = "/content/uksc_cache_highcourt"
-CASE_SOURCE_NAME = "EWHC King's Bench"
 
 os.makedirs(CACHE_DIR, exist_ok=True)
-EXPORT_DIR = os.path.join(CACHE_DIR, "export")
-os.makedirs(EXPORT_DIR, exist_ok=True)
-USE_CACHED_CASES = True
-CASES_CACHE_PATH = os.path.join(CACHE_DIR, "cases_raw.json")
-CASE_JSON_DIR = os.path.join(CACHE_DIR, "case_json")
-CACHE_SAVE_EVERY = 20
-CRAWL_DEBUG = True
-CRAWL_DEBUG_SAMPLE_IDS = 5
-USE_DERIVED_CACHE = True
-OVERWRITE_DERIVED_CACHE = False
-DERIVED_CACHE_DIR = os.path.join(CACHE_DIR, "derived")
-DERIVED_META_PATH = os.path.join(DERIVED_CACHE_DIR, "derived_meta.json")
-DERIVED_ARRAYS_PATH = os.path.join(DERIVED_CACHE_DIR, "derived_arrays.npz")
-# Persistent cache that reuses CACHE_DIR (Colab-friendly; no __file__ dependency)
-LOCAL_DERIVED_DIR = Path(CACHE_DIR) / "derived_cache_local"
-LOCAL_DERIVED_META_PATH = LOCAL_DERIVED_DIR / "derived_meta.json"
-LOCAL_DERIVED_ARRAYS_PATH = LOCAL_DERIVED_DIR / "derived_arrays.npz"
-os.makedirs(LOCAL_DERIVED_DIR, exist_ok=True)
-DERIVED_CACHE_VERSION = 8
-TEST_REPORT_PATH = os.path.join(EXPORT_DIR, "test_report.json")
-SPEED_REPORT_PATH = os.path.join(EXPORT_DIR, "speed_diagnostic.json")
-SPEED_ASSIGNMENTS_PATH = os.path.join(EXPORT_DIR, "speed_assignments.json")
-KEYWORD_DF_MAX_RATIO = 0.1
-KEYWORD_MIN_CHARS = 4
-KEYWORD_TOP_CASE_TERMS = 8
-KEYWORD_TOP_JUDGE_TERMS = 30
-KEYWORD_SIM_THRESHOLD = 0.55
-KEYWORD_SIM_TOP_N = 8
-
-# Minimal practice-area taxonomy (KB) for coarse expertise signals (label, seed terms/description)
-TAXONOMY = [
-    ("Immigration / Asylum / Deportation", "asylum, deportation, removal directions, immigration detention, Home Office, refugee, leave to remain"),
-    ("Judicial Review / Public Law", "judicial review, public law, ultra vires, public body, wednesbury, administrative court"),
-    ("Planning / Environmental", "planning permission, planning inspectorate, green belt, listed building, section 106, environmental law"),
-    ("Police / False Imprisonment / Misfeasance", "police powers, false imprisonment, misfeasance, unlawful arrest, detention, stop and search"),
-    ("Data Protection / Privacy / Information", "data protection, GDPR, privacy, article 8, subject access request, ICO"),
-    ("Defamation / Media", "defamation, libel, slander, serious harm, publication, media law"),
-    ("Personal Injury / Clinical Negligence", "personal injury, clinical negligence, medical negligence, duty of care, causation"),
-    ("Commercial / Contract", "commercial dispute, contract breach, damages, warranty, sale of goods, misrepresentation"),
-    ("Insolvency / Bankruptcy", "insolvency, bankruptcy, liquidation, administration, receiver, proof of debt"),
-    ("Property / Land / Landlord", "landlord and tenant, possession, lease, rent, easement, adverse possession"),
-    ("Employment (High Court)", "employment, restrictive covenant, garden leave, confidential information, injunction"),
-    ("Human Rights / HRA", "human rights act, article 3, article 8, article 10, article 5, proportionality"),
-    ("Costs / Procedure / Contempt", "civil procedure rules, costs, summary assessment, detailed assessment, contempt, sanctions"),
-]
-
-GENERIC_KW_STOPWORDS = {
-    "court", "high", "bench", "division", "king", "queen", "england", "wales",
-    "royal", "justice", "judgment", "judgement", "appeal", "appellate"
-}
-GENERIC_KW_PATTERN = re.compile(r"\b(court|high|bench|division|king|queen|england|wales|royal)\b", re.IGNORECASE)
-
-os.makedirs(DERIVED_CACHE_DIR, exist_ok=True)
 os.makedirs(CASE_JSON_DIR, exist_ok=True)
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+os.makedirs(PLOTS_DIR, exist_ok=True)
 
-random.seed(RANDOM_SEED)
-np.random.seed(RANDOM_SEED)
-torch.manual_seed(RANDOM_SEED)
-
-
-# ============================
+# -----------------------------
 # Utilities
-# ============================
-
-def _safe_filename(s: str) -> str:
-    return re.sub(r"[^a-zA-Z0-9._-]+", "_", s)
+# -----------------------------
 
 def sha1(s: str) -> str:
     return hashlib.sha1(s.encode("utf-8")).hexdigest()
@@ -179,9 +105,6 @@ def clean_text(s: str) -> str:
     return s.strip()
 
 def parse_date_maybe(s: str) -> Optional[str]:
-    """
-    Returns ISO date (YYYY-MM-DD) or None.
-    """
     try:
         dt = dateparser.parse(s, dayfirst=True, fuzzy=True)
         if dt is None:
@@ -200,218 +123,54 @@ def days_between(d1_iso: Optional[str], d2_iso: Optional[str]) -> Optional[int]:
     except Exception:
         return None
 
-
 def compute_turnaround_days(case: Dict[str, Any]) -> Optional[int]:
-    """
-    Convenience helper to compute hearing→judgment turnaround in days.
-    Stored on each case as `turnaround_days` for reuse across modules.
-    """
     delta = days_between(case.get("hearing_start"), case.get("judgment_date"))
-    # Drop obviously bad values where hearing date parses after judgment date
     if delta is None or delta < 0:
         return None
     return delta
 
-
 def annotate_turnaround_days(cases: List[Dict[str, Any]]) -> None:
-    """
-    Attach `turnaround_days` to every case so downstream components
-    can rely on a consistent field rather than recomputing ad‑hoc.
-    """
     for c in cases:
         c["turnaround_days"] = compute_turnaround_days(c)
 
-
 def drop_negative_turnaround_cases(cases: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """
-    Remove cases with negative turnaround (bad/misaligned hearing vs judgment dates).
-    """
     cleaned = []
-    dropped = 0
     for c in cases:
-        t = c.get("turnaround_days")
-        raw_delta = days_between(c.get("hearing_start"), c.get("judgment_date"))
-        if (t is not None and t < 0) or (raw_delta is not None and raw_delta < 0):
-            dropped += 1
+        if c.get("turnaround_days") is None:
+            continue
+        if c["turnaround_days"] < 0:
             continue
         cleaned.append(c)
-    if dropped and CRAWL_DEBUG:
-        debug_log(f"[cleanup] Dropped {dropped} cases with negative turnaround days")
     return cleaned
 
-def cosine_sim(a: np.ndarray, b: np.ndarray) -> float:
-    denom = (np.linalg.norm(a) * np.linalg.norm(b) + 1e-12)
-    return float(np.dot(a, b) / denom)
+def debug_log(msg: str) -> None:
+    print(msg)
 
-def caseload_prior(n_cases: int) -> float:
-    """
-    Mild penalty for very high-volume judges; returns value in (0,1].
-    """
-    n = max(0, n_cases)
-    return float(1.0 / (1.0 + math.log1p(n)))
+# -----------------------------
+# HTTP helpers
+# -----------------------------
 
-def request_get(
-    url: str,
-    session: requests.Session,
-    max_retries: int = 3,
-    headers: Optional[Dict[str, str]] = None
-) -> Optional[requests.Response]:
+def request_get(url: str, session: requests.Session, max_retries: int = 3, headers: Optional[Dict[str, str]] = None) -> Optional[requests.Response]:
     req_headers = headers or DEFAULT_HEADERS
     for attempt in range(max_retries):
         try:
             r = session.get(url, headers=req_headers, timeout=HTTP_TIMEOUT)
             if r.status_code == 200:
                 return r
-            # retry on transient-ish failures
             if r.status_code in {429, 500, 502, 503, 504}:
                 time.sleep(0.8 * (attempt + 1))
                 continue
-            return r  # non-200, non-retry
+            return r
         except Exception:
             time.sleep(0.8 * (attempt + 1))
     return None
 
-def debug_log(msg: str) -> None:
-    if CRAWL_DEBUG:
-        print(msg)
-
-def print_block(title: str) -> None:
-    bar = "=" * 90
-    print(f"\n{bar}\n{title}\n{bar}")
-
-def load_cases_cache(path: str) -> List[Dict[str, Any]]:
-    if not path or not os.path.exists(path):
-        return []
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        if isinstance(data, list):
-            # Invalidate if parse version missing/mismatch
-            if not data:
-                return data
-            first = data[0] or {}
-            if first.get("_parse_version") != CASE_PARSE_VERSION:
-                debug_log(f"[cache] cases cache parse_version mismatch; expected {CASE_PARSE_VERSION}")
-                return []
-            return data
-        if isinstance(data, dict) and isinstance(data.get("cases"), list):
-            return data["cases"]
-    except Exception as exc:
-        debug_log(f"[cache] Failed to load cache at {path}: {exc}")
-    return []
-
-def save_cases_cache(path: str, cases: List[Dict[str, Any]]) -> None:
-    if not path:
-        return
-    tmp_path = f"{path}.tmp"
-    with open(tmp_path, "w", encoding="utf-8") as f:
-        json.dump(cases, f, ensure_ascii=False, indent=2)
-    os.replace(tmp_path, path)
-
-def sync_export_files():
-    """
-    Ensure key files are present under EXPORT_DIR for sharing/zipping.
-    """
-    os.makedirs(EXPORT_DIR, exist_ok=True)
-    # cases_raw.json
-    if os.path.exists(CASES_CACHE_PATH):
-        shutil.copy2(CASES_CACHE_PATH, os.path.join(EXPORT_DIR, "cases_raw.json"))
-    # report.html (if present in cache root)
-    report_src = os.path.join(CACHE_DIR, "report.html")
-    if os.path.exists(report_src):
-        shutil.copy2(report_src, os.path.join(EXPORT_DIR, "report.html"))
-    # derived cache (embeddings + meta) for reuse
-    if os.path.exists(DERIVED_META_PATH):
-        shutil.copy2(DERIVED_META_PATH, os.path.join(EXPORT_DIR, "derived_meta.json"))
-    if os.path.exists(DERIVED_ARRAYS_PATH):
-        shutil.copy2(DERIVED_ARRAYS_PATH, os.path.join(EXPORT_DIR, "derived_arrays.npz"))
-
-def zip_outputs(cache_dir: str, zip_results: bool = True) -> Optional[str]:
-    """
-    Bundle outputs into a zip for easy download (Colab-friendly).
-    Returns zip path or None.
-    """
-    if not zip_results:
-        return None
-    cache_path = Path(cache_dir)
-    if not cache_path.exists():
-        return None
-
-    zip_path = Path("/content") / f"{cache_path.name}.zip"
-    try:
-        if zip_path.exists():
-            zip_path.unlink()
-        # Zip only the export folder (outputs) to avoid raw caches
-        export_dir = cache_path / "export"
-        if export_dir.exists():
-            subprocess.check_call(["zip", "-r", str(zip_path), str(export_dir)])
-        else:
-            # fallback: zip selected output files at cache root
-            candidates = [
-                "cases_raw.json",
-                "test_assignments.json",
-                "test_report.json",
-                "judge_profiles_summary.json",
-                "report.html",
-            ]
-            args = ["zip", "-r", str(zip_path)] + [str(cache_path / c) for c in candidates if (cache_path / c).exists()]
-            subprocess.check_call(args)
-    except Exception:
-        # Fallback: zip key files only
-        to_include = list((cache_path / "export").rglob("*")) if (cache_path / "export").exists() else []
-        with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-            for src in to_include:
-                if src.exists():
-                    zf.write(src, arcname=str(src.relative_to(cache_path)))
-
-    # Attempt Colab download
-    try:
-        from google.colab import files  # type: ignore
-        files.download(str(zip_path))
-    except Exception:
-        pass
-    return str(zip_path)
-
-def soup_main_text(soup: BeautifulSoup) -> str:
-    main = soup.find("main")
-    node = main if main else soup
-    return clean_text(node.get_text("\n"))
-
-def extract_lines(soup: BeautifulSoup) -> List[str]:
-    lines = [x.strip() for x in soup.get_text("\n").splitlines()]
-    return [x for x in lines if x and x != "•"]
-
-def highcourt_year_from_url(url: str) -> Optional[int]:
-    """
-    Extract the year segment from a BAILII KB URL, e.g.
-    https://www.bailii.org/ew/cases/EWHC/KB/2026/142.html -> 2026
-    """
-    m = re.search(r"/EWHC/KB/(\d{4})/", url, flags=re.IGNORECASE)
-    return int(m.group(1)) if m else None
-
-def normalize_person_name(s: str) -> str:
-    return re.sub(r"\s+", " ", (s or "").strip()).lower()
-
-def is_noise_keyword(s: str) -> bool:
-    nk = normalize_keyword(s)
-    if not nk:
-        return True
-    if len(nk) < KEYWORD_MIN_CHARS:
-        return True
-    if GENERIC_KW_PATTERN.search(nk):
-        return True
-    if any(tok in nk.split() for tok in GENERIC_KW_STOPWORDS):
-        return True
-    return False
+# -----------------------------
+# Judge parsing helpers
+# -----------------------------
 
 def canonicalize_judge_name(name: str) -> str:
-    """
-    Normalize judge strings so that variants like
-    'HHJ Lickley KC sitting as a Judge of the High Court'
-    and 'HHJ LICKLEY KC SITTING AS A' collapse.
-    """
     n = (name or "").strip()
-    # remove common role phrases
     n = re.sub(r"\s*sitting as.*", "", n, flags=re.IGNORECASE)
     n = re.sub(r"\s*acting as.*", "", n, flags=re.IGNORECASE)
     n = re.sub(r"\s*the honourable\s+", "", n, flags=re.IGNORECASE)
@@ -419,10 +178,15 @@ def canonicalize_judge_name(name: str) -> str:
     n = re.sub(r"\s{2,}", " ", n)
     return n.strip().lower()
 
+def is_valid_judge_name(name: str, min_len: int = 4) -> bool:
+    if not name:
+        return False
+    n = name.strip()
+    if len(n) < min_len:
+        return False
+    return bool(re.search(r"[A-Za-z]", n))
+
 def dedup_judges_ordered(judges: List[str]) -> List[str]:
-    """
-    Deduplicate judge names using canonical form and fuzzy similarity.
-    """
     from difflib import SequenceMatcher
     seen = []
     out = []
@@ -432,10 +196,7 @@ def dedup_judges_ordered(judges: List[str]) -> List[str]:
             continue
         duplicate = False
         for c in seen:
-            if c == canon:
-                duplicate = True
-                break
-            if SequenceMatcher(None, c, canon).ratio() > 0.9:
+            if c == canon or SequenceMatcher(None, c, canon).ratio() > 0.9:
                 duplicate = True
                 break
         if duplicate:
@@ -444,21 +205,7 @@ def dedup_judges_ordered(judges: List[str]) -> List[str]:
         out.append(j)
     return out
 
-def is_valid_judge_name(name: str, min_len: int = 4) -> bool:
-    """
-    Basic sanity filter to avoid spurious tokens like ':' or very short strings.
-    """
-    if not name:
-        return False
-    n = name.strip()
-    if len(n) < min_len:
-        return False
-    return bool(re.search(r"[A-Za-z]", n))
-
 def filter_judges(judges: List[str]) -> List[str]:
-    """
-    Apply validity + deduplication in one pass.
-    """
     out = []
     seen = set()
     for j in judges or []:
@@ -471,483 +218,33 @@ def filter_judges(judges: List[str]) -> List[str]:
         out.append(j)
     return out
 
-def autotune_embed_batch_size(model: SentenceTransformer, device: str, default_bs: int = EMBED_BATCH_SIZE) -> int:
-    """
-    Try descending batch sizes to find the largest that fits GPU memory; fall back to default.
-    """
-    if device != "cuda":
-        return min(default_bs, 32)  # keep CPU memory modest
+# -----------------------------
+# Parsing helpers
+# -----------------------------
 
-    candidates = [256, 128, 96, 80, 64, 56, 48, 40, 32, 24, 16]
-    sample = ["autotune batch size"] * max(candidates)
-    for bs in candidates:
-        try:
-            model.encode(
-                sample[:bs],
-                batch_size=bs,
-                convert_to_numpy=True,
-                normalize_embeddings=True,
-                show_progress_bar=False
-            )
-            return bs
-        except RuntimeError as e:
-            if "CUDA out of memory" in str(e):
-                torch.cuda.empty_cache()
-                continue
-            # unknown error: use default
-            break
-    return default_bs
+def extract_lines(soup: BeautifulSoup) -> List[str]:
+    lines = [x.strip() for x in soup.get_text("\n").splitlines()]
+    return [x for x in lines if x and x != "*"]
 
-def infer_opinion_author(lines: List[str]) -> Optional[str]:
-    """
-    Heuristic: look for early lines like
-      "LORD REED: (with whom ... agree)" or "Judgment given by Lord Reed"
-    """
-    patterns = [
-        r"^(?P<name>(?:lord|lady|mr|mrs|ms|miss|sir|dame|hhj|his honour judge|her honour judge|the hon\.?|mr justice|mrs justice|ms justice|miss justice|lady justice|lord justice)[^:]{0,80}):",
-        r"judgment\s+(?:given|delivered)\s+by\s+(?P<name>[^,.;]{3,80})",
-        r"^(?P<name>lord\s+[A-Z][A-Za-z\-\s']{1,60})\s*\(with whom"
-    ]
-    # scan first ~200 lines where headings live
-    for ln in lines[:200]:
-        text = ln.strip()
-        for pat in patterns:
-            m = re.search(pat, text, flags=re.IGNORECASE)
-            if m:
-                name = m.group("name").strip()
-                name = re.sub(r"\s*\(with whom.*", "", name, flags=re.IGNORECASE)
-                name = re.sub(r"\s*[:,–-]+\s*$", "", name)
-                name = re.sub(r"\s{2,}", " ", name)
-                if name:
-                    return name
-    # fallback: first standalone judge-style line
-    for ln in lines[:120]:
-        text = ln.strip()
-        if re.match(r"^(the hon\.?\s+)?(lord|lady|mr|mrs|ms|miss|sir|dame)\s+.*justice", text, flags=re.IGNORECASE):
-            return re.sub(r"\s{2,}", " ", text)
-    return None
-def find_value_after_label(lines: List[str], label: str) -> Optional[str]:
-    for i in range(len(lines) - 1):
-        if lines[i].strip().lower() == label.strip().lower():
-            return lines[i + 1].strip()
-    return None
+def soup_main_text(soup: BeautifulSoup) -> str:
+    main = soup.find("main")
+    node = main if main else soup
+    return clean_text(node.get_text("\n"))
 
-def find_block_after_label(lines: List[str], label: str, stop_labels: List[str], max_lines: int = 60) -> Optional[str]:
-    """
-    Finds a paragraph-ish block after a label until we hit another stop label or exceed max_lines.
-    """
-    label_low = label.lower()
-    stop_set = {s.lower() for s in stop_labels}
-    for i in range(len(lines)):
-        if lines[i].strip().lower() == label_low:
-            out = []
-            for j in range(i + 1, min(len(lines), i + 1 + max_lines)):
-                if lines[j].strip().lower() in stop_set:
-                    break
-                out.append(lines[j])
-            txt = " ".join(out).strip()
-            return txt if txt else None
-    return None
+def highcourt_year_from_url(url: str) -> Optional[int]:
+    m = re.search(r"/EWHC/KB/(\d{4})/", url, flags=re.IGNORECASE)
+    return int(m.group(1)) if m else None
 
-def chunk_words(text: str, chunk_words: int = 450, overlap: int = 60) -> List[str]:
-    words = text.split()
-    if not words:
-        return []
-    chunks = []
-    step = max(1, chunk_words - overlap)
-    for start in range(0, len(words), step):
-        end = min(len(words), start + chunk_words)
-        chunk = " ".join(words[start:end]).strip()
-        if chunk:
-            chunks.append(chunk)
-        if end >= len(words):
-            break
-    return chunks
-
-def estimate_case_urgency(text: str) -> float:
-    """
-    Heuristic urgency score in [0,1] based on presence of typically time-sensitive subject matter.
-    Adjust for your own domain assumptions.
-    """
-    t = (text or "").lower()
-    triggers = [
-        "bail", "extradition", "detention", "deport", "removal", "immigration detention",
-        "child", "children", "adoption", "injunction", "interim", "asylum",
-        "custody", "urgent", "habeas", "prison", "probation"
-    ]
-    hits = sum(1 for w in triggers if w in t)
-    return float(min(1.0, hits / 4.0))
-
-def normalize_keyword(s: str) -> str:
-    s = (s or "").strip().lower()
-    s = re.sub(r"\s+", " ", s)
-    return s
-
-def is_repetitive_keyword(s: str) -> bool:
-    parts = s.split()
-    return len(parts) > 1 and len(set(parts)) == 1
-
-_TAX_EMB_CACHE: Dict[str, np.ndarray] = {}
-
-def taxonomy_label_embeddings(model: SentenceTransformer) -> Dict[str, np.ndarray]:
-    """
-    Compute (and cache) embeddings for taxonomy labels + seed descriptions.
-    """
-    global _TAX_EMB_CACHE
-    if _TAX_EMB_CACHE:
-        return _TAX_EMB_CACHE
-    texts = [f"{label}: {desc}" for label, desc in TAXONOMY]
-    embs = model.encode(texts, convert_to_numpy=True, normalize_embeddings=True, show_progress_bar=False)
-    for (label, _), emb in zip(TAXONOMY, embs):
-        _TAX_EMB_CACHE[label] = emb
-    return _TAX_EMB_CACHE
-
-def classify_taxonomy_semantic(text: str, title: str, model: SentenceTransformer, top_k: int = 3, threshold: float = 0.2) -> List[Tuple[str, float]]:
-    """
-    Semantic similarity between case text embedding and taxonomy label embeddings.
-    """
-    if not text:
-        return []
-    # Build a compact summary: title + first 800 words
-    words = (text or "").split()
-    snippet = " ".join(words[:800])
-    payload = f"{title}\n{snippet}".strip()
-    case_emb = model.encode([payload], convert_to_numpy=True, normalize_embeddings=True, show_progress_bar=False)[0]
-    label_embs = taxonomy_label_embeddings(model)
-    sims = []
-    for label, emb in label_embs.items():
-        sims.append((label, float(np.dot(case_emb, emb))))
-    sims.sort(key=lambda x: x[1], reverse=True)
-    sims = [(l, s) for l, s in sims if s >= threshold]
-    return sims[:top_k]
-
-def encode_with_backoff(
-    model: SentenceTransformer,
-    texts: List[str],
-    batch_size: int,
-    desc: Optional[str] = None
-) -> np.ndarray:
-    """
-    Encode with dynamic batch downscaling on CUDA OOM.
-    """
-    bs = max(1, batch_size)
-    while bs >= 8:
-        try:
-            return model.encode(
-                texts,
-                batch_size=bs,
-                show_progress_bar=bool(desc),
-                convert_to_numpy=True,
-                normalize_embeddings=True
-            )
-        except RuntimeError as e:
-            if "CUDA out of memory" in str(e):
-                debug_log(f"[embed][oom] batch_size={bs} -> halving")
-                torch.cuda.empty_cache()
-                bs = max(8, bs // 2)
-                continue
-            raise
-    # final attempt with minimal batch
-    return model.encode(
-        texts,
-        batch_size=4,
-        show_progress_bar=bool(desc),
-        convert_to_numpy=True,
-        normalize_embeddings=True
-    )
-
-def compute_cases_hash(cases: List[Dict[str, Any]]) -> str:
-    urls = [c.get("case_url", "") or "" for c in cases]
-    payload = [str(CASE_PARSE_VERSION)] + urls
-    return sha1("\n".join(payload))
-
-def compute_keyword_idf(case_keywords: List[List[str]]) -> Dict[str, float]:
-    n_cases = len(case_keywords)
-    if n_cases == 0:
-        return {}
-    df = Counter()
-    for kws in case_keywords:
-        uniq = set()
-        for kw in kws or []:
-            nk = normalize_keyword(kw)
-            if not nk or len(nk) < KEYWORD_MIN_CHARS:
-                continue
-            if is_noise_keyword(nk):
-                continue
-            if is_repetitive_keyword(nk):
-                continue
-            uniq.add(nk)
-        for nk in uniq:
-            df[nk] += 1
-    out = {}
-    for kw, count in df.items():
-        if (count / n_cases) > KEYWORD_DF_MAX_RATIO:
-            continue
-        out[kw] = math.log((1.0 + n_cases) / (1.0 + count)) + 1.0
-    return out
-
-def select_top_case_terms(case_keywords: List[str], keyword_idf: Dict[str, float], top_n: int) -> List[str]:
-    scored = []
-    seen = set()
-    for kw in case_keywords or []:
-        nk = normalize_keyword(kw)
-        if not nk or nk in seen:
-            continue
-        if nk not in keyword_idf:
-            continue
-        scored.append((keyword_idf[nk], nk))
-        seen.add(nk)
-    scored.sort(reverse=True)
-    return [k for _, k in scored[:top_n]]
-
-def select_top_judge_terms(keyword_counts: Dict[str, int], keyword_idf: Dict[str, float], top_n: int) -> List[str]:
-    scored = []
-    for kw, count in (keyword_counts or {}).items():
-        nk = normalize_keyword(kw)
-        if not nk or is_noise_keyword(nk):
-            continue
-        idf = keyword_idf.get(nk)
-        if not idf:
-            continue
-        scored.append((count * idf, nk))
-    scored.sort(reverse=True)
-    return [k for _, k in scored[:top_n]]
-
-def semantic_keyword_matches(
-    case_keywords: List[str],
-    judge_keyword_counts: Dict[str, int],
-    keyword_idf: Dict[str, float],
-    embed_model: SentenceTransformer
-) -> List[Dict[str, Any]]:
-    if not embed_model or not keyword_idf:
-        return []
-    case_terms = select_top_case_terms(case_keywords, keyword_idf, KEYWORD_TOP_CASE_TERMS)
-    judge_terms = select_top_judge_terms(judge_keyword_counts, keyword_idf, KEYWORD_TOP_JUDGE_TERMS)
-    if not case_terms or not judge_terms:
-        return []
-
-    case_embs = embed_model.encode(case_terms, batch_size=32, convert_to_numpy=True, normalize_embeddings=True)
-    judge_embs = embed_model.encode(judge_terms, batch_size=32, convert_to_numpy=True, normalize_embeddings=True)
-    sims = case_embs @ judge_embs.T
-
-    pairs = []
-    for i, ct in enumerate(case_terms):
-        for j, jt in enumerate(judge_terms):
-            pairs.append((float(sims[i, j]), ct, jt))
-    pairs.sort(key=lambda x: x[0], reverse=True)
-
-    out = []
-    used_case = set()
-    used_judge = set()
-    for sim, ct, jt in pairs:
-        if sim < KEYWORD_SIM_THRESHOLD:
-            break
-        if ct in used_case or jt in used_judge:
-            continue
-        out.append({"case_term": ct, "judge_term": jt, "similarity": sim})
-        used_case.add(ct)
-        used_judge.add(jt)
-        if len(out) >= KEYWORD_SIM_TOP_N:
-            break
-    return out
-
-def serialize_profiles(profiles: Dict[str, "JudgeProfile"]) -> Dict[str, Any]:
-    out = {}
-    for j, p in profiles.items():
-        out[j] = {
-            "embedding": p.embedding.tolist(),
-            "n_train_cases": p.n_train_cases,
-            "avg_turnaround_days": p.avg_turnaround_days,
-            "median_turnaround_days": p.median_turnaround_days,
-            "avg_complexity": p.avg_complexity,
-            "area_counts": p.area_counts,
-            "keyword_counts": p.keyword_counts,
-            "taxonomy_counts": p.taxonomy_counts,
-            "taxonomy_probs": p.taxonomy_probs,
-            "taxonomy_scaled_probs": p.taxonomy_scaled_probs,
-        }
-    return out
-
-def debug_sample_case_features(cases: List[Dict[str, Any]], case_keywords: List[List[str]], limit: int = 10) -> None:
-    """
-    Print a small sample of judge/area/keywords to inspect noise.
-    """
-    print_block("DEBUG CASE FEATURES (sample)")
-    n = min(limit, len(cases))
-    for i in range(n):
-        c = cases[i]
-        kws = case_keywords[i] if i < len(case_keywords) else []
-        print(f"- {c.get('case_id') or '[no id]'} | {c.get('title','')[:80]}")
-        print(f"  URL: {c.get('case_url')}")
-        print(f"  Judges: {', '.join(c.get('justices') or [])}")
-        print(f"  Area: {c.get('area_of_law')}")
-        print(f"  Keywords: {', '.join(kws[:12])}")
-    print()
-
-def deserialize_profiles(data: Dict[str, Any]) -> Dict[str, "JudgeProfile"]:
-    out: Dict[str, "JudgeProfile"] = {}
-    for j, p in (data or {}).items():
-        out[j] = JudgeProfile(
-            name=j,
-            embedding=np.array(p.get("embedding", []), dtype=np.float32),
-            n_train_cases=int(p.get("n_train_cases", 0)),
-            avg_turnaround_days=p.get("avg_turnaround_days"),
-            median_turnaround_days=p.get("median_turnaround_days"),
-            avg_complexity=p.get("avg_complexity"),
-            area_counts=p.get("area_counts") or {},
-            keyword_counts=p.get("keyword_counts") or {},
-            taxonomy_counts=p.get("taxonomy_counts") or {},
-            taxonomy_probs=p.get("taxonomy_probs") or {},
-            taxonomy_scaled_probs=p.get("taxonomy_scaled_probs") or {},
-        )
-    return out
-
-def _load_derived_bundle(meta_path: str, arrays_path: str, cases: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
-    if not os.path.exists(meta_path) or not os.path.exists(arrays_path):
-        return None
-    with open(meta_path, "r", encoding="utf-8") as f:
-        meta = json.load(f)
-    if meta.get("version") != DERIVED_CACHE_VERSION:
-        return None
-    if meta.get("embed_model") != EMBED_MODEL_NAME:
-        return None
-    if meta.get("test_size") != TEST_SIZE:
-        return None
-    if meta.get("cases_hash") != compute_cases_hash(cases):
-        return None
-    arrays = np.load(arrays_path)
-    return {
-        "case_embs": arrays["case_embs"],
-        "case_complexity": arrays["case_complexity"],
-        "case_keywords": meta.get("case_keywords") or [],
-        "keyword_idf": meta.get("keyword_idf") or {},
-        "train_idx": meta.get("train_idx") or [],
-        "test_idx": meta.get("test_idx") or [],
-        "profiles": deserialize_profiles(meta.get("profiles") or {}),
-        "speed_scores": meta.get("speed_scores") or {},
-        "train_by_judge": meta.get("train_by_judge") or {},
-    }
-
-def load_derived_cache(cases: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
-    if not USE_DERIVED_CACHE or OVERWRITE_DERIVED_CACHE:
-        return None
-    try:
-        primary = _load_derived_bundle(DERIVED_META_PATH, DERIVED_ARRAYS_PATH, cases)
-        if primary:
-            return primary
-        fallback = _load_derived_bundle(str(LOCAL_DERIVED_META_PATH), str(LOCAL_DERIVED_ARRAYS_PATH), cases)
-        if fallback:
-            debug_log("[cache] Loaded derived cache from local data/derived_cache")
-            return fallback
-    except Exception as exc:
-        debug_log(f"[cache] Failed to load derived cache: {exc}")
-    return None
-
-def save_derived_cache(
-    cases: List[Dict[str, Any]],
-    case_embs: np.ndarray,
-    case_complexity: np.ndarray,
-    case_keywords: List[List[str]],
-    keyword_idf: Dict[str, float],
-    train_idx: List[int],
-    test_idx: List[int],
-    profiles: Dict[str, "JudgeProfile"],
-    speed_scores: Dict[str, float],
-    train_by_judge: Dict[str, List[int]]
-) -> None:
-    if not USE_DERIVED_CACHE:
-        return
-    meta = {
-        "version": DERIVED_CACHE_VERSION,
-        "cases_hash": compute_cases_hash(cases),
-        "embed_model": EMBED_MODEL_NAME,
-        "test_size": TEST_SIZE,
-        "case_keywords": case_keywords,
-        "keyword_idf": keyword_idf,
-        "train_idx": train_idx,
-        "test_idx": test_idx,
-        "profiles": serialize_profiles(profiles),
-        "speed_scores": speed_scores,
-        "train_by_judge": train_by_judge,
-    }
-    with open(DERIVED_META_PATH, "w", encoding="utf-8") as f:
-        json.dump(meta, f, ensure_ascii=False, indent=2)
-    case_embs = case_embs.astype(np.float32, copy=False)
-    case_complexity = case_complexity.astype(np.float32, copy=False)
-    np.savez_compressed(
-        DERIVED_ARRAYS_PATH,
-        case_embs=case_embs,
-        case_complexity=case_complexity
-    )
-    # Also persist a copy inside the repo for reuse across runs
-    try:
-        shutil.copy2(DERIVED_META_PATH, LOCAL_DERIVED_META_PATH)
-        shutil.copy2(DERIVED_ARRAYS_PATH, LOCAL_DERIVED_ARRAYS_PATH)
-    except Exception as exc:
-        debug_log(f"[cache] Failed to copy derived cache to local data dir: {exc}")
-
-
-# ============================
-# Crawling / Parsing
-# ============================
-
-def list_highcourt_case_urls(session: requests.Session) -> List[str]:
-    """
-    BAILII listing: iterate toc-A.html ... toc-Z.html and collect case pages.
-    """
-    letters = [chr(c) for c in range(ord("A"), ord("Z") + 1)]
-    urls: List[str] = []
-    seen = set()
-    for letter in letters:
-        toc_url = HIGHCOURT_TOC_TEMPLATE.format(letter)
-        r = request_get(toc_url, session, headers=BAILII_HEADERS)
-        if r is None or r.status_code != 200:
-            debug_log(f"[bailii][warn] Failed to fetch toc-{letter}: {toc_url}")
-            continue
-        html = r.text or ""
-        soup = BeautifulSoup(html, "lxml")
-        new_links = 0
-        for a in soup.find_all("a", href=True):
-            href = a["href"].strip()
-            if "/ew/cases/EWHC/KB/" not in href:
-                continue
-            if not href.lower().endswith(".html"):
-                continue
-            full = href
-            if href.startswith("/"):
-                full = HIGHCOURT_BASE_URL.rstrip("/") + href
-            year = highcourt_year_from_url(full)
-            if year is None or year < MIN_CASE_YEAR or year > CURRENT_YEAR:
-                continue
-            if full in seen:
-                continue
-            seen.add(full)
-            urls.append(full)
-            new_links += 1
-        debug_log(f"[bailii] toc-{letter}: +{new_links} (total {len(seen)})")
-        time.sleep(REQUEST_DELAY_SEC)
-
-    urls.sort()
-    if urls and CRAWL_DEBUG:
-        sample = ", ".join(urls[:CRAWL_DEBUG_SAMPLE_IDS])
-        debug_log(f"[bailii] sample URLs: {sample}")
-    return urls
-
-def cache_path(case_url: str) -> str:
-    return os.path.join(CASE_JSON_DIR, f"{sha1(case_url)}.json")
+def cache_path(case_url: str) -> Path:
+    return CASE_JSON_DIR / f"{sha1(case_url)}.json"
 
 def extract_panel_judges(soup: BeautifulSoup) -> List[str]:
-    """
-    BAILII often wraps the sitting panel in <panel>...</panel>.
-    Extract clean judge names from those tags.
-    """
     judges = []
     for p in soup.find_all("panel"):
         txt = p.get_text("\n")
         parts = [t.strip() for t in txt.split("\n") if t.strip()]
         if not parts:
             continue
-        # Typically first line is the judge name; drop role lines like "(Sitting as ...)"
         name = parts[0]
         name = re.sub(r"\s*\(.*?\)\s*$", "", name)
         name = re.sub(r"\s{2,}", " ", name).strip()
@@ -956,10 +253,6 @@ def extract_panel_judges(soup: BeautifulSoup) -> List[str]:
     return dedup_judges_ordered(judges)
 
 def extract_judge_from_before(lines: List[str]) -> Optional[str]:
-    """
-    Heuristic inspired by sample_pdf_parser: look for a "Before" line and
-    pull a judge name such as "MR JUSTICE BLOGGS" that follows it.
-    """
     judge_pat = re.compile(r"\b(?:MR|MRS|MS)\s+JUSTICE\s+[A-Z][A-Z]+(?:\s+[A-Z][A-Z]+)*\b", re.IGNORECASE)
     for i, ln in enumerate(lines[:200]):
         if not ln.lower().startswith("before"):
@@ -968,7 +261,6 @@ def extract_judge_from_before(lines: List[str]) -> Optional[str]:
         if m:
             j = m.group(0).title().replace("Mr ", "MR ").replace("Mrs ", "MRS ").replace("Ms ", "MS ")
             return j
-        # sometimes judge name sits on next line
         if i + 1 < len(lines):
             nxt = lines[i + 1]
             m2 = judge_pat.search(nxt)
@@ -980,9 +272,6 @@ def extract_judge_from_before(lines: List[str]) -> Optional[str]:
     return None
 
 def extract_bailii_judges(lines: List[str]) -> List[str]:
-    """
-    Heuristic extraction of judge names from BAILII page text.
-    """
     judges = []
     stop_tokens = {
         "between", "and between", "claimant", "claimants", "defendant", "defendants",
@@ -1014,7 +303,7 @@ def extract_bailii_judges(lines: List[str]) -> List[str]:
                 continue
             if "adjudged" in low or "judgment" in low:
                 continue
-            if re.match(r"^(the hon\.?\s+)?(lord|lady|mr|mrs|ms|miss|sir|dame)\b.*(justice|judge)", ln, re.IGNORECASE):
+            if re.match(r"^(the hon\.?\s+)?(lord|lady|mr|mrs|ms|miss|sir|dame)\s+.*(justice|judge)", ln, re.IGNORECASE):
                 cand = ln.strip()
                 if is_valid_judge_name(cand):
                     judges.append(cand)
@@ -1031,11 +320,7 @@ def extract_bailii_judges(lines: List[str]) -> List[str]:
     return dedup_judges_ordered(judges)
 
 def parse_highcourt_case(case_url: str, session: requests.Session) -> Optional[Dict[str, Any]]:
-    """
-    Parse a BAILII High Court (KB) case page.
-    """
     def parse_hearing_start(text: str, lines: List[str]) -> Optional[str]:
-        # Text-wide patterns
         m = re.search(r"\bHearing\s+date[s]?:\s*([^\n]+)", text, flags=re.IGNORECASE)
         if not m:
             m = re.search(r"\bDate\s+of\s+hearing[s]?:\s*([^\n]+)", text, flags=re.IGNORECASE)
@@ -1044,7 +329,6 @@ def parse_highcourt_case(case_url: str, session: requests.Session) -> Optional[D
             dt = parse_date_maybe(raw)
             if dt:
                 return dt
-        # Line-wise fallback
         for ln in lines[:150]:
             m2 = re.search(r"\b[Hh]earing\s+date[s]?\s*[:-]\s*([A-Za-z0-9 ,/]+)", ln)
             if m2:
@@ -1052,12 +336,13 @@ def parse_highcourt_case(case_url: str, session: requests.Session) -> Optional[D
                 if dt:
                     return dt
         return None
-    cpath = cache_path(case_url)
+
     yr = highcourt_year_from_url(case_url)
     if yr is None or yr < MIN_CASE_YEAR or yr > CURRENT_YEAR:
-        debug_log(f"[bailii][skip] {case_url} year={yr} outside range {MIN_CASE_YEAR}-{CURRENT_YEAR}")
         return None
-    if os.path.exists(cpath):
+
+    cpath = cache_path(case_url)
+    if cpath.exists():
         try:
             with open(cpath, "r", encoding="utf-8") as f:
                 cached = json.load(f)
@@ -1074,12 +359,9 @@ def parse_highcourt_case(case_url: str, session: requests.Session) -> Optional[D
     lines = extract_lines(soup)
     flat_text = "\n".join(lines)
     panel_judges = extract_panel_judges(soup)
-    opinion_author = infer_opinion_author(lines)
 
-    # Title
     title = clean_text(soup.title.get_text(" ")) if soup.title else None
 
-    # Neutral citation / case id
     case_id = None
     case_no = None
     m_case_no = re.search(r"Case\s*No:\s*([A-Z]{1,5}-\d{4}-\d+)", flat_text, flags=re.IGNORECASE)
@@ -1100,7 +382,6 @@ def parse_highcourt_case(case_url: str, session: requests.Session) -> Optional[D
         if m:
             case_id = m.group(0)
     if not case_id:
-        # fallback using URL components
         parts = case_url.rstrip("/").split("/")
         if len(parts) >= 3:
             year = parts[-2] if parts[-2].isdigit() else None
@@ -1108,10 +389,8 @@ def parse_highcourt_case(case_url: str, session: requests.Session) -> Optional[D
             if year and num:
                 case_id = f"[{year}] EWHC {num} (KB)"
 
-    # Judgment / hearing dates
     judgment_date = None
     hearing_start = None
-    hearing_end = None
     for dt in soup.find_all("date"):
         jd = parse_date_maybe(dt.get_text(" "))
         if jd:
@@ -1139,43 +418,17 @@ def parse_highcourt_case(case_url: str, session: requests.Session) -> Optional[D
 
     justices = panel_judges
     if not justices:
-        if PANEL_JUDGES_ONLY:
-            debug_log(f"[bailii][warn] No <panel> judges found; skipping case {case_url}")
-            return None
         judge_from_before = extract_judge_from_before(lines)
         if judge_from_before and is_valid_judge_name(judge_from_before):
             justices = [judge_from_before]
         else:
             justices = extract_bailii_judges(lines)
 
-    # Drop obviously bad parses (too short / no alpha)
     justices = filter_judges(justices)
-
-    if opinion_author and is_valid_judge_name(opinion_author) and opinion_author not in justices:
-        justices.append(opinion_author)
-    # Deduplicate but preserve first entry order; keep only first name to avoid duplicates of same judge wording
-    seen = set()
-    dedup = []
-    for j in justices:
-        low = j.lower()
-        if low in seen:
-            continue
-        seen.add(low)
-        dedup.append(j)
-    if dedup:
-        justices = [dedup[0]]  # High Court cases are typically single-judge; keep the first parsed
-    else:
-        justices = []
-    if CRAWL_DEBUG:
-        debug_log(f"[bailii][judges] {case_url} -> {justices}")
-        if any(len(j) > 80 for j in justices):
-            debug_log(f"[bailii][warn] judge name too long; skipping {case_url}")
-            return None
+    if not justices:
+        return None
 
     text_full = soup_main_text(soup)
-    analysis_text = text_full
-
-    # Area of law: try to pick a division/court line near the top
     area_of_law = "High Court (King's Bench)"
     for ln in lines[:120]:
         if len(ln) > 80:
@@ -1184,9 +437,7 @@ def parse_highcourt_case(case_url: str, session: requests.Session) -> Optional[D
             area_of_law = ln.strip()
             break
 
-    # Require both start and end dates; otherwise skip to keep turnaround reliable
     if not hearing_start or not judgment_date:
-        debug_log(f"[bailii][skip] missing hearing/judgment date for {case_url} (hearing={hearing_start}, judgment={judgment_date})")
         return None
 
     out = {
@@ -1201,38 +452,92 @@ def parse_highcourt_case(case_url: str, session: requests.Session) -> Optional[D
         "date_of_issue": None,
         "judgment_date": judgment_date,
         "hearing_start": hearing_start,
-        "hearing_end": hearing_end,
-        "justices": justices,
-        "opinion_author": opinion_author or "",
+        "hearing_end": None,
+        "justices": justices[:1],  # keep primary judge only for speed model
+        "opinion_author": "",
         "text_full": text_full[:2_000_000],
-        "analysis_text": analysis_text[:2_000_000],
+        "analysis_text": text_full[:2_000_000],
         "source_urls": {"case": case_url, "judgment": case_url},
         "_parse_version": CASE_PARSE_VERSION,
-        # taxonomy labels populated later once embeddings are available
-        "taxonomy_labels": [],
     }
-
-    out["justices"] = filter_judges(out.get("justices"))
 
     with open(cpath, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
 
     return out
 
+# -----------------------------
+# Crawling
+# -----------------------------
 
-def crawl_cases(
-    n_cases: int,
-    session: requests.Session,
-    cache_path: Optional[str] = None,
-    seed_cases: Optional[List[Dict[str, Any]]] = None
-) -> List[Dict[str, Any]]:
+def list_highcourt_case_urls(session: requests.Session) -> List[str]:
+    letters = [chr(c) for c in range(ord("A"), ord("Z") + 1)]
+    urls: List[str] = []
+    seen = set()
+    for letter in letters:
+        toc_url = HIGHCOURT_TOC_TEMPLATE.format(letter)
+        r = request_get(toc_url, session, headers=BAILII_HEADERS)
+        if r is None or r.status_code != 200:
+            continue
+        html = r.text or ""
+        soup = BeautifulSoup(html, "lxml")
+        for a in soup.find_all("a", href=True):
+            href = a["href"].strip()
+            if "/ew/cases/EWHC/KB/" not in href:
+                continue
+            if not href.lower().endswith(".html"):
+                continue
+            full = href
+            if href.startswith("/"):
+                full = HIGHCOURT_BASE_URL.rstrip("/") + href
+            year = highcourt_year_from_url(full)
+            if year is None or year < MIN_CASE_YEAR or year > CURRENT_YEAR:
+                continue
+            if full in seen:
+                continue
+            seen.add(full)
+            urls.append(full)
+        time.sleep(REQUEST_DELAY_SEC)
+
+    urls.sort()
+    return urls
+
+def load_cases_cache(path: Path) -> List[Dict[str, Any]]:
+    # show where we are trying to load from (helps when running in different cwd)
+    print(f"[cache] attempting load from {path} (dir={path.parent})")
+    if not path.exists():
+        print(f"[cache] miss: file not found at {path}")
+        return []
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, list):
+            if data:
+                found_version = data[0].get("_parse_version")
+                if found_version != CASE_PARSE_VERSION:
+                    print(f"[cache] parse_version mismatch (found {found_version}, expected {CASE_PARSE_VERSION}); ignoring cache")
+                    return []
+            print(f"[cache] loaded {len(data)} cached cases from {path}")
+            return data
+        else:
+            print(f"[cache] unexpected cache format (type={type(data).__name__}); ignoring")
+    except Exception as exc:
+        print(f"[cache] failed to load {path}: {exc}")
+    return []
+
+def save_cases_cache(path: Path, cases: List[Dict[str, Any]]) -> None:
+    tmp = path.with_suffix(".tmp")
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(cases, f, ensure_ascii=False, indent=2)
+    os.replace(tmp, path)
+
+def crawl_cases(n_cases: int, session: requests.Session, cache_path: Optional[Path] = None, seed_cases: Optional[List[Dict[str, Any]]] = None) -> List[Dict[str, Any]]:
     found: List[Dict[str, Any]] = list(seed_cases) if seed_cases else []
     seen: set = {c.get("case_url") for c in found if c.get("case_url")}
     if len(found) >= n_cases:
         return found[:n_cases]
 
     last_saved = len(found)
-    parse_fn = parse_highcourt_case
 
     def handle_urls(urls: List[str], progress_desc: Optional[str] = None) -> bool:
         nonlocal last_saved
@@ -1244,23 +549,13 @@ def crawl_cases(
                 continue
             seen.add(u)
 
-            case = parse_fn(u, session)
+            case = parse_highcourt_case(u, session)
             time.sleep(REQUEST_DELAY_SEC)
 
             if case is None:
                 continue
 
-            # Ensure we have at least: id/title/judgment date/justices
-            if not case.get("case_id") or not case.get("title") or not case.get("justices"):
-                # still keep (some older entries might be sparse), but warn
-                pass
-
             case["justices"] = filter_judges(case.get("justices", []))
-            if CRAWL_DEBUG:
-                debug_log(
-                    f"[bailii][parsed] {case.get('case_id','')} "
-                    f"hearing_start={case.get('hearing_start')} judgment_date={case.get('judgment_date')}"
-                )
             found.append(case)
 
             if cache_path and (len(found) - last_saved) >= CACHE_SAVE_EVERY:
@@ -1273,1299 +568,548 @@ def crawl_cases(
                 return True
         return False
 
-    print_block("HIGH COURT LISTING")
     urls = list_highcourt_case_urls(session)
     if urls:
         handle_urls(urls, progress_desc="Parsing High Court cases")
-    else:
-        debug_log("[bailii][warn] No High Court case URLs extracted; returning cached/seed cases.")
-
     if cache_path:
         save_cases_cache(cache_path, found)
     return found
 
+# -----------------------------
+# Speed analysis
+# -----------------------------
 
-# ============================
-# Embedding + Complexity + Keywords
-# ============================
+def year_from_iso(date_iso: Optional[str]) -> Optional[int]:
+    if not date_iso:
+        return None
+    try:
+        return int(date_iso.split("-")[0])
+    except Exception:
+        return None
 
-def build_embeddings(cases: List[Dict[str, Any]], model: SentenceTransformer) -> Tuple[np.ndarray, Dict[int, List[int]]]:
-    """
-    Returns:
-      case_embeddings: (N, D)
-      case_to_chunk_idxs: mapping case_idx -> list of chunk indices
-    """
-    all_chunks = []
-    case_to_chunk_idxs = {}
-    for i, c in enumerate(cases):
-        chunks = chunk_words(c.get("analysis_text", ""), CHUNK_WORDS, CHUNK_OVERLAP)
-        if not chunks:
-            chunks = [c.get("analysis_text", "")[:2000] or c.get("title", "")]
-        start = len(all_chunks)
-        all_chunks.extend(chunks)
-        case_to_chunk_idxs[i] = list(range(start, start + len(chunks)))
-
-    # Encode with backoff to avoid OOM
-    chunk_embs = encode_with_backoff(
-        model,
-        all_chunks,
-        batch_size=EMBED_BATCH_SIZE,
-        desc="Encoding chunks"
-    )
-
-    # Pool to case embedding
-    case_embs = []
-    for i in range(len(cases)):
-        idxs = case_to_chunk_idxs[i]
-        ce = chunk_embs[idxs].mean(axis=0)
-        ce = ce / (np.linalg.norm(ce) + 1e-12)
-        case_embs.append(ce)
-
-    return np.vstack(case_embs), case_to_chunk_idxs
-
-def assign_taxonomy_labels(
-    cases: List[Dict[str, Any]],
-    case_embs: np.ndarray,
-    model: SentenceTransformer,
-    top_k: int = TAXONOMY_TOP_K,
-    threshold: float = TAXONOMY_THRESHOLD
-) -> None:
-    """
-    Populate taxonomy_labels for each case using semantic similarity to taxonomy embeddings.
-    """
-    label_embs = taxonomy_label_embeddings(model)
-    labels = list(label_embs.keys())
-    emb_matrix = np.vstack([label_embs[l] for l in labels])
-    # dot product since all normalized
-    sims = case_embs @ emb_matrix.T
-    for i, c in enumerate(cases):
-        row = sims[i]
-        ranked = sorted(zip(labels, row.tolist()), key=lambda x: x[1], reverse=True)
-        ranked = [(l, s) for l, s in ranked if s >= threshold][:top_k]
-        c["taxonomy_labels"] = ranked
-
-def compute_complexity(cases: List[Dict[str, Any]], case_embs: np.ndarray, model: SentenceTransformer) -> np.ndarray:
-    """
-    A lightweight complexity proxy:
-      - log(length in words)
-      - topical dispersion: average cosine distance of chunks from doc centroid
-    Produces normalized [0,1] score.
-    """
-    # Re-derive chunk embeddings cheaply by re-chunking + encoding smaller sample:
-    # We'll approximate dispersion using 6 representative chunks per doc (head/mid/tail).
-    disp = []
-    lengths = []
-    for c in tqdm(cases, desc="Complexity features"):
-        text = c.get("analysis_text", "")
-        words = text.split()
-        lengths.append(len(words))
-        chunks = chunk_words(text, CHUNK_WORDS, CHUNK_OVERLAP)
-        if len(chunks) <= 1:
-            disp.append(0.0)
-            continue
-        # sample up to 6 chunks
-        pick = []
-        for frac in [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]:
-            idx = min(len(chunks)-1, int(frac * (len(chunks)-1)))
-            pick.append(chunks[idx])
-        pick = list(dict.fromkeys(pick))  # unique
-        em = encode_with_backoff(
-            model,
-            pick,
-            batch_size=EMBED_BATCH_SIZE,
-            desc=None
-        )
-        centroid = em.mean(axis=0)
-        centroid = centroid / (np.linalg.norm(centroid) + 1e-12)
-        # average cosine distance
-        d = float(np.mean([1.0 - cosine_sim(centroid, e) for e in em]))
-        disp.append(d)
-
-    lengths = np.array(lengths, dtype=np.float32)
-    disp = np.array(disp, dtype=np.float32)
-
-    loglen = np.log1p(lengths)
-
-    # z-score then squash to [0,1]
-    def z(x):
-        return (x - x.mean()) / (x.std() + 1e-6)
-
-    raw = 0.65 * z(loglen) + 0.35 * z(disp)
-    # logistic to 0..1
-    comp = 1.0 / (1.0 + np.exp(-raw))
-    return comp.astype(np.float32)
-
-def extract_case_keywords(cases: List[Dict[str, Any]], kw_model: KeyBERT, top_n: int = 10) -> List[List[str]]:
-    """
-    Extract keywords from the full analysis_text (fallback to issue/facts).
-    """
-    out = []
-    for c in tqdm(cases, desc="Keywords"):
-        seed = (c.get("analysis_text","") or "").strip()
-        if not seed:
-            seed = " ".join([c.get("area_of_law",""), c.get("issue",""), c.get("facts","")]).strip()
-        seed = seed[:12000]  # cap for speed
-        try:
-            kws = kw_model.extract_keywords(
-                seed,
-                keyphrase_ngram_range=(1, 3),
-                stop_words="english",
-                top_n=top_n,
-                use_mmr=True,
-                diversity=0.5
-            )
-            filtered = [k for k, _ in kws if not is_noise_keyword(k)]
-            out.append(filtered)
-        except Exception:
-            out.append([])
-    return out
-
-
-# ============================
-# Judge Profiling + Assignment
-# ============================
-
-@dataclass
-class JudgeProfile:
-    name: str
-    embedding: np.ndarray
-    n_train_cases: int
-    avg_turnaround_days: Optional[float]
-    median_turnaround_days: Optional[float]
-    avg_complexity: Optional[float]
-    area_counts: Dict[str, int]
-    keyword_counts: Dict[str, int]
-    taxonomy_counts: Dict[str, float]
-    taxonomy_probs: Dict[str, float]
-    taxonomy_scaled_probs: Dict[str, float]
-
-def build_judge_profiles(
-    cases: List[Dict[str, Any]],
-    case_embs: np.ndarray,
-    case_complexity: np.ndarray,
-    case_keywords: List[List[str]],
-    train_indices: List[int]
-) -> Dict[str, JudgeProfile]:
-    by_judge_emb_sum = defaultdict(lambda: np.zeros(case_embs.shape[1], dtype=np.float32))
-    by_judge_emb_w = defaultdict(float)
-    by_judge_turn = defaultdict(list)   # list of (days, weight)
-    by_judge_comp = defaultdict(list)   # list of (comp, weight)
-    by_judge_area = defaultdict(Counter)  # weighted counts
-    by_judge_kw = defaultdict(Counter)    # weighted counts
-    by_judge_tax = defaultdict(Counter)   # taxonomy label weights
-    contrib_counts = defaultdict(int)     # number of training cases actually used per judge
-
-    for idx in train_indices:
-        c = cases[idx]
-        emb = case_embs[idx]
-        comp = float(case_complexity[idx])
+def build_speed_dataset(cases: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    rows = []
+    for c in cases:
         tdays = c.get("turnaround_days")
         if tdays is None:
-            tdays = days_between(c.get("hearing_start"), c.get("judgment_date"))
-        area = (c.get("area_of_law") or "").strip()
-        kws = case_keywords[idx] or []
-        op_author = normalize_person_name(c.get("opinion_author") or "")
-
-        judges = filter_judges(c.get("justices", []) or [])
-        for j in judges:
-            # optional cap on per-judge training contributions
-            if CAP_TRAIN_CASES_PER_JUDGE and contrib_counts[j] >= CAP_TRAIN_CASES_PER_JUDGE:
-                continue
-
-            w = 1.0
-            if USE_OPINION_AUTHOR_WEIGHTING and op_author and normalize_person_name(j) == op_author:
-                w = OPINION_AUTHOR_WEIGHT
-            if INVERSE_FREQ_WEIGHT:
-                w *= 1.0 / math.sqrt(contrib_counts[j] + 1.0)
-
-            by_judge_emb_sum[j] += emb * w
-            by_judge_emb_w[j] += w
-            by_judge_comp[j].append((comp, w))
-            if tdays is not None and tdays >= 0:
-                by_judge_turn[j].append((tdays, w))
-            if area:
-                by_judge_area[j][area] += w
-            for kw in kws:
-                nk = normalize_keyword(kw)
-                if nk:
-                    by_judge_kw[j][nk] += w
-            for label, score in c.get("taxonomy_labels", []) or []:
-                by_judge_tax[j][label] += w * (score or 1.0)
-
-            contrib_counts[j] += 1
-
-    profiles = {}
-    for j, w_sum in by_judge_emb_w.items():
-        if w_sum <= 0:
             continue
-        centroid = by_judge_emb_sum[j] / w_sum
-        centroid = centroid / (np.linalg.norm(centroid) + 1e-12)
+        judge = None
+        judges = filter_judges(c.get("justices", []) or [])
+        if judges:
+            judge = judges[0]
+        if not judge:
+            continue
+        rows.append({
+            "case_id": c.get("case_id"),
+            "title": c.get("title"),
+            "case_url": c.get("case_url"),
+            "judge": judge,
+            "turnaround_days": tdays,
+            "hearing_start": c.get("hearing_start"),
+            "judgment_date": c.get("judgment_date"),
+            "hearing_year": year_from_iso(c.get("hearing_start")),
+            "judgment_year": year_from_iso(c.get("judgment_date")),
+            "area_of_law": c.get("area_of_law"),
+        })
+    return rows
 
-        turns = by_judge_turn.get(j, [])
-        avg_t = None
-        med_t = None
-        if turns:
-            vals = [t for t, _ in turns]
-            weights = [w for _, w in turns]
-            avg_t = float(np.average(vals, weights=weights))
-            med_t = float(np.median(vals))
-
-        avg_c = None
-        if by_judge_comp[j]:
-            comp_vals = [v for v, _ in by_judge_comp[j]]
-            comp_w = [w for _, w in by_judge_comp[j]]
-            avg_c = float(np.average(comp_vals, weights=comp_w))
-
-        tax_counts = dict(by_judge_tax[j])
-        total_tax = float(sum(tax_counts.values()))
-        tax_probs = {lbl: (cnt / total_tax) for lbl, cnt in tax_counts.items()} if total_tax > 0 else {}
-        if TAXONOMY_USE_SCALED:
-            scaled = {lbl: math.sqrt(cnt) for lbl, cnt in tax_counts.items()}
-            scaled_total = float(sum(scaled.values()))
-            tax_scaled_probs = {lbl: (val / scaled_total) for lbl, val in scaled.items()} if scaled_total > 0 else {}
-        else:
-            tax_scaled_probs = tax_probs
-
-        profiles[j] = JudgeProfile(
-            name=j,
-            embedding=centroid,
-            n_train_cases=int(round(w_sum)),
-            avg_turnaround_days=avg_t,
-            median_turnaround_days=med_t,
-            avg_complexity=avg_c,
-            area_counts=dict(by_judge_area[j]),
-            keyword_counts=dict(by_judge_kw[j]),
-            taxonomy_counts=tax_counts,
-            taxonomy_probs=tax_probs,
-            taxonomy_scaled_probs=tax_scaled_probs,
-        )
-    return profiles
-
-def normalize_speed_scores(profiles: Dict[str, JudgeProfile]) -> Dict[str, float]:
+def trim_turnaround(rows: List[Dict[str, Any]], p_low: Optional[float], p_high: Optional[float]) -> Tuple[List[Dict[str, Any]], Dict[str, float]]:
     """
-    Convert avg_turnaround_days to a normalized speed score (higher = faster).
-    Uses 1/(days+1) then z-score then logistic.
+    Remove rows with turnaround_days outside [p_low, p_high] percentiles.
     """
-    vals = []
-    keys = []
-    for j, p in profiles.items():
-        if p.avg_turnaround_days is not None and p.avg_turnaround_days >= 0:
-            keys.append(j)
-            vals.append(1.0 / (p.avg_turnaround_days + 1.0))
-    if not vals:
-        return {j: 0.0 for j in profiles.keys()}
+    if rows is None or len(rows) == 0 or p_high is None:
+        return rows, {}
+    vals = np.array([r["turnaround_days"] for r in rows], dtype=float)
+    low = np.percentile(vals, p_low * 100) if p_low is not None else vals.min()
+    high = np.percentile(vals, p_high * 100)
+    kept = [r for r in rows if low <= r["turnaround_days"] <= high]
+    dropped = len(rows) - len(kept)
+    return kept, {"low": float(low), "high": float(high), "dropped": dropped}
 
-    v = np.array(vals, dtype=np.float32)
-    z = (v - v.mean()) / (v.std() + 1e-6)
-    s = 1.0 / (1.0 + np.exp(-z))
-    out = {j: 0.0 for j in profiles.keys()}
-    for j, sc in zip(keys, s.tolist()):
-        out[j] = float(sc)
+def winsorize_turnaround(rows: List[Dict[str, Any]], p_low: float, p_high: float) -> Tuple[List[Dict[str, Any]], Dict[str, float]]:
+    """
+    Clip turnaround_days at given percentiles. Returns (rows, stats).
+    """
+    if rows is None or len(rows) == 0 or p_high is None:
+        return rows, {}
+    vals = np.array([r["turnaround_days"] for r in rows], dtype=float)
+    lo = np.percentile(vals, p_low * 100) if p_low and p_low > 0 else vals.min()
+    hi = np.percentile(vals, p_high * 100) if p_high and p_high < 1.0 else vals.max()
+    for r in rows:
+        v = r["turnaround_days"]
+        if v < lo:
+            r["turnaround_days"] = float(lo)
+        elif v > hi:
+            r["turnaround_days"] = float(hi)
+    return rows, {"low": float(lo), "high": float(hi)}
+
+def summarize_turnaround(rows: List[Dict[str, Any]]) -> Dict[str, float]:
+    vals = np.array([r["turnaround_days"] for r in rows], dtype=float)
+    if vals.size == 0:
+        return {}
+    return {
+        "count": int(vals.size),
+        "mean": float(np.mean(vals)),
+        "median": float(np.median(vals)),
+        "std": float(np.std(vals)),
+        "p10": float(np.percentile(vals, 10)),
+        "p90": float(np.percentile(vals, 90)),
+        "min": float(np.min(vals)),
+        "max": float(np.max(vals)),
+    }
+
+def build_design_matrix(
+    rows: List[Dict[str, Any]],
+    target_key: str = "turnaround_days",
+    include_judge: bool = True,
+    include_judgment_year: bool = True,
+    include_hearing_year: bool = False,
+    include_area: bool = False
+) -> Tuple[np.ndarray, np.ndarray, Dict[str, Any]]:
+    y = np.array([r[target_key] for r in rows], dtype=float)
+
+    cols = []
+    col_names = []
+    judge_names = []
+    baseline_judge = None
+
+    if include_judge:
+        judge_names = sorted({r["judge"] for r in rows})
+        if judge_names:
+            baseline_judge = judge_names[0]
+            for j in judge_names[1:]:
+                col = np.array([1.0 if r["judge"] == j else 0.0 for r in rows], dtype=float)
+                cols.append(col)
+                col_names.append(f"judge[{j}]")
+
+    judgment_year_names = []
+    baseline_judgment_year = None
+    if include_judgment_year:
+        judgment_year_names = sorted({r["judgment_year"] for r in rows if r.get("judgment_year") is not None})
+        if judgment_year_names:
+            baseline_judgment_year = judgment_year_names[0]
+            for yv in judgment_year_names[1:]:
+                col = np.array([1.0 if r.get("judgment_year") == yv else 0.0 for r in rows], dtype=float)
+                cols.append(col)
+                col_names.append(f"judgment_year[{yv}]")
+
+    hearing_year_names = []
+    baseline_hearing_year = None
+    if include_hearing_year:
+        hearing_year_names = sorted({r["hearing_year"] for r in rows if r.get("hearing_year") is not None})
+        if hearing_year_names:
+            baseline_hearing_year = hearing_year_names[0]
+            for yv in hearing_year_names[1:]:
+                col = np.array([1.0 if r.get("hearing_year") == yv else 0.0 for r in rows], dtype=float)
+                cols.append(col)
+                col_names.append(f"hearing_year[{yv}]")
+
+    area_names = []
+    baseline_area = None
+    if include_area:
+        area_names = sorted({r["area_of_law"] for r in rows if r.get("area_of_law")})
+        if area_names:
+            baseline_area = area_names[0]
+            for a in area_names[1:]:
+                col = np.array([1.0 if r.get("area_of_law") == a else 0.0 for r in rows], dtype=float)
+                cols.append(col)
+                col_names.append(f"area[{a}]")
+
+    if cols:
+        X = np.column_stack([np.ones(len(rows), dtype=float)] + cols)
+    else:
+        X = np.ones((len(rows), 1), dtype=float)
+
+    meta = {
+        "col_names": col_names,
+        "baseline_judge": baseline_judge,
+        "judge_names": judge_names,
+        "judgment_year_names": judgment_year_names,
+        "baseline_judgment_year": baseline_judgment_year,
+        "hearing_year_names": hearing_year_names,
+        "baseline_hearing_year": baseline_hearing_year,
+        "area_names": area_names,
+        "baseline_area": baseline_area,
+        "n_params": X.shape[1],
+        "n_judge_params": len(judge_names) - 1 if include_judge else 0,
+    }
+    return X, y, meta
+
+def fit_ols(X: np.ndarray, y: np.ndarray) -> Dict[str, Any]:
+    beta, *_ = np.linalg.lstsq(X, y, rcond=None)
+    y_hat = X @ beta
+    resid = y - y_hat
+    ssr = float(resid @ resid)
+    sst = float(((y - y.mean()) @ (y - y.mean()))) if y.size else 0.0
+    r2 = 1.0 - ssr / sst if sst > 0 else 0.0
+    df_resid = max(0, len(y) - X.shape[1])
+    return {
+        "beta": beta,
+        "y_hat": y_hat,
+        "resid": resid,
+        "ssr": ssr,
+        "sst": sst,
+        "r2": r2,
+        "df_resid": df_resid,
+    }
+
+def f_test_judge_effects(rows: List[Dict[str, Any]], target_key: str = "turnaround_days") -> Dict[str, Any]:
+    X_full, y, meta_full = build_design_matrix(
+        rows,
+        target_key=target_key,
+        include_judge=True,
+        include_judgment_year=INCLUDE_JUDGMENT_YEAR,
+        include_hearing_year=INCLUDE_HEARING_YEAR,
+        include_area=INCLUDE_AREA_FE
+    )
+    full = fit_ols(X_full, y)
+
+    X_restricted, _, _ = build_design_matrix(
+        rows,
+        target_key=target_key,
+        include_judge=False,
+        include_judgment_year=INCLUDE_JUDGMENT_YEAR,
+        include_hearing_year=INCLUDE_HEARING_YEAR,
+        include_area=INCLUDE_AREA_FE
+    )
+    restricted = fit_ols(X_restricted, y)
+
+    q = meta_full["n_judge_params"]
+    if q <= 0:
+        return {"n_judges": len(meta_full.get("judge_names", [])), "f_stat": None, "p_value": None}
+
+    df_den = full["df_resid"]
+    if df_den <= 0:
+        return {"n_judges": len(meta_full.get("judge_names", [])), "f_stat": None, "p_value": None}
+
+    f_stat = ((restricted["ssr"] - full["ssr"]) / q) / (full["ssr"] / df_den)
+    p_val = None
+    if f_dist is not None and math.isfinite(f_stat):
+        try:
+            p_val = float(f_dist.sf(f_stat, q, df_den))
+        except Exception:
+            p_val = None
+    return {
+        "n_judges": len(meta_full.get("judge_names", [])),
+        "f_stat": float(f_stat) if math.isfinite(f_stat) else None,
+        "p_value": p_val,
+        "df_num": q,
+        "df_den": df_den,
+        "r2": full["r2"],
+        "adj_r2": 1 - (1 - full["r2"]) * (len(y) - 1) / max(1, df_den),
+        "baselines": {
+            "judge": meta_full.get("baseline_judge"),
+            "judgment_year": meta_full.get("baseline_judgment_year"),
+            "hearing_year": meta_full.get("baseline_hearing_year"),
+            "area": meta_full.get("baseline_area"),
+        },
+        "beta": full["beta"].tolist(),
+        "col_names": meta_full.get("col_names", []),
+    }
+
+def judge_effects(rows: List[Dict[str, Any]], f_result: Dict[str, Any]) -> List[Dict[str, Any]]:
+    X_full, y, meta = build_design_matrix(
+        rows,
+        target_key="turnaround_days",
+        include_judge=True,
+        include_judgment_year=INCLUDE_JUDGMENT_YEAR,
+        include_hearing_year=INCLUDE_HEARING_YEAR,
+        include_area=INCLUDE_AREA_FE
+    )
+    beta = np.array(f_result.get("beta"))
+    if beta.size == 0:
+        return []
+    col_names = meta.get("col_names", [])
+
+    # Map beta coefficients back to judges; baseline judge effect = 0
+    effects = {meta.get("baseline_judge"): 0.0}
+    for name, coeff in zip(col_names, beta[1:]):  # skip intercept
+        if name.startswith("judge["):
+            j = name[len("judge["):-1]
+            effects[j] = float(coeff)
+
+    # Aggregate observed turnaround by judge
+    by_judge = defaultdict(list)
+    for r in rows:
+        by_judge[r["judge"]].append(r["turnaround_days"])
+
+    out = []
+    for j, vals in by_judge.items():
+        eff = effects.get(j, 0.0)
+        arr = np.array(vals, dtype=float)
+        out.append({
+            "judge": j,
+            "n_cases": int(arr.size),
+            "mean_turnaround": float(arr.mean()),
+            "median_turnaround": float(np.median(arr)),
+            "effect_days": float(eff),
+            "is_baseline": j == meta.get("baseline_judge"),
+        })
+
+    out.sort(key=lambda x: x["effect_days"])
     return out
 
-def score_judges_for_case(
-    case_idx: int,
-    cases: List[Dict[str, Any]],
-    case_embs: np.ndarray,
-    case_complexity: np.ndarray,
-    profiles: Dict[str, JudgeProfile],
-    speed_scores: Dict[str, float],
-    weights: Optional[Dict[str, float]] = None,
-    use_scaled_taxonomy: bool = TAXONOMY_USE_SCALED,
-    caseload_params: Optional[Dict[str, float]] = None
-) -> List[Dict[str, Any]]:
-    w = weights or {}
-    w_sim = w.get("sim", W_SIM)
-    w_speed_base = w.get("speed", W_SPEED)
-    w_cfit = w.get("complexity_fit", W_COMPLEXITY_FIT)
-    w_tax = w.get("taxonomy", W_TAXONOMY)
-
-    cp = caseload_params or {"base": CASELOAD_PRIOR_BASE, "weight": CASELOAD_PRIOR_WEIGHT}
-    prior_base = cp.get("base", CASELOAD_PRIOR_BASE)
-    prior_w = cp.get("weight", CASELOAD_PRIOR_WEIGHT)
-
-    emb = case_embs[case_idx]
-    comp = float(case_complexity[case_idx])
-    urgency = estimate_case_urgency(" ".join([cases[case_idx].get("issue", ""), cases[case_idx].get("facts", "")]))
-    case_tax = cases[case_idx].get("taxonomy_labels") or []
-
-    scores = []
-    for j, p in profiles.items():
-        sim = cosine_sim(emb, p.embedding)
-        spd = speed_scores.get(j, 0.0)
-
-        # complexity fit: prefer judges whose historical avg complexity is close
-        if p.avg_complexity is None:
-            cfit = 0.5
-        else:
-            cfit = 1.0 - min(1.0, abs(comp - float(p.avg_complexity)))
-
-        # Taxonomy match: weighted overlap using semantic label scores
-        tax_score = 0.0
-        if case_tax:
-            judge_tax = p.taxonomy_scaled_probs if use_scaled_taxonomy else p.taxonomy_probs
-            num = 0.0
-            denom = 0.0
-            for label, cscore in case_tax:
-                jt = judge_tax.get(label, 0.0)
-                num += cscore * jt
-                denom += cscore
-            if denom > 0:
-                tax_score = num / denom
-
-        w_speed = w_speed_base + URGENT_SPEED_BOOST * urgency
-        base_score = (w_sim * sim) + (w_speed * spd) + (w_cfit * cfit) + (w_tax * tax_score)
-        prior = caseload_prior(p.n_train_cases)
-        score = base_score * (prior_base + prior_w * prior)
-        scores.append({
-            "judge": j,
-            "score": float(score),
-            "sim": float(sim),
-            "spd": float(spd),
-            "cfit": float(cfit),
-            "tax": float(tax_score),
-            "urgency": float(urgency),
-            "w_speed": float(w_speed),
-            "caseload_prior": float(prior),
-        })
-
-    scores.sort(key=lambda x: x["score"], reverse=True)
-    return scores
-
-def assign_judge(
-    case_idx: int,
-    cases: List[Dict[str, Any]],
-    case_embs: np.ndarray,
-    case_complexity: np.ndarray,
-    profiles: Dict[str, JudgeProfile],
-    speed_scores: Dict[str, float],
-    train_indices_by_judge: Dict[str, List[int]],
-    top_k: int = 3,
-    weights: Optional[Dict[str, float]] = None,
-    use_scaled_taxonomy: bool = TAXONOMY_USE_SCALED,
-    caseload_params: Optional[Dict[str, float]] = None
-) -> List[Tuple[str, float]]:
-    """
-    Returns top_k (judge, score) sorted desc.
-    """
-    scores = score_judges_for_case(
-        case_idx,
-        cases,
-        case_embs,
-        case_complexity,
-        profiles,
-        speed_scores,
-        weights=weights,
-        use_scaled_taxonomy=use_scaled_taxonomy,
-        caseload_params=caseload_params
-    )
-    return [(s["judge"], s["score"]) for s in scores[:top_k]]
-
-def evaluate_assignments(
-    test_indices: List[int],
-    cases: List[Dict[str, Any]],
-    case_embs: np.ndarray,
-    case_complexity: np.ndarray,
-    profiles: Dict[str, JudgeProfile],
-    speed_scores: Dict[str, float],
-    train_indices_by_judge: Dict[str, List[int]],
-    top_k: int = 3,
-    weights: Optional[Dict[str, float]] = None,
-    use_scaled_taxonomy: bool = TAXONOMY_USE_SCALED,
-    caseload_params: Optional[Dict[str, float]] = None
-) -> Dict[str, float]:
-    """
-    Top-1 / Top-3 accuracy against the true panel membership.
-    """
-    top1 = 0
-    topk = 0
-    mrr = 0.0
-    overlap_cases = 0
-    overlap_total = 0
-    n = 0
-    known_judges = set(profiles.keys())
-    skipped_unknown = 0
-
-    for idx in test_indices:
-        true_panel = set(cases[idx].get("justices", []) or [])
-        if not true_panel:
-            continue
-        if not (true_panel & known_judges):
-            skipped_unknown += 1
-            continue
-        preds = assign_judge(
-            idx,
-            cases,
-            case_embs,
-            case_complexity,
-            profiles,
-            speed_scores,
-            train_indices_by_judge,
-            top_k=top_k,
-            weights=weights,
-            use_scaled_taxonomy=use_scaled_taxonomy,
-            caseload_params=caseload_params
-        )
-        ranked = [j for j, _ in preds]
-
-        n += 1
-        if ranked and ranked[0] in true_panel:
-            top1 += 1
-        overlap = len(set(ranked[:top_k]).intersection(true_panel))
-        if overlap > 0:
-            topk += 1
-            overlap_cases += 1
-        overlap_total += overlap
-
-        # MRR for membership
-        rr = 0.0
-        for r, j in enumerate(ranked, start=1):
-            if j in true_panel:
-                rr = 1.0 / r
-                break
-        mrr += rr
-
-    if n == 0:
-        return {"n": 0, "top1": 0.0, f"top{top_k}": 0.0, "mrr": 0.0, "overlap_cases": 0, "avg_overlap": 0.0}
+def dispersion_stats(effects: List[Dict[str, Any]]) -> Dict[str, float]:
+    vals = np.array([e["effect_days"] for e in effects], dtype=float)
+    if vals.size == 0:
+        return {}
     return {
-        "n": n,
-        "top1": top1 / n,
-        f"top{top_k}": topk / n,
-        "mrr": mrr / n,
-        "overlap_cases": overlap_cases,
-        "avg_overlap": overlap_total / n,
-        "skipped_unknown_judges": skipped_unknown
+        "std": float(np.std(vals)),
+        "p10": float(np.percentile(vals, 10)),
+        "p90": float(np.percentile(vals, 90)),
+        "iqr": float(np.percentile(vals, 75) - np.percentile(vals, 25)),
+        "range": float(np.max(vals) - np.min(vals)),
     }
 
+# -----------------------------
+# Plotting helpers
+# -----------------------------
 
-# ============================
-# Speed -> Judge diagnostic
-# ============================
+def plot_turnaround(rows: List[Dict[str, Any]]) -> Dict[str, str]:
+    out = {}
+    vals = np.array([r["turnaround_days"] for r in rows], dtype=float)
+    if vals.size == 0:
+        return out
 
-def build_speed_model(cases: List[Dict[str, Any]], train_indices: List[int]) -> Dict[str, Dict[str, float]]:
+    def _save(fig, name: str):
+        path = PLOTS_DIR / name
+        fig.tight_layout()
+        fig.savefig(path, dpi=180)
+        plt.close(fig)
+        out[name] = str(path)
+
+    fig, ax = plt.subplots(figsize=(7, 4))
+    ax.hist(vals, bins=60, color="#4c78a8", alpha=0.85)
+    ax.set_title("Turnaround (days)")
+    ax.set_xlabel("days")
+    ax.set_ylabel("count")
+    ax.axvline(vals.mean(), color="red", linestyle="--", label=f"mean={vals.mean():.1f}")
+    ax.axvline(np.median(vals), color="green", linestyle="--", label=f"median={np.median(vals):.1f}")
+    ax.legend()
+    _save(fig, "turnaround_hist.png")
+
+    fig, ax = plt.subplots(figsize=(7, 4))
+    ax.hist(np.log1p(vals), bins=60, color="#f58518", alpha=0.85)
+    ax.set_title("Turnaround log1p(days)")
+    ax.set_xlabel("log1p(days)")
+    ax.set_ylabel("count")
+    _save(fig, "turnaround_hist_log.png")
+
+    return out
+
+def plot_judge_effects(effects: List[Dict[str, Any]], top_n: int = 25) -> Dict[str, str]:
+    out = {}
+    if not effects:
+        return out
+    sorted_eff = sorted(effects, key=lambda x: x["effect_days"])
+    sample = sorted_eff[:top_n] + sorted_eff[-top_n:] if len(sorted_eff) > top_n else sorted_eff
+    labels = [e["judge"] for e in sample]
+    vals = [e["effect_days"] for e in sample]
+
+    fig, ax = plt.subplots(figsize=(8, max(6, 0.25 * len(sample))))
+    ax.barh(range(len(sample)), vals, color="#54a24b")
+    ax.axvline(0, color="black", linewidth=1)
+    ax.set_yticks(range(len(sample)))
+    ax.set_yticklabels(labels, fontsize=8)
+    ax.set_xlabel("Judge effect (days vs baseline; negative = faster)")
+    ax.set_title("Judge fixed effects (sample)")
+    fig.tight_layout()
+    path = PLOTS_DIR / "judge_effects_bar.png"
+    fig.savefig(path, dpi=180)
+    plt.close(fig)
+    out["judge_effects_bar.png"] = str(path)
+
+    # Boxplot for overall spread
+    fig, ax = plt.subplots(figsize=(4, 5))
+    ax.boxplot(vals, vert=True, showfliers=True)
+    ax.set_ylabel("Judge effect (days)")
+    ax.set_title("Judge effects spread (sample)")
+    fig.tight_layout()
+    path2 = PLOTS_DIR / "judge_effects_box.png"
+    fig.savefig(path2, dpi=180)
+    plt.close(fig)
+    out["judge_effects_box.png"] = str(path2)
+
+    return out
+
+# -----------------------------
+# Reporting helpers
+# -----------------------------
+
+def print_readable_summary(
+    n_cases: int,
+    f_res: Dict[str, Any],
+    disp: Dict[str, Any],
+    t_summary: Dict[str, Any],
+    log_res: Optional[Dict[str, Any]] = None
+) -> None:
     """
-    Simple per-judge turnaround model: mean/std over training cases.
-    Returns {judge: {mu, sigma, n}}.
+    Emit a compact, human-readable summary aligned to the review questions.
     """
-    stats: Dict[str, List[float]] = defaultdict(list)
-    for idx in train_indices:
-        c = cases[idx]
-        t = c.get("turnaround_days")
-        if t is None:
-            continue
-        judges = filter_judges(c.get("justices", []) or [])
-        if not judges:
-            continue
-        stats[judges[0]].append(float(t))
-
-    model: Dict[str, Dict[str, float]] = {}
-    for j, vals in stats.items():
-        if not vals:
-            continue
-        mu = float(np.mean(vals))
-        sigma = float(np.std(vals))
-        if sigma < 1.0:
-            sigma = 1.0  # avoid degenerate likelihoods
-        model[j] = {"mu": mu, "sigma": sigma, "n": float(len(vals))}
-    return model
-
-
-def predict_judge_from_speed(
-    turnaround_days: float,
-    speed_model: Dict[str, Dict[str, float]],
-    top_k: int = 3
-) -> List[Tuple[str, float]]:
-    """
-    Rank judges by Gaussian likelihood of observed turnaround_days.
-    """
-    scores = []
-    for j, s in speed_model.items():
-        mu = s["mu"]
-        sigma = s["sigma"]
-        # log likelihood up to constant
-        ll = -0.5 * ((turnaround_days - mu) / sigma) ** 2 - math.log(sigma + 1e-6)
-        # mild prior on judge frequency
-        ll += math.log(s["n"] + 1.0)
-        scores.append((j, ll))
-    scores.sort(key=lambda x: x[1], reverse=True)
-    return scores[:top_k]
-
-
-def evaluate_speed_based_prediction(
-    cases: List[Dict[str, Any]],
-    train_indices: List[int],
-    test_indices: List[int],
-    top_k: int = 3
-) -> Dict[str, Any]:
-    """
-    Diagnostic: how predictive is turnaround speed for judge identity?
-    Uses a per-judge Gaussian over turnaround_days (observed ex-post).
-    """
-    model = build_speed_model(cases, train_indices)
-    if not model:
-        return {"n": 0}
-
-    top1 = topk = 0
-    mrr = 0.0
-    n = 0
-    skipped_no_speed = 0
-    for idx in test_indices:
-        c = cases[idx]
-        t = c.get("turnaround_days")
-        judges = filter_judges(c.get("justices", []) or [])
-        if t is None or not judges:
-            skipped_no_speed += 1
-            continue
-        true_judge = judges[0]
-        preds = predict_judge_from_speed(float(t), model, top_k=top_k)
-        ranked = [p for p, _ in preds]
-        if not ranked:
-            continue
-        n += 1
-        if ranked[0] == true_judge:
-            top1 += 1
-        if true_judge in ranked[:top_k]:
-            topk += 1
-        rr = 0.0
-        for r, j in enumerate(ranked, start=1):
-            if j == true_judge:
-                rr = 1.0 / r
-                break
-        mrr += rr
-
-    if n == 0:
-        return {"n": 0, "skipped_no_speed": skipped_no_speed}
-
-    return {
-        "n": n,
-        "top1": top1 / n,
-        f"top{top_k}": topk / n,
-        "mrr": mrr / n,
-        "skipped_no_speed": skipped_no_speed,
-        "judges_in_model": len(model),
-    }
-
-
-def build_speed_assignments(
-    cases: List[Dict[str, Any]],
-    train_indices: List[int],
-    test_indices: List[int],
-    top_k: int = 3
-) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
-    """
-    Build speed-only predictions + metrics using a per-judge Gaussian model.
-    Returns (assignments, metrics).
-    """
-    speed_model = build_speed_model(cases, train_indices)
-    assignments = []
-    if not speed_model:
-        return assignments, {"n": 0}
-
-    for idx in test_indices:
-        c = cases[idx]
-        preds = []
-        if c.get("turnaround_days") is not None:
-            preds = predict_judge_from_speed(float(c["turnaround_days"]), speed_model, top_k=top_k)
-        assignments.append({
-            "case_idx": idx,
-            "case_id": c.get("case_id"),
-            "title": c.get("title"),
-            "turnaround_days": c.get("turnaround_days"),
-            "true_panel": c.get("justices"),
-            "predictions": [{"judge": j, "score": s} for j, s in preds]
-        })
-
-    metrics = evaluate_speed_based_prediction(cases, train_indices, test_indices, top_k=top_k)
-    return assignments, metrics
-
-def _default_grid_configs() -> List[Dict[str, Any]]:
-    if GRID_SEARCH_CONFIGS:
-        return GRID_SEARCH_CONFIGS
-    configs = []
-    for w_tax in [0.25, 0.35, 0.45]:
-        for w_sim in [0.40, 0.50]:
-            for use_scaled in [True, False]:
-                for c_w in [0.10, 0.20]:
-                    cfg = {
-                        "weights": {
-                            "sim": w_sim,
-                            "taxonomy": w_tax,
-                            "speed": W_SPEED,
-                            "complexity_fit": W_COMPLEXITY_FIT
-                        },
-                        "use_scaled_taxonomy": use_scaled,
-                        "caseload": {"base": CASELOAD_PRIOR_BASE, "weight": c_w},
-                        "top_k": 3
-                    }
-                    configs.append(cfg)
-    return configs
-
-def grid_search_weights(
-    cases: List[Dict[str, Any]],
-    case_embs: np.ndarray,
-    case_complexity: np.ndarray,
-    profiles: Dict[str, JudgeProfile],
-    speed_scores: Dict[str, float],
-    train_indices_by_judge: Dict[str, List[int]],
-    test_indices: List[int]
-) -> List[Tuple[Dict[str, Any], Dict[str, float]]]:
-    """
-    Lightweight sweep over weight/caseload/taxonomy settings using cached embeddings.
-    """
-    configs = _default_grid_configs()
-    results: List[Tuple[Dict[str, Any], Dict[str, float]]] = []
-    print_block("GRID SEARCH")
-    print(f"Configs to test: {len(configs)}")
-    for i, cfg in enumerate(configs, start=1):
-        weights = cfg.get("weights") or {}
-        use_scaled = cfg.get("use_scaled_taxonomy", TAXONOMY_USE_SCALED)
-        caseload = cfg.get("caseload")
-        top_k = cfg.get("top_k", 3)
-        metrics = evaluate_assignments(
-            test_indices,
-            cases,
-            case_embs,
-            case_complexity,
-            profiles,
-            speed_scores,
-            train_indices_by_judge,
-            top_k=top_k,
-            weights=weights,
-            use_scaled_taxonomy=use_scaled,
-            caseload_params=caseload
-        )
-        results.append((cfg, metrics))
-        print(
-            f"[{i}/{len(configs)}] "
-            f"sim={weights.get('sim')} tax={weights.get('taxonomy')} scaled={use_scaled} "
-            f"caseload_w={caseload.get('weight') if caseload else None} "
-            f"top1={metrics.get('top1'):.3f} top{top_k}={metrics.get(f'top{top_k}'):.3f} mrr={metrics.get('mrr'):.3f}"
-        )
-    # sort by top1 then topk
-    results.sort(key=lambda x: (x[1].get("top1", 0.0), x[1].get("top3", x[1].get(f"top{configs[0].get('top_k',3)}", 0.0))), reverse=True)
-    best_cfg, best_metrics = results[0]
-    print("\nBest config:")
-    print(json.dumps({"config": best_cfg, "metrics": best_metrics}, indent=2))
-    return results
-
-def build_test_report(
-    assignments: List[Dict[str, Any]],
-    cases: List[Dict[str, Any]],
-    top_k: int = 3
-) -> Dict[str, Any]:
-    n_total = len(assignments)
-    top1_count = 0
-    topk_count = 0
-    mrr_sum = 0.0
-    overlap_cases = 0
-    overlap_total = 0
-    panel_sizes = []
-    overlap_ratios = []
-    overlap_dist = Counter()
-    top1_pred_counts = Counter()
-    top1_correct_counts = Counter()
-    per_case = []
-
-    for a in assignments:
-        case_idx = a.get("case_idx")
-        c = cases[case_idx]
-        true_panel = a.get("true_panel") or []
-        true_set = set(true_panel)
-        preds = a.get("predictions") or []
-        ranked = [p.get("judge") for p in preds if p.get("judge")]
-
-        top1_pred = ranked[0] if ranked else None
-        if top1_pred:
-            top1_pred_counts[top1_pred] += 1
-
-        panel_size = len(true_set)
-        has_panel = panel_size > 0
-        overlap = len(set(ranked[:top_k]).intersection(true_set)) if has_panel else 0
-        overlap_dist[overlap] += 1
-
-        rank_first = None
-        if has_panel:
-            panel_sizes.append(panel_size)
-            for i, j in enumerate(ranked, start=1):
-                if j in true_set:
-                    rank_first = i
-                    break
-            if rank_first:
-                mrr_sum += 1.0 / rank_first
-            if ranked and ranked[0] in true_set:
-                top1_count += 1
-                top1_correct_counts[ranked[0]] += 1
-            if overlap > 0:
-                topk_count += 1
-                overlap_cases += 1
-            overlap_total += overlap
-            overlap_ratio = overlap / panel_size if panel_size else 0.0
-            overlap_ratios.append(overlap_ratio)
+    fstat = f_res.get("f_stat")
+    pval = f_res.get("p_value")
+    df_num = f_res.get("df_num")
+    df_den = f_res.get("df_den")
+    decision = None
+    if pval is not None:
+        if pval < 0.01:
+            decision = "Reject H0 at 1% (strong evidence of judge effects)."
+        elif pval < 0.05:
+            decision = "Reject H0 at 5% (judge effects significant)."
+        elif pval < 0.10:
+            decision = "Reject H0 at 10% (weak evidence)."
         else:
-            overlap_ratio = None
+            decision = "Fail to reject H0 (no joint significance)."
 
-        per_case.append({
-            "case_idx": case_idx,
-            "case_id": c.get("case_id"),
-            "title": c.get("title"),
-            "case_url": c.get("case_url"),
-            "judgment_date": c.get("judgment_date"),
-            "true_panel": true_panel,
-            "true_panel_size": panel_size,
-            "predictions": preds,
-            "top1_pred": top1_pred,
-            "top1_correct": bool(has_panel and ranked and ranked[0] in true_set),
-            f"top{top_k}_hit": bool(has_panel and overlap > 0),
-            "overlap_count": overlap if has_panel else None,
-            "overlap_ratio": overlap_ratio,
-            "rank_first_correct": rank_first
-        })
-
-    n_with_panel = len(panel_sizes)
-    if n_with_panel:
-        top1_acc = top1_count / n_with_panel
-        topk_acc = topk_count / n_with_panel
-        mrr = mrr_sum / n_with_panel
-        avg_overlap = overlap_total / n_with_panel
-        topk_precision = overlap_total / (n_with_panel * top_k)
-        avg_panel_size = float(np.mean(panel_sizes))
-        median_panel_size = float(np.median(panel_sizes))
-        avg_overlap_ratio = float(np.mean(overlap_ratios)) if overlap_ratios else 0.0
+    print("\n=== READABLE SUMMARY ===")
+    print("Speed measure:")
+    print(f"  hearing -> judgment days | cases with valid speed: {n_cases}")
+    print(f"  mean / median turnaround: {t_summary.get('mean'):.1f} / {t_summary.get('median'):.1f} days")
+    print("\nModel:")
+    print("  speed_ij = alpha + gamma_judge + controls (judgment year) + epsilon_ij")
+    print("\nTest: Are judge fixed effects jointly significant?")
+    if fstat is not None and df_num is not None and df_den is not None:
+        print(f"  F({df_num}, {df_den}) = {fstat:.3f}   p = {pval:.4f}   -> {decision}")
     else:
-        top1_acc = topk_acc = mrr = avg_overlap = topk_precision = 0.0
-        avg_panel_size = median_panel_size = avg_overlap_ratio = 0.0
-
-    metrics = {
-        "n_total": n_total,
-        "n_with_panel": n_with_panel,
-        "top1_accuracy": top1_acc,
-        f"top{top_k}_accuracy": topk_acc,
-        "mrr": mrr,
-        "overlap_cases": overlap_cases,
-        "avg_overlap_count": avg_overlap,
-        f"top{top_k}_precision": topk_precision,
-        "avg_panel_size": avg_panel_size,
-        "median_panel_size": median_panel_size,
-        "avg_overlap_ratio": avg_overlap_ratio,
-        "overlap_distribution": {str(k): v for k, v in sorted(overlap_dist.items())},
-        "top1_prediction_counts": top1_pred_counts.most_common(),
-        "top1_correct_counts": top1_correct_counts.most_common()
-    }
-
-    report = {
-        "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "config": {
-            "max_cases": MAX_CASES,
-            "test_size": TEST_SIZE,
-            "embed_model": EMBED_MODEL_NAME,
-            "weights": {"sim": W_SIM, "speed": W_SPEED, "complexity_fit": W_COMPLEXITY_FIT},
-            "urgent_speed_boost": URGENT_SPEED_BOOST,
-            "top_k": top_k
-        },
-        "metrics": metrics,
-        "per_case": per_case
-    }
-    return report
-
-def build_train_indices_by_judge(cases: List[Dict[str, Any]], train_indices: List[int]) -> Dict[str, List[int]]:
-    m = defaultdict(list)
-    for idx in train_indices:
-        for j in cases[idx].get("justices", []) or []:
-            m[j].append(idx)
-    return m
-
-
-# ============================
-# Explanation Module
-# ============================
-
-def explain_assignment(
-    case_idx: int,
-    chosen_judge: str,
-    cases: List[Dict[str, Any]],
-    case_embs: np.ndarray,
-    case_complexity: np.ndarray,
-    case_keywords: List[List[str]],
-    profiles: Dict[str, JudgeProfile],
-    speed_scores: Dict[str, float],
-    train_indices_by_judge: Dict[str, List[int]],
-    keyword_idf: Optional[Dict[str, float]] = None,
-    embed_model: Optional[SentenceTransformer] = None,
-    top_assignments: int = 5,
-    top_similar: int = 3
-) -> Dict[str, Any]:
-    c = cases[case_idx]
-    prof = profiles[chosen_judge]
-
-    emb = case_embs[case_idx]
-    sim = cosine_sim(emb, prof.embedding)
-    spd = speed_scores.get(chosen_judge, 0.0)
-
-    comp = float(case_complexity[case_idx])
-    cfit = 0.5 if prof.avg_complexity is None else 1.0 - min(1.0, abs(comp - float(prof.avg_complexity)))
-
-    urgency = estimate_case_urgency(" ".join([c.get("issue",""), c.get("facts","")]))
-    prior = caseload_prior(prof.n_train_cases)
-
-    # Judge expertise areas
-    areas_sorted = sorted(prof.area_counts.items(), key=lambda x: x[1], reverse=True)[:5]
-
-    # Similar past cases for this judge (training)
-    sims = []
-    for tidx in train_indices_by_judge.get(chosen_judge, []):
-        s = cosine_sim(emb, case_embs[tidx])
-        sims.append((tidx, s))
-    sims.sort(key=lambda x: x[1], reverse=True)
-    top_cases = []
-    for tidx, s in sims[:top_similar]:
-        tc = cases[tidx]
-        top_cases.append({
-            "case_id": tc.get("case_id"),
-            "title": tc.get("title"),
-            "area_of_law": tc.get("area_of_law"),
-            "judgment_date": tc.get("judgment_date"),
-            "case_url": tc.get("case_url"),
-            "similarity": float(s),
-        })
-
-    semantic_matches = []
-    if embed_model and keyword_idf:
-        semantic_matches = semantic_keyword_matches(
-            case_keywords[case_idx] or [],
-            prof.keyword_counts,
-            keyword_idf,
-            embed_model
-        )
-
-    # Recompute taxonomy overlap for explanation (same as scoring)
-    tax_score = 0.0
-    case_tax = c.get("taxonomy_labels") or []
-    if case_tax:
-        judge_tax = prof.taxonomy_scaled_probs if TAXONOMY_USE_SCALED else prof.taxonomy_probs
-        num = 0.0
-        denom = 0.0
-        for label, cscore in case_tax:
-            jt = judge_tax.get(label, 0.0)
-            num += cscore * jt
-            denom += cscore
-        if denom > 0:
-            tax_score = num / denom
-
-    reasons = [
-        {"factor": "expertise_similarity", "value": sim, "detail": "Cosine similarity between case embedding and judge profile embedding."},
-        {"factor": "speed_fit", "value": spd, "detail": "Normalized speed score from historical hearing→judgment turnaround (higher = faster)."},
-        {"factor": "complexity_fit", "value": cfit, "detail": "How close the case complexity is to this judge’s historical average complexity."},
-        {"factor": "taxonomy_overlap", "value": tax_score, "detail": "Semantic overlap between case taxonomy labels and judge’s taxonomy history."},
-        {"factor": "urgency_estimate", "value": urgency, "detail": "Heuristic urgency score from issue/facts (used to upweight speed)."},
-        {"factor": "caseload_prior", "value": prior, "detail": "Penalty for very large training volume (log-damped)."},
-        {"factor": "weights", "value": {"taxonomy": W_TAXONOMY, "sim": W_SIM, "speed": W_SPEED, "complexity": W_COMPLEXITY_FIT}, "detail": "Scoring weights applied."},
-    ]
-
-    explanation = {
-        "case": {
-            "case_id": c.get("case_id"),
-            "title": c.get("title"),
-            "area_of_law": c.get("area_of_law"),
-            "judgment_date": c.get("judgment_date"),
-            "hearing_start": c.get("hearing_start"),
-            "case_url": c.get("case_url"),
-            "true_panel": c.get("justices"),
-        },
-        "assigned_judge": {
-            "name": chosen_judge,
-            "n_train_cases": prof.n_train_cases,
-            "avg_turnaround_days": prof.avg_turnaround_days,
-            "median_turnaround_days": prof.median_turnaround_days,
-            "avg_case_complexity": prof.avg_complexity,
-            "top_areas_of_law": areas_sorted,
-        },
-        "why": reasons,
-        "supporting_evidence": {
-            "semantic_keyword_matches": semantic_matches,
-            "most_similar_past_cases_for_judge": top_cases
-        },
-        "top_assignments": score_judges_for_case(
-            case_idx,
-            cases,
-            case_embs,
-            case_complexity,
-            profiles,
-            speed_scores
-        )[:top_assignments]
-    }
-    return explanation
-
-def print_explanation(expl: Dict[str, Any]) -> None:
-    c = expl["case"]
-    j = expl["assigned_judge"]
-    print("\n" + "="*90)
-    print(f"CASE: {c['case_id']} — {c['title']}")
-    print(f"Area: {c.get('area_of_law','')}")
-    print(f"Hearing start: {c.get('hearing_start')} | Judgment: {c.get('judgment_date')}")
-    print(f"URL: {c.get('case_url')}")
-    print(f"True panel: {', '.join(c.get('true_panel') or [])}")
-    print("-"*90)
-    print(f"ASSIGNED JUDGE: {j['name']}")
-    print(f"Train cases: {j['n_train_cases']} | Avg turnaround days: {j['avg_turnaround_days']} | Median: {j['median_turnaround_days']}")
-    print(f"Avg complexity handled: {j['avg_case_complexity']}")
-    if j.get("top_areas_of_law"):
-        areas = ", ".join([f"{a}({n})" for a, n in j["top_areas_of_law"][:3]])
-        print(f"Top areas: {areas}")
-    print("-"*90)
-    for r in expl["why"]:
-        val = r.get("value")
-        if isinstance(val, (int, float)):
-            val_str = f"{val:.4f}"
+        print("  F-test not available")
+    if f_res.get("r2") is not None:
+        print(f"  Model fit: R^2 = {f_res.get('r2'):.3f}   adj R^2 = {f_res.get('adj_r2'):.3f}")
+    print("\nDispersion of judge effects (days relative to baseline; negative = faster):")
+    span = (disp.get("p90", 0) - disp.get("p10", 0)) if disp else 0
+    print(f"  Std dev: {disp.get('std'):.2f}")
+    print(f"  P10 -> P90: {disp.get('p10'):.1f} -> {disp.get('p90'):.1f} (span {span:.1f})")
+    print(f"  IQR: {disp.get('iqr'):.1f}   Range: {disp.get('range'):.1f}")
+    print("  Interpretation: gamma_judge < 0 = faster than baseline; > 0 = slower.")
+    if log_res:
+        lf = log_res.get("f_test", {})
+        print("\nLog(turnaround+1) robustness:")
+        if lf.get("stat") is not None:
+            print(f"  F({lf.get('df_num')}, {lf.get('df_den')}) = {lf.get('stat'):.3f}   p = {lf.get('p_value'):.4f}")
+            if log_res.get("r2") is not None:
+                print(f"  R^2 = {log_res.get('r2'):.3f}   adj R^2 = {log_res.get('adj_r2'):.3f}")
         else:
-            val_str = str(val)
-        print(f"{r['factor']}: {val_str} — {r['detail']}")
-    print("-"*90)
-    top = expl.get("top_assignments") or []
-    if top:
-        print("Top assignments (score components):")
-        header = f"{'rk':>2}  {'judge':<30} {'score':>7} {'sim':>6} {'spd':>6} {'cfit':>6} {'wspd':>6}"
-        print(header)
-        print("-"*90)
-        for i, row in enumerate(top, start=1):
-            name = row.get("judge", "")
-            if len(name) > 30:
-                name = f"{name[:28]}.."
-            print(
-                f"{i:>2}  {name:<30} {row['score']:>7.4f} {row['sim']:>6.3f} {row['spd']:>6.3f} "
-                f"{row['cfit']:>6.3f} {row['w_speed']:>6.3f}"
-            )
-        print("-"*90)
-    ov = expl["supporting_evidence"].get("semantic_keyword_matches") or []
-    if ov:
-        print("Semantic keyword matches:")
-        for item in ov:
-            print(f"  - {item['case_term']} ~ {item['judge_term']} (sim={item['similarity']:.2f})")
-    sims = expl["supporting_evidence"]["most_similar_past_cases_for_judge"]
-    if sims:
-        print("\nMost similar past cases for this judge:")
-        for s in sims:
-            print(f"  - {s['case_id']} | sim={s['similarity']:.3f} | {s['title']}  ({s.get('area_of_law','')})")
-            print(f"    {s['case_url']}")
-    print("="*90 + "\n")
+            print("  Not available")
+    print("========================\n")
 
+# -----------------------------
+# Main
+# -----------------------------
 
-# ============================
-# Main run
-# ============================
-
-def main():
-    global EMBED_BATCH_SIZE
+def main() -> None:
     session = requests.Session()
-    model = None
 
-    print_block("CASE INGESTION")
-    print(f"source={CASE_SOURCE_NAME}")
-    print(f"cache_dir={CACHE_DIR}")
-    seed_cases = []
-    if USE_CACHED_CASES:
-        seed_cases = load_cases_cache(CASES_CACHE_PATH)
-        if seed_cases:
-            print(f"Loaded {len(seed_cases)} cached cases from: {CASES_CACHE_PATH}")
+    print("=== CASE INGESTION ===")
+    seed_cases = load_cases_cache(CASES_CACHE_PATH)
+    if seed_cases:
+        print(f"Loaded {len(seed_cases)} cached cases from {CASES_CACHE_PATH}")
 
     if len(seed_cases) >= MAX_CASES:
         cases = seed_cases[:MAX_CASES]
-        for c in cases:
-            c["justices"] = filter_judges(c.get("justices", []))
-        annotate_turnaround_days(cases)
-        cases = drop_negative_turnaround_cases(cases)
         print("Using cached cases; skipping crawl.")
     else:
-        if seed_cases:
-            print("Crawling cases (with judgment dates), resuming from cache...")
-        else:
-            print("Crawling cases (with judgment dates)...")
+        print("Crawling cases (with judgment dates)...")
         cases = crawl_cases(MAX_CASES, session, cache_path=CASES_CACHE_PATH, seed_cases=seed_cases)
-        annotate_turnaround_days(cases)
-        cases = drop_negative_turnaround_cases(cases)
         print(f"Collected {len(cases)} cases.")
 
-    # Optional: speed-only experiment (skip embeddings/keywords/taxonomy)
-    if SPEED_ONLY_MODE:
-        print_block("SPEED-ONLY MODE")
-        if len(cases) < 30:
-            print("Too few cases collected for speed-only evaluation.")
-            return
-        cases = drop_negative_turnaround_cases(cases)
-        idxs = list(range(len(cases)))
-        train_idx, test_idx = train_test_split(idxs, test_size=TEST_SIZE, random_state=RANDOM_SEED)
-        train_idx = sorted(train_idx)
-        test_idx = sorted(test_idx)
-        print(f"Train cases: {len(train_idx)} | Test cases: {len(test_idx)}")
-
-        assignments, speed_diag = build_speed_assignments(cases, train_idx, test_idx, top_k=SPEED_ONLY_TOP_K)
-        if speed_diag.get("n", 0) == 0:
-            print("Speed model empty (no turnaround_days in training).")
-            return
-        print(json.dumps(speed_diag, indent=2))
-
-        with open(SPEED_ASSIGNMENTS_PATH, "w", encoding="utf-8") as f:
-            json.dump(assignments, f, ensure_ascii=False, indent=2)
-        with open(SPEED_REPORT_PATH, "w", encoding="utf-8") as f:
-            json.dump({
-                "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                "config": {
-                    "speed_only": True,
-                    "top_k": SPEED_ONLY_TOP_K,
-                    "test_size": TEST_SIZE
-                },
-                "metrics": speed_diag
-            }, f, ensure_ascii=False, indent=2)
-        sync_export_files()
-        zip_path = zip_outputs(CACHE_DIR, ZIP_RESULTS)
-        if zip_path:
-            print_block("ZIP EXPORT")
-            print(f"Zipped outputs to: {zip_path}")
-        print("\nDone.")
-        print(f"Cache directory: {CACHE_DIR}")
-        return
-
+    annotate_turnaround_days(cases)
+    cases = drop_negative_turnaround_cases(cases)
     if len(cases) < 30:
-        print("Too few cases collected. Consider increasing MAX_CASES, disabling USE_CACHED_CASES, or checking connectivity.")
+        print("Too few cases with valid turnaround times to run analysis.")
         return
 
-    # Save raw dataset
-    print_block("SAVING RAW CASES")
-    save_cases_cache(CASES_CACHE_PATH, cases)
-    print(f"Saved raw cases to: {CASES_CACHE_PATH}")
-    sync_export_files()
+    print("=== SPEED DATASET ===")
+    speed_rows = build_speed_dataset(cases)
+    print(f"Cases with speed + judge: {len(speed_rows)}")
 
-    print_block("FEATURE EXTRACTION / CACHES")
-    derived = load_derived_cache(cases)
-    if derived:
-        if derived["case_embs"].shape[0] != len(cases) or derived["case_complexity"].shape[0] != len(cases):
-            debug_log("[cache] Derived cache case count mismatch; recomputing.")
-            derived = None
-    if derived and len(derived.get("case_keywords") or []) != len(cases):
-        debug_log("[cache] Derived cache keyword count mismatch; recomputing.")
-        derived = None
-    if derived:
-        print(f"Loaded derived cache from: {DERIVED_META_PATH}")
-        case_embs = derived["case_embs"]
-        case_complexity = derived["case_complexity"]
-        case_keywords = derived["case_keywords"]
-        keyword_idf = derived["keyword_idf"]
-        train_idx = derived["train_idx"]
-        test_idx = derived["test_idx"]
-        profiles = derived["profiles"]
-        speed_scores = derived["speed_scores"]
-        train_by_judge = derived.get("train_by_judge") or build_train_indices_by_judge(cases, train_idx)
-        if not keyword_idf:
-            keyword_idf = compute_keyword_idf(case_keywords)
-        # ensure taxonomy labels exist based on embeddings
-        tmp_model = SentenceTransformer(EMBED_MODEL_NAME, device="cuda" if torch.cuda.is_available() else "cpu")
-        assign_taxonomy_labels(cases, case_embs, tmp_model)
-        print(f"Train cases: {len(train_idx)} | Test cases: {len(test_idx)}")
-        print(f"Loaded profiles for {len(profiles)} judges.")
-        if CRAWL_DEBUG:
-            debug_sample_case_features(cases, case_keywords, limit=10)
-    else:
-        # Embedding model
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-        print(f"Loading embedding model on {device}: {EMBED_MODEL_NAME}")
-        model = SentenceTransformer(EMBED_MODEL_NAME, device=device)
-        # Autotune batch size for better GPU utilisation
-        tuned_bs = autotune_embed_batch_size(model, device)
-        if tuned_bs != EMBED_BATCH_SIZE:
-            EMBED_BATCH_SIZE = tuned_bs
-        print(f"Using embed batch size: {EMBED_BATCH_SIZE}")
+    trim_info = {}
+    if TRIM_HIGH_PCTL is not None:
+        speed_rows, trim_info = trim_turnaround(speed_rows, TRIM_LOW_PCTL, TRIM_HIGH_PCTL)
+        print(f"Trimmed turnaround outside [{trim_info.get('low'):.1f}, {trim_info.get('high'):.1f}] (pctl {TRIM_LOW_PCTL*100:.1f}-{TRIM_HIGH_PCTL*100:.1f}); dropped {trim_info.get('dropped',0)} cases")
 
-        print_block("EMBEDDINGS")
-        print("Building embeddings...")
-        case_embs, _ = build_embeddings(cases, model)
-        print(f"Embeddings shape: {case_embs.shape}")
-        assign_taxonomy_labels(cases, case_embs, model)
+    winsor_info = {}
+    if WINSOR_HIGH_PCTL is not None:
+        speed_rows, winsor_info = winsorize_turnaround(speed_rows, WINSOR_LOW_PCTL, WINSOR_HIGH_PCTL)
+        if winsor_info:
+            print(f"Winsorized turnaround at [{winsor_info.get('low'):.1f}, {winsor_info.get('high'):.1f}] (pctl {WINSOR_LOW_PCTL*100:.1f}-{WINSOR_HIGH_PCTL*100:.1f})")
 
-        print_block("COMPLEXITY")
-        print("Computing complexity...")
-        case_complexity = compute_complexity(cases, case_embs, model)
+    print("=== MODEL: judge fixed effects on turnaround ===")
+    f_res = f_test_judge_effects(speed_rows)
+    effects = judge_effects(speed_rows, f_res)
+    disp = dispersion_stats(effects)
+    t_summary = summarize_turnaround(speed_rows)
+    plot_paths = {}
+    plot_paths.update(plot_turnaround(speed_rows))
+    plot_paths.update(plot_judge_effects(effects))
 
-        # Keywords
-        print_block("KEYWORDS")
-        print("Extracting keywords (KeyBERT)...")
-        kw_model = KeyBERT(model=model)
-        case_keywords = extract_case_keywords(cases, kw_model, top_n=10)
-        keyword_idf = compute_keyword_idf(case_keywords)
-        if CRAWL_DEBUG:
-            debug_sample_case_features(cases, case_keywords, limit=10)
-
-        # Train/test split
-        print_block("SPLIT + PROFILES")
-        idxs = list(range(len(cases)))
-        train_idx, test_idx = train_test_split(idxs, test_size=TEST_SIZE, random_state=RANDOM_SEED)
-        train_idx = sorted(train_idx)
-        test_idx = sorted(test_idx)
-        print(f"Train cases: {len(train_idx)} | Test cases: {len(test_idx)}")
-
-        # Judge profiles
-        profiles = build_judge_profiles(cases, case_embs, case_complexity, case_keywords, train_idx)
-        print(f"Built profiles for {len(profiles)} judges.")
-
-        # Speed score normalization (judge turnaround)
-        speed_scores = normalize_speed_scores(profiles)
-
-        # Judge -> training indices mapping
-        train_by_judge = build_train_indices_by_judge(cases, train_idx)
-
-        save_derived_cache(
-            cases,
-            case_embs,
-            case_complexity,
-            case_keywords,
-            keyword_idf,
-            train_idx,
-            test_idx,
-            profiles,
-            speed_scores,
-            train_by_judge
-        )
-
-    if RUN_GRID_SEARCH or GRID_SEARCH_ONLY:
-        grid_search_weights(
-            cases,
-            case_embs,
-            case_complexity,
-            profiles,
-            speed_scores,
-            train_by_judge,
-            test_idx
-        )
-        if GRID_SEARCH_ONLY:
-            return
-
-    if model is None:
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-        print(f"Loading embedding model on {device}: {EMBED_MODEL_NAME}")
-        model = SentenceTransformer(EMBED_MODEL_NAME, device=device)
-        tuned_bs = autotune_embed_batch_size(model, device)
-        if tuned_bs != EMBED_BATCH_SIZE:
-            EMBED_BATCH_SIZE = tuned_bs
-        print(f"Using embed batch size: {EMBED_BATCH_SIZE}")
-
-    print_block("ASSIGNMENTS")
-    assignments = []
-    known_judges = set(profiles.keys())
-    skipped_unknown = 0
-    for idx in tqdm(test_idx, desc="Assigning test cases"):
-        true_panel = set(cases[idx].get("justices", []) or [])
-        if true_panel and not (true_panel & known_judges):
-            skipped_unknown += 1
-            continue  # skip evaluation when ground-truth judges were never seen in training
-
-        preds = assign_judge(idx, cases, case_embs, case_complexity, profiles, speed_scores, train_by_judge, top_k=3)
-        assignments.append({
-            "case_idx": idx,
-            "case_id": cases[idx].get("case_id"),
-            "title": cases[idx].get("title"),
-            "true_panel": cases[idx].get("justices"),
-            "predictions": [{"judge": j, "score": s} for j, s in preds]
-        })
-
-    if skipped_unknown:
-        print(f"Skipped {skipped_unknown} test cases where none of the true panel judges appeared in training/profiles.")
-
-    out_path = os.path.join(EXPORT_DIR, "test_assignments.json")
-    with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(assignments, f, ensure_ascii=False, indent=2)
-    print(f"\nSaved test assignments to: {out_path}")
-
-    print_block("EVALUATION")
-    report = build_test_report(assignments, cases, top_k=3)
-    print("\n=== Evaluation (predict judge ∈ true panel) ===")
-    print(json.dumps(report["metrics"], indent=2))
-    if report["metrics"].get("n_with_panel", 0):
-        overlap_cases = report["metrics"].get("overlap_cases", 0)
-        overlap_rate = overlap_cases / report["metrics"]["n_with_panel"]
-        avg_overlap = report["metrics"].get("avg_overlap_count", 0.0)
-        print(
-            f"Overlap summary: {overlap_cases}/{report['metrics']['n_with_panel']} cases overlap with true panel "
-            f"({overlap_rate:.1%}); avg overlap per case={avg_overlap:.2f}"
-        )
-
-    with open(TEST_REPORT_PATH, "w", encoding="utf-8") as f:
-        json.dump(report, f, ensure_ascii=False, indent=2)
-    print(f"Saved test report to: {TEST_REPORT_PATH}")
-
-    # Speed -> judge diagnostic
-    print_block("SPEED → JUDGE (DIAGNOSTIC)")
-    speed_assignments = []
-    speed_diag = {"n": 0}
-    if RUN_SPEED_ONLY_WITH_FULL:
-        speed_assignments, speed_diag = build_speed_assignments(cases, train_idx, test_idx, top_k=3)
-    else:
-        speed_diag = evaluate_speed_based_prediction(cases, train_idx, test_idx, top_k=3)
-
-    if speed_diag.get("n", 0) == 0:
-        print("Not enough cases with turnaround_days to run speed-based diagnostic.")
-    else:
-        print(json.dumps(speed_diag, indent=2))
-        if RUN_SPEED_ONLY_WITH_FULL and speed_assignments:
-            with open(SPEED_ASSIGNMENTS_PATH, "w", encoding="utf-8") as f:
-                json.dump(speed_assignments, f, ensure_ascii=False, indent=2)
-        with open(SPEED_REPORT_PATH, "w", encoding="utf-8") as f:
-            json.dump({
-                "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                "config": {
-                    "speed_only": False,
-                    "top_k": 3,
-                    "test_size": TEST_SIZE
-                },
-                "metrics": speed_diag
-            }, f, ensure_ascii=False, indent=2)
-
-    # Save judge profiles (serializable)
-    print_block("SAVING PROFILES")
-    prof_out = {}
-    for j, p in profiles.items():
-        top_tax = sorted(p.taxonomy_counts.items(), key=lambda x: x[1], reverse=True)[:10]
-        prof_out[j] = {
-            "n_train_cases": p.n_train_cases,
-            "avg_turnaround_days": p.avg_turnaround_days,
-            "median_turnaround_days": p.median_turnaround_days,
-            "avg_complexity": p.avg_complexity,
-            "top_areas_of_law": sorted(p.area_counts.items(), key=lambda x: x[1], reverse=True)[:10],
-            "top_keywords": Counter(p.keyword_counts).most_common(25),
-            "top_taxonomy": top_tax,
+    # Optional log model
+    log_model_res = None
+    if USE_LOG_MODEL:
+        rows_log = []
+        for r in speed_rows:
+            rlog = dict(r)
+            rlog["turnaround_log"] = math.log1p(r["turnaround_days"])
+            rows_log.append(rlog)
+        log_f = f_test_judge_effects(rows_log, target_key="turnaround_log")
+        log_model_res = {
+            "f_test": {
+                "stat": log_f.get("f_stat"),
+                "p_value": log_f.get("p_value"),
+                "df_num": log_f.get("df_num"),
+                "df_den": log_f.get("df_den"),
+            },
+            "r2": log_f.get("r2"),
+            "adj_r2": log_f.get("adj_r2"),
         }
-    prof_path = os.path.join(EXPORT_DIR, "judge_profiles_summary.json")
-    with open(prof_path, "w", encoding="utf-8") as f:
-        json.dump(prof_out, f, ensure_ascii=False, indent=2)
-    print(f"Saved judge profile summaries to: {prof_path}")
-    sync_export_files()
 
-    # Zip outputs for easy sharing
-    zip_path = zip_outputs(CACHE_DIR, ZIP_RESULTS)
-    if zip_path:
-        print_block("ZIP EXPORT")
-        print(f"Zipped outputs to: {zip_path}")
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    with open(CASES_OUTPUT_PATH, "w", encoding="utf-8") as f:
+        json.dump(speed_rows, f, ensure_ascii=False, indent=2)
+    with open(JUDGE_EFFECTS_PATH, "w", encoding="utf-8") as f:
+        json.dump(effects, f, ensure_ascii=False, indent=2)
+    with open(SPEED_RESULTS_PATH, "w", encoding="utf-8") as f:
+        json.dump({
+            "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "n_cases": len(speed_rows),
+            "n_judges": f_res.get("n_judges"),
+            "controls": [
+                c for c in [
+                    "judgment_year" if INCLUDE_JUDGMENT_YEAR else None,
+                    "hearing_year" if INCLUDE_HEARING_YEAR else None,
+                    "area_of_law" if INCLUDE_AREA_FE else None
+                ] if c
+            ],
+            "turnaround_summary": t_summary,
+            "f_test": {
+                "stat": f_res.get("f_stat"),
+                "p_value": f_res.get("p_value"),
+                "df_num": f_res.get("df_num"),
+                "df_den": f_res.get("df_den"),
+            },
+            "r2": f_res.get("r2"),
+            "adj_r2": f_res.get("adj_r2"),
+            "dispersion": disp,
+            "baselines": f_res.get("baselines"),
+            "trim": trim_info,
+            "winsor": winsor_info,
+            "log_model": log_model_res,
+            "plots": plot_paths,
+        }, f, ensure_ascii=False, indent=2)
 
-    # Show a few explanations
-    print_block("EXPLANATIONS")
-    print("\nShowing example explanations for 3 random test cases...\n")
-    for idx in random.sample(test_idx, k=min(3, len(test_idx))):
-        preds = assign_judge(idx, cases, case_embs, case_complexity, profiles, speed_scores, train_by_judge, top_k=1)
-        chosen = preds[0][0]
-        expl = explain_assignment(
-            idx,
-            chosen,
-            cases,
-            case_embs,
-            case_complexity,
-            case_keywords,
-            profiles,
-            speed_scores,
-            train_by_judge,
-            keyword_idf=keyword_idf,
-            embed_model=model,
-            top_similar=3
-        )
-        print_explanation(expl)
+    print("=== RESULTS ===")
+    print(json.dumps({
+        "cases": len(speed_rows),
+        "judges": f_res.get("n_judges"),
+        "f_stat": f_res.get("f_stat"),
+        "p_value": f_res.get("p_value"),
+        "dispersion_std": disp.get("std"),
+        "p90_minus_p10": (disp.get("p90", 0) - disp.get("p10", 0)) if disp else None,
+    }, indent=2))
+    print(f"Saved: {CASES_OUTPUT_PATH}, {JUDGE_EFFECTS_PATH}, {SPEED_RESULTS_PATH}")
+    print_readable_summary(len(speed_rows), f_res, disp, t_summary, log_model_res)
+    if plot_paths:
+        print("Saved plots:")
+        for name, path in plot_paths.items():
+            print(f"  - {name}: {path}")
 
-    print("\nDone.")
-    print(f"Cache directory: {CACHE_DIR}")
-
-main()
+if __name__ == "__main__":
+    main()

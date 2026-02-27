@@ -1,0 +1,66 @@
+{
+  "generated_at": "2026-02-27T15:43:03Z",
+  "n_cases": 907,
+  "n_judges": 286,
+  "controls": [
+    "judgment_year",
+    "hearing_year",
+    "area_of_law"
+  ],
+  "turnaround_summary": {
+    "count": 907,
+    "mean": 787.7382579933849,
+    "median": 29.0,
+    "std": 1797.1635986975155,
+    "p10": 1.6000000000000085,
+    "p90": 3762.9999999999986,
+    "min": 0.0,
+    "max": 7337.76
+  },
+  "f_test": {
+    "stat": 1.1091685536315283,
+    "p_value": 0.15069820802484113,
+    "df_num": 285,
+    "df_den": 592
+  },
+  "r2": 0.9983259294518536,
+  "adj_r2": 0.9974379933840868,
+  "dispersion": {
+    "std": 79.1707409005245,
+    "p10": -81.99139076720405,
+    "p90": 65.01472807982917,
+    "iqr": 42.59186631128034,
+    "range": 671.9689895352769
+  },
+  "baselines": {
+    "judge": ": MRS JUSTICE COCKERILL DBE",
+    "judgment_year": 2022,
+    "hearing_year": 2001,
+    "area": "England and Wales High Court (King's Bench Division) Decisions"
+  },
+  "trim": {
+    "low": 0.0,
+    "high": 8049.84,
+    "dropped": 10
+  },
+  "winsor": {
+    "low": 0.0,
+    "high": 7337.76
+  },
+  "log_model": {
+    "f_test": {
+      "stat": 3.082171467036948,
+      "p_value": 5.706011135126472e-31,
+      "df_num": 285,
+      "df_den": 592
+    },
+    "r2": 0.8946184427433641,
+    "adj_r2": 0.8387234951444051
+  },
+  "plots": {
+    "turnaround_hist.png": "data/plots/turnaround_hist.png",
+    "turnaround_hist_log.png": "data/plots/turnaround_hist_log.png",
+    "judge_effects_bar.png": "data/plots/judge_effects_bar.png",
+    "judge_effects_box.png": "data/plots/judge_effects_box.png"
+  }
+}
