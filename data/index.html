@@ -669,8 +669,7 @@
       const years = DATA.years || [];
       const q = DATA.parse_quality || {};
       document.getElementById("dataNote").textContent =
-        `Cached BAILII sample: ${q.raw_cases || 0} parsed cases, ${q.model_ready_cases || 0} model-ready cases. ` +
-        "BAILII currently blocks additional crawling, so this dashboard is limited to the available cache. Raw judgment text is not embedded in this page.";
+        `Cached BAILII sample: ${q.raw_cases || 0} parsed cases, ${q.model_ready_cases || 0} model-ready cases. `;
       const yearStart = document.getElementById("yearStart");
       const yearEnd = document.getElementById("yearEnd");
       yearStart.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join("");
