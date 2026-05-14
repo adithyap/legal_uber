@@ -6,3 +6,12 @@ data/cases_raw.json
 data/cases_raw_all.json
 data/derived_arrays.npz
 data/derived_meta.json
+
+# Generated analysis outputs
+data/cases_speed.json
+data/judge_effects.json
+data/speed_results.json
+data/assignment_results.json
+data/crawl_rejections.json
+data/dashboard_data.json
+data/judge_aliases.json
