@@ -1676,19 +1676,12 @@ def write_dashboard_html(path: Path, dashboard_data: Dict[str, Any]) -> None:
       max-width: 1100px;
       line-height: 1.45;
     }
-    .nav {
-      display: flex;
-      align-items: center;
-      gap: 22px;
-      min-height: 52px;
-      padding: 0 32px;
-      background: var(--brand);
-      color: white;
-      font-weight: 650;
-    }
-    .nav span:first-child {
-      font-size: 18px;
-      margin-right: 12px;
+    .data-note {
+      margin-top: 12px;
+      color: #475467;
+      font-size: 13px;
+      line-height: 1.45;
+      max-width: 1100px;
     }
     main {
       padding: 24px 32px 38px;
@@ -1709,6 +1702,12 @@ def write_dashboard_html(path: Path, dashboard_data: Dict[str, Any]) -> None:
       color: var(--muted);
       margin-bottom: 5px;
       font-weight: 700;
+    }
+    .control-help {
+      margin-top: 5px;
+      color: #667085;
+      font-size: 12px;
+      line-height: 1.3;
     }
     select, input {
       width: 100%;
@@ -1836,6 +1835,28 @@ def write_dashboard_html(path: Path, dashboard_data: Dict[str, Any]) -> None:
       line-height: 1.45;
       max-width: 1180px;
     }
+    .control-guide {
+      margin-top: 14px;
+      padding: 0 0 18px;
+      border-bottom: 1px solid var(--line);
+      color: #475467;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .control-guide h2 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      color: var(--ink);
+    }
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(220px, 1fr));
+      gap: 10px 18px;
+      max-width: 1180px;
+    }
+    .guide-grid strong {
+      color: var(--ink);
+    }
     .small { color: var(--muted); font-size: 12px; }
     canvas { width: 100%; height: 280px; display: block; }
     svg { width: 100%; height: 290px; display: block; }
@@ -1843,6 +1864,7 @@ def write_dashboard_html(path: Path, dashboard_data: Dict[str, Any]) -> None:
     a:hover { text-decoration: underline; }
     @media (max-width: 1120px) {
       .controls { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
+      .guide-grid { grid-template-columns: 1fr; }
       .kpis { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
       .layout, .grid2 { grid-template-columns: 1fr; }
     }
@@ -1851,25 +1873,31 @@ def write_dashboard_html(path: Path, dashboard_data: Dict[str, Any]) -> None:
 <body>
   <header>
     <h1>Judge Reassignment Analysis</h1>
-    <div class="subhead">Counterfactual assignment model for EWHC King's/Queen's Bench cases. Primary speed is hearing end to judgment date; scenarios preserve same-period judge capacity with configurable slack.</div>
+    <div class="subhead">Counterfactual assignment model for EWHC King's/Queen's Bench cases. Primary speed is the number of calendar days from hearing end to judgment.</div>
+    <div class="data-note" id="dataNote">Built from a cached BAILII sample; loading summary...</div>
   </header>
-  <div class="nav">
-    <span>BAILII Court Allocation</span>
-    <span>National Analysis</span>
-    <span>Judges</span>
-    <span>Topics</span>
-  </div>
   <main>
     <section class="controls">
       <div><label for="yearStart">Start year</label><select id="yearStart"></select></div>
       <div><label for="yearEnd">End year</label><select id="yearEnd"></select></div>
       <div><label for="court">Court</label><select id="court"><option value="all">All</option></select></div>
       <div><label for="topic">Topic</label><select id="topic"><option value="all">All</option></select></div>
-      <div><label for="minCases">Min judge cases (eligible)</label><input id="minCases" type="number" min="1" step="1" value="5" /></div>
-      <div><label for="capacitySlack">Capacity slack</label><input id="capacitySlack" type="number" min="0" max="1" step="0.01" value="0.10" /></div>
-      <div><label for="timeBucket">Time bucket</label><select id="timeBucket"><option value="year">Year</option><option value="quarter">Quarter</option><option value="month">Month</option></select></div>
-      <div><label for="modelView">Model view</label><select id="modelView"><option value="log">Log model</option><option value="raw">Raw-days model</option></select></div>
+      <div><label for="minCases">Min judge cases</label><input id="minCases" type="number" min="1" step="1" value="5" /><div class="control-help">Only judges with at least this many cases can receive reassigned cases.</div></div>
+      <div><label for="capacitySlack">Capacity slack</label><input id="capacitySlack" type="number" min="0" max="1" step="0.01" value="0.10" /><div class="control-help">Extra workload allowed above a judge's observed caseload in the same period.</div></div>
+      <div><label for="timeBucket">Time bucket</label><select id="timeBucket"><option value="year">Year</option><option value="quarter">Quarter</option><option value="month">Month</option></select><div class="control-help">Keeps reassignments within the same year, quarter, or month.</div></div>
+      <div><label for="modelView">Model view</label><select id="modelView"><option value="log">Log model</option><option value="raw">Raw-days model</option></select><div class="control-help">Log is the default because it reduces the pull of unusually long cases.</div></div>
       <div><label>&nbsp;</label><button id="applyFilters" type="button">Apply filters</button></div>
+    </section>
+    <section class="control-guide">
+      <h2>How to read the controls</h2>
+      <div class="guide-grid">
+        <div><strong>Year, court, and topic</strong> choose which cases are included in the scenario.</div>
+        <div><strong>Min judge cases</strong> prevents the model from moving cases to judges with very little observed data.</div>
+        <div><strong>Capacity slack</strong> controls how much additional work a judge may receive. A value of 0.10 means up to 10% more cases than that judge handled in the selected time bucket.</div>
+        <div><strong>Time bucket</strong> keeps assignments realistic by only moving cases among judges active in the same year, quarter, or month.</div>
+        <div><strong>Model view</strong> switches between the main log model and a raw-days comparison. Use the log model unless you specifically want day-for-day sensitivity to very long cases.</div>
+        <div><strong>Predicted savings</strong> means model-estimated hearing-to-judgment days saved, not guaranteed calendar time saved by the court.</div>
+      </div>
     </section>
 
     <section class="kpis">
@@ -2280,6 +2308,10 @@ def write_dashboard_html(path: Path, dashboard_data: Dict[str, Any]) -> None:
 
     function initControls() {
       const years = DATA.years || [];
+      const q = DATA.parse_quality || {};
+      document.getElementById("dataNote").textContent =
+        `Cached BAILII sample: ${q.raw_cases || 0} parsed cases, ${q.model_ready_cases || 0} model-ready cases. ` +
+        "BAILII currently blocks additional crawling, so this dashboard is limited to the available cache. Raw judgment text is not embedded in this page.";
       const yearStart = document.getElementById("yearStart");
       const yearEnd = document.getElementById("yearEnd");
       yearStart.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join("");

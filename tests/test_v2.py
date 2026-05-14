@@ -183,6 +183,9 @@ class DashboardTests(unittest.TestCase):
 
         self.assertIn('<script id="dashboard-data" type="application/json">', html)
         self.assertIn('"generated_at":"2026-05-14T00:00:00Z"', html)
+        self.assertIn("How to read the controls", html)
+        self.assertIn("Capacity slack", html)
+        self.assertNotIn("BAILII Court Allocation", html)
         self.assertNotIn('fetch("dashboard_data.json")', html)
 
 
